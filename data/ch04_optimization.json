@@ -1,0 +1,357 @@
+{
+  "id": "ch04",
+  "roman": "IV",
+  "title": "Optimization",
+  "blurb": "How networks actually learn: GD/SGD/Momentum/RMSprop/Adam, overfitting vs underfitting, the regularization toolbox (L1/L2, weight decay, dropout, early stopping), batch normalization, weight initialization, and transfer learning. The densest source of exam points.",
+  "knowledge_points": [
+    {
+      "id": "optimizers",
+      "title": "Optimization Algorithms (GD, SGD, Momentum, RMSprop, Adam)",
+      "recap": "**GD** updates $\\theta_{t+1}=\\theta_t-\\alpha\\frac{\\partial L}{\\partial\\theta_t}$ once per epoch (full dataset). **SGD** updates every mini-batch — faster, noisier (helps escape saddle points). **Momentum** accumulates a velocity to push through local minima/saddles. **RMSprop** adapts a per-parameter learning rate from gradient magnitudes. **Adam = Momentum + RMSprop** with bias correction. We always step in the **negative** gradient direction (steepest descent).",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 4,
+          "sources": ["Summary IV.4 Q1a", "Summary IV.4 Q1b", "SS20 P5e"],
+          "q": "What is the main difference between gradient descent (GD) and stochastic gradient descent (SGD)? Name two advantages of SGD.",
+          "answer": "**Difference:** GD performs the optimizer step **at the end of each epoch** (gradient over the whole training set); SGD performs a step **at every iteration / mini-batch**.\n**Advantages of SGD:** (1) more optimization steps per unit time → **converges faster**; (2) the **noisier** updates help **escape saddle points / local minima**.",
+          "extend": "Noise is a feature, not a bug: SGD's stochasticity is regularizing and helps escape flat/saddle regions where full-batch GD stalls."
+        },
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["Summary IV.4 Q1f", "Summary IV.4 Q1g", "SS20 P5f"],
+          "q": "What two optimizers does Adam combine? Why is SGD+Momentum usually better than plain SGD?",
+          "answer": "**Adam = RMSprop + Momentum** (adaptive per-parameter rates + velocity), plus bias correction.\n**SGD+Momentum** is usually better because momentum helps the optimizer **escape saddle points** and accelerate along consistent gradient directions, smoothing out noisy updates.",
+          "extend": "Momentum = exponential moving average of gradients (velocity). RMSprop = EMA of squared gradients (per-parameter scaling). Adam fuses both."
+        },
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["SS24 2.9", "Summary IV.4 Q1d", "Summary IV.4 Q1e"],
+          "q": "What is the bias correction in Adam (and why is it needed)? Do Adam with and without bias correction have different global minima?",
+          "answer": "Adam initializes the first/second moment estimates $m,v$ at **zero**, so early estimates are **biased toward zero**, making the first updates too small/ineffective. **Bias correction** $\\hat m=\\frac{m}{1-\\beta_1^k}$, $\\hat v=\\frac{v}{1-\\beta_2^k}$ rescales them so early steps are effective.\n**Global minimum:** unchanged (the loss/goal is the same) — bias correction only makes early convergence faster, though the path may end in a **different local minimum** (SS24 2.9; Summary IV.4 Q1e: *False* they differ in global minimum).",
+          "extend": "Bias correction matters most in the first few steps (when $\\beta^k$ is far from 0). RMSprop has no bias correction simply because Adam introduced it later."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary IV.4 Q1c", "Summary IV.4 Q1h"],
+          "q": "Why can we call RMSprop an *adaptive* optimizer? Why do we always step in the negative gradient direction, and how would you modify SGD to *maximize* the loss?",
+          "answer": "**Adaptive:** RMSprop adapts the learning rate **per parameter**, based on the running magnitude of that parameter's gradients (large gradients → smaller effective step).\n**Negative gradient:** the gradient points in the direction of steepest **ascent**; to minimize we go opposite. To **maximize**, flip the sign: $\\theta_{t+1}=\\theta_t + \\alpha\\frac{\\partial L}{\\partial\\theta_t}$ (gradient ascent).",
+          "extend": "Adaptive methods (RMSprop/Adam) normalize each dimension's step, so you don't need to hand-tune a single global rate for differently-scaled parameters."
+        },
+        {
+          "type": "mc",
+          "freq": 2,
+          "sources": ["SS21 1.2"],
+          "q": "In which cases would you usually reduce the learning rate when training a neural network?",
+          "options": [
+            {"text": "When the training loss stops decreasing.", "correct": true},
+            {"text": "To reduce memory consumption.", "correct": false},
+            {"text": "After increasing the mini-batch size.", "correct": false},
+            {"text": "After reducing the mini-batch size.", "correct": true}
+          ],
+          "answer": "Reduce the LR **when training loss plateaus** (LR scheduling/decay to fine-tune) and **after reducing the mini-batch size** (smaller batches → noisier gradients → a smaller step is safer). LR has nothing to do with memory; larger batches actually permit *larger* (not smaller) rates.",
+          "extend": "Batch size and learning rate scale together (roughly linearly): smaller batch → noisier → lower LR; larger batch → smoother → can raise LR."
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": ["SS21 1.5"],
+          "q": "Which are affected by multiplying the loss function by a constant positive value when using SGD?",
+          "options": [
+            {"text": "Memory consumption during training.", "correct": false},
+            {"text": "Magnitude of the gradient step.", "correct": true},
+            {"text": "Location of minima.", "correct": false},
+            {"text": "Number of mini-batches per epoch.", "correct": false}
+          ],
+          "answer": "Only the **magnitude of the gradient step** changes — scaling $L$ by $c$ scales $\\nabla L$ by $c$, so the step size scales too (equivalent to scaling the learning rate). The **location** of the minima, memory, and batch count are unaffected.",
+          "extend": "Scaling the loss ≡ scaling the LR. The argmin doesn't move, but your effective step does — a subtle but common exam point."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["SS20 P5g", "SS20 P5h", "SS20 P5i"],
+          "q": "(a) Why use larger mini-batches in SGD? (b) Why do we usually use small mini-batches in practice? (c) Name an optimizer using both first and second order moments.",
+          "answer": "(a) Larger mini-batches make the **gradients less noisy** (better estimate of the true gradient).\n(b) We use small mini-batches because of **limited GPU memory** (note: 'faster computation' alone scores 0).\n(c) **Adam** (first moment = momentum, second moment = RMSprop-style).",
+          "extend": "Batch-size trade-off: bigger = smoother gradients but more memory & sometimes worse generalization; smaller = noisier (regularizing) and memory-friendly."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "You switch from SGD to Adam and training loss drops fast but validation generalization is slightly worse. Give a plausible reason and a common remedy.",
+          "answer": "Adam's adaptive per-parameter steps can converge to **sharper minima** that generalize a little worse than SGD+momentum's flatter solutions. Remedies: use **SGD+momentum with a schedule** for the final phase, add **weight decay** (AdamW), or tune the learning rate / use warmup.",
+          "extend": "A known empirical pattern: Adam trains faster, SGD+momentum often generalizes better on vision. AdamW (decoupled weight decay) narrows the gap."
+        }
+      ]
+    },
+    {
+      "id": "over-underfitting",
+      "title": "Overfitting & Underfitting",
+      "recap": "**Overfitting:** great on training data, poor on unseen data (train loss ≪ val loss; val loss rises). **Underfitting:** poor even on training data (both losses high/plateau). The one-word go-to fix for overfitting: **regularization**. Detect via the train/val loss curves.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["Summary IV.4 Q2a", "Summary IV.4 Q2b", "Summary IV.4 Q2e", "WS22 8.2"],
+          "q": "Define overfitting and underfitting in one sentence each. In a single word, what is the go-to solution to overfitting? How do the loss curves look?",
+          "answer": "**Overfitting:** the model performs too well on training data but fails to generalize to unseen data (train loss keeps dropping while val loss rises). **Underfitting:** the model fails to perform well even on training data (both curves stay high / plateau). **Go-to solution:** **Regularization**.",
+          "extend": "Curve signatures: overfitting = diverging train/val gap (val turns up); underfitting = both high and flat. Label your axes & both curves to earn the marks."
+        },
+        {
+          "type": "mc",
+          "freq": 2,
+          "sources": ["SS24 1.4"],
+          "q": "Which statements about loss curves, overfitting and underfitting are correct?",
+          "options": [
+            {"text": "Underfitting is indicated by high training loss and high validation loss.", "correct": true},
+            {"text": "Overfitting occurs when both training and validation loss are high.", "correct": false},
+            {"text": "A model is underfitting if training loss is low and validation loss is high.", "correct": false},
+            {"text": "Consistently decreasing train AND validation loss indicates overfitting.", "correct": false}
+          ],
+          "answer": "Only **'underfitting = high train + high val loss'** is correct. Overfitting is **low train, high val** (a growing gap); both-decreasing curves indicate **healthy** training, not overfitting.",
+          "extend": "Map the 2×2: low/low = good, low/high = overfit, high/high = underfit, high/low = (usually a bug or distribution mismatch)."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary IV.4 Q2c", "Summary IV.4 Q2d"],
+          "q": "State two behaviours that indicate underfitting. State a possible reason for validation loss being *lower* than training loss.",
+          "answer": "**Underfitting signs:** the training loss is still decreasing when training stops (not trained enough/too low capacity); the **training accuracy is very low**.\n**Val < train loss reasons:** the validation set is **easier** than the training set; the model is still in the **underfitting** phase early in training; or a **bug** (e.g. dropout/augmentation active in training only).",
+          "extend": "Cross-links to Ch I: dropout & augmentation are *on* during training and *off* at validation, which can legitimately push val loss below train loss."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["SS24 1.6"],
+          "q": "Your cat-species classifier gets low training error but high validation error. What is happening and what helps?",
+          "answer": "Classic **overfitting** (memorizing training data, failing to generalize). Remedies: more data / **data augmentation**, **regularization** (dropout, weight decay), early stopping, or a smaller model.",
+          "extend": "Low-train/high-val is the textbook overfitting signature. Attack it with regularization + more (or augmented) data."
+        }
+      ]
+    },
+    {
+      "id": "regularization",
+      "title": "Regularization (L1/L2, Weight Decay, Dropout, Early Stopping)",
+      "recap": "A regularization term makes training *harder* to force generalization. **L1** pushes weights to exactly zero (sparsity); **L2** shrinks all weights toward (but not to) zero. **Weight decay** is L2 applied in the optimizer step (scaled by LR). **Dropout** randomly drops neurons during training (an ensemble); at inference scale by $p_{keep}$ (or use inverse dropout during training). **Data augmentation** is regularization; **early stopping** is debatable (it just halts, doesn't make training harder).",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["Summary IV.4 Q3b", "Summary IV.4 Q3c"],
+          "q": "What is the effect of L1 vs L2 regularization on the weights? What are the differences between L1/L2 regularization terms and 'weight decay'?",
+          "answer": "**L1** pushes some weights to **exactly zero** → sparse weights. **L2** spreads the penalty so **all** weights become smaller, but not necessarily zero.\n**vs weight decay:** (1) L1/L2 terms are added to the **loss function**, whereas weight decay is added directly to the **optimizer step**; (2) in weight decay the term is also scaled by the **learning rate**, mitigating the effect of its magnitude.",
+          "extend": "L1 → feature selection / sparsity; L2 → smooth small weights. Weight decay ≈ L2 but decoupled into the update rule (this is the AdamW distinction)."
+        },
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["Summary IV.4 Q3e", "Summary IV.4 Q3d", "WS22 1.8"],
+          "q": "Explain how dropout works during training and inference (mind the definition of $p$). How do we avoid dropout's computational overhead at inference? Why is dropout an ensemble?",
+          "answer": "**Training:** at each iteration, drop neurons/channels with probability $p_{drop}$. **Inference:** keep all neurons but scale activations by $p_{keep}$: $x^\\star = x\\cdot p_{keep}$ (to match expected magnitudes).\n**Avoid overhead:** use **inverse dropout** — scale the surviving neurons by $1/p_{keep}$ already **during training**, so inference needs no scaling.\n**Ensemble:** each dropout mask defines a different sub-network, so training with dropout ≈ training an **ensemble** of exponentially many shared-weight networks.",
+          "extend": "$p_{keep}=1-p_{drop}$. Inverse dropout is what frameworks use so test-time is a plain forward pass."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary IV.4 Q3f", "Summary IV.4 Q3g"],
+          "q": "Why is data augmentation a regularization technique? Why is early stopping *not* really one?",
+          "answer": "**Data augmentation** virtually increases the training-set size and variety, making training **harder** and forcing the model to learn more general patterns → regularization.\n**Early stopping** doesn't make training harder; it merely **halts** when the generalization gap starts to grow. It doesn't fix overfitting, just prevents the current weights from getting worse (saving checkpoints is a better approach).",
+          "extend": "Regularization (in the strict I2DL definition) = anything that makes training *harder* to improve generalization. Augmentation qualifies; early stopping is borderline."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary IV.4 Q3a"],
+          "q": "The term 'regularization term' is ambiguous — what are its two usages?",
+          "answer": "(1) A term that makes training **harder**, forcing the network to generalize better (the go-to exam definition). (2) A term representing an **additional objective** added to the training process (e.g. a task-specific penalty).",
+          "extend": "Usage (1) is the generalization sense (dropout, L2, augmentation); usage (2) is the 'extra loss term' sense (e.g. KL term in a VAE)."
+        },
+        {
+          "type": "mc",
+          "freq": 2,
+          "sources": ["WS22 1.8"],
+          "q": "Dropout...",
+          "options": [
+            {"text": "... makes your network train faster.", "correct": false},
+            {"text": "... can be seen as an ensemble of networks.", "correct": true},
+            {"text": "... is an efficient way for regularization.", "correct": true},
+            {"text": "... has trouble with tanh activations.", "correct": false}
+          ],
+          "answer": "Dropout **is an ensemble of (sub-)networks** and an **efficient regularizer**. It does **not** speed up training (it can slow convergence), and it is activation-agnostic (no special problem with tanh).",
+          "extend": "Each mini-batch trains a different randomly-thinned network; averaging them at test time (via $p_{keep}$ scaling) is the ensemble effect."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["SS20 P8e"],
+          "q": "Why is L2-regularization often called 'weight decay'? Derive the update rule.",
+          "answer": "Adding $\\frac{\\lambda}{2}\\lVert\\theta\\rVert^2$ to the loss gives gradient contribution $\\lambda\\theta$, so the GD update becomes $\\theta_{k+1}=\\theta_k-\\alpha(\\nabla L(\\theta_k)+\\lambda\\theta_k)=(1-\\alpha\\lambda)\\theta_k-\\alpha\\nabla L(\\theta_k)$. The factor $(1-\\alpha\\lambda)<1$ **shrinks ('decays') the weights** every step — hence 'weight decay'.",
+          "extend": "The $(1-\\alpha\\lambda)$ multiplicative shrink is the literal 'decay'. This is exactly L2 for vanilla SGD (decoupled in AdamW)."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "You apply dropout with $p_{drop}=0.5$ but forget to scale at inference (no inverse dropout). What happens to the outputs and how do you fix it?",
+          "answer": "At inference all neurons are active, so the expected pre-activations are roughly **2× too large** (since only half were active during training). Fix by **scaling activations by $p_{keep}=0.5$ at test time**, or use **inverse dropout** (scale by $1/p_{keep}$ during training) so test-time needs no change.",
+          "extend": "The scaling keeps the expected activation magnitude consistent between train and test — skip it and every downstream layer sees an unexpected distribution shift."
+        }
+      ]
+    },
+    {
+      "id": "batchnorm",
+      "title": "Batch Normalization",
+      "recap": "BN normalizes a layer's activations: $y=\\gamma\\,x_{norm}+\\beta$ with learnable $\\gamma,\\beta$ (length = #channels/features). It stabilizes/ speeds training, reduces sensitivity to initialization, mitigates vanishing/exploding gradients, and mildly regularizes. At **test time** it uses **running (cached) mean & variance** from training since there's no batch. In a CNN (shape B×C×H×W) statistics are per-channel → $\\gamma,\\beta\\in\\mathbb{R}^{C}$.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 4,
+          "sources": ["SS20 P3a", "SS22 7.1", "Summary IV.4 Q4d"],
+          "q": "Why is it useful to apply batch normalization after a linear (FC/conv) layer? What optimization problems does it help with?",
+          "answer": "BN normalizes the layer inputs so each layer receives **stable, well-scaled** activations (mitigating internal covariate shift). Benefits: **faster/more stable training**, **less sensitivity to initialization**, efficient backprop, and it helps with the **vanishing/exploding gradient** problems by keeping activations from blowing up or shrinking.",
+          "extend": "BN keeps activations zero-mean/unit-variance per channel before the learnable rescale — the same 'keep signals in a healthy range' motivation as input normalization (Ch I)."
+        },
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["SS22 7.2", "SS20 P3b", "WS26 P3i"],
+          "q": "What are $\\gamma$ and $\\beta$ in batch normalization and what is their purpose? How can BN represent the identity (undo normalization)?",
+          "answer": "$\\gamma$ (scale) and $\\beta$ (shift) are **learnable parameters** that let the network **undo** the normalization if needed: $y=\\gamma\\,x_{norm}+\\beta$. Setting $\\gamma=\\sqrt{\\text{Var}(x)}$ (i.e. $\\sigma$) and $\\beta=\\mu$ (the original mean) recovers $y=x$ — the identity. Their purpose is to preserve the layer's representational power.",
+          "extend": "Without $\\gamma,\\beta$, BN would force every layer's output to zero-mean/unit-variance, removing useful scale/shift. The learnable pair restores flexibility, including the identity."
+        },
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["SS20 P3c", "SS24 2.10", "Summary IV.4 Q4c"],
+          "q": "How is BN applied at training vs test time? Which variables must be cached and why (for a CNN input B×C×H×W)?",
+          "answer": "**Training:** normalize using the **current mini-batch** mean & variance, then apply $\\gamma,\\beta$; also update **running averages** of mean/variance.\n**Test:** use the **cached running mean & variance** (a single sample has no batch to compute statistics from), giving deterministic, consistent outputs.\n**Cached variables (CNN):** mean and variance of shape $[C]$ (per channel), since BN in a CNN normalizes over B,H,W per channel.",
+          "extend": "Per-channel stats: for B×C×H×W, BN reduces over (B,H,W) → C means and C variances. Caching them avoids test-time dependence on batch composition."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["SS21 2.13"],
+          "q": "How is batch normalization applied differently between a fully-connected and a convolutional layer? How many learnable parameters does BN have?",
+          "answer": "**FC layer:** normalize over the batch for **each neuron** → statistics per feature; $\\gamma,\\beta$ have length $D$ (number of features).\n**Conv layer:** normalize over batch **and spatial dims** for **each channel** → statistics per channel; $\\gamma,\\beta$ have length $C$ (number of channels).\nLearnable parameters $=2\\times(\\text{features or channels})$ (one $\\gamma$ and one $\\beta$ each).",
+          "extend": "Key difference: conv-BN shares stats across all spatial positions of a channel (translation consistency), FC-BN is per-neuron."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["SS22 7.4", "Summary IV.4 Q4b"],
+          "q": "What is the consequence of a small batch size on a batch-normalization layer? Why is BN sometimes called a regularizer?",
+          "answer": "With a **small batch**, the mini-batch mean/variance are **noisy/inaccurate** estimates of the true statistics, so normalization becomes unstable and training quality degrades.\nThat same noise is why BN **mildly regularizes**: small-batch statistical noise injects randomness into the updates (like a weak dropout), improving generalization — but BN shouldn't be your primary regularizer.",
+          "extend": "Small-batch BN is unreliable → use GroupNorm/LayerNorm when batches must be tiny. The noise is a side-effect, not a substitute for dropout/weight decay."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["Summary IV.4 Q4a"],
+          "q": "For BN $y=\\gamma\\,x_{norm}+\\beta$ after an FC layer with output $8\\times16$: what are the dimensions of $\\gamma,\\beta$, and what are $\\frac{\\partial L}{\\partial\\gamma},\\frac{\\partial L}{\\partial\\beta}$?",
+          "answer": "$\\gamma,\\beta\\in\\mathbb{R}^{1\\times16}$ (one per feature). Gradients (summing over the batch of $N=8$):\n$\\frac{\\partial L}{\\partial\\gamma}=\\sum_n \\big(\\text{dout}\\odot x_{norm}\\big) = $ `np.sum(dout * x_norm, axis=0)`,\n$\\frac{\\partial L}{\\partial\\beta}=\\sum_n \\text{dout} = $ `np.sum(dout, axis=0)`.",
+          "extend": "Because $\\gamma,\\beta$ are broadcast across the batch, their gradients sum the upstream gradient over the batch dimension (axis 0)."
+        }
+      ]
+    },
+    {
+      "id": "weight-init",
+      "title": "Weight Initialization (Xavier / He)",
+      "recap": "Good init keeps activation/gradient variance stable across layers. **Xavier/Glorot** suits tanh/sigmoid; **He/Kaiming** $W\\sim\\mathcal{N}(0,\\frac{2}{n_{in}})$ suits ReLU and prevents dead units. Never initialize all weights to the **same value** (symmetry → all neurons learn identically).",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["SS21 2.4", "Summary IV.4 Q6a"],
+          "q": "What weight-initialization scheme fits ReLU, and how does it affect the activations? What variance does Xavier give?",
+          "answer": "**He/Kaiming initialization** $W\\sim\\mathcal{N}\\!\\big(0,\\frac{2}{n_{in}}\\big)$ (a ReLU-tuned variant of Xavier) keeps the **variance of activations stable across layers** and prevents the **dead-ReLU** problem. Xavier keeps $\\text{Var}(X_L)=\\text{Var}(X_{L+1})$ so signal magnitude is preserved forward (and gradients backward).",
+          "extend": "ReLU halves the variance (zeros out negatives), so He uses $2/n_{in}$ to compensate; Xavier ($1/n_{in}$-style) is for symmetric activations (tanh)."
+        },
+        {
+          "type": "mc",
+          "freq": 2,
+          "sources": ["SS22 1.8"],
+          "q": "What is true about Xavier initialization? (Each FC layer: input $X$, weights $W$, bias $b$.)",
+          "options": [
+            {"text": "$\\text{Var}(X_L) = \\text{Var}(X_{L+1})$", "correct": true},
+            {"text": "$\\text{Var}(W_{L-1}) = \\text{Var}(W_L)$", "correct": false},
+            {"text": "$\\text{Var}(X_L) = \\text{Var}(W_L)$", "correct": false},
+            {"text": "$\\text{Var}(W_L)=\\frac{1}{m}$, where $m$ is the number of columns of $W_L$.", "correct": false}
+          ],
+          "answer": "The defining property is **$\\text{Var}(X_L)=\\text{Var}(X_{L+1})$** — Xavier preserves activation variance from layer to layer. The other statements misstate which variances are equal or the exact $\\frac{1}{n}$ factor (it's based on $n_{in}$/fan-in, not 'columns').",
+          "extend": "Xavier's goal: signal neither explodes nor vanishes as it flows through layers. That's a statement about **activation** variance across layers, not weight variances."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary IV.4 Q6b", "SS22 1.9"],
+          "q": "What happens if we initialize all weights of the model to the same value?",
+          "answer": "**Symmetry is never broken:** neurons in a layer receive identical gradients and update identically, so they all learn the **same features** — the network cannot learn complex patterns. Weights must be sampled **randomly** from some distribution.",
+          "extend": "Random init breaks symmetry so different neurons specialize. All-equal (or all-zero) weights collapse a layer to a single effective neuron."
+        }
+      ]
+    },
+    {
+      "id": "hyperparams-lr",
+      "title": "Hyperparameter Tuning & Learning Rate",
+      "recap": "**Grid search** is simple but its cost explodes with the search-space size (curse of dimensionality) — random search is often more efficient. **Learning rate** is the key hyperparameter: too high → divergence; too low → painfully slow convergence. LR schedules decay the rate over training.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["SS20 P5j", "Summary IV.4 Q5a"],
+          "q": "Name a problem from a learning rate that is too high, and one from a rate that is too low. What is the main bottleneck of grid search?",
+          "answer": "**Too high:** the cost function does not converge and can even **diverge**. **Too low:** it converges very slowly (or gets stuck), taking a very long time.\n**Grid search bottleneck:** the search space grows exponentially with the number of hyperparameters, and each configuration needs a full (expensive) training run — impractical for large spaces.",
+          "extend": "LR is the single most important hyperparameter. Grid search scales as (values)^(params) → use random/Bayesian search for many hyperparameters."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["SS20 P5e", "SS20 P5d"],
+          "q": "What is a saddle point and the problem with GD there? How does SGD help?",
+          "answer": "At a **saddle point** the gradient is (near) **zero** but it is not a minimum, so plain GD **gets stuck** (no update direction). **SGD's noisier updates** can knock the optimizer out of the saddle/flat region and let it continue descending.",
+          "extend": "High-dimensional loss surfaces have far more saddles than local minima; noise (SGD) and momentum are the standard escapes."
+        }
+      ]
+    },
+    {
+      "id": "transfer-learning",
+      "title": "Transfer Learning",
+      "recap": "Reuse a model pre-trained on a large dataset as a backbone, then fine-tune on a smaller target dataset. Early layers learn generic low-level features (reusable); later layers are task-specific. Useful when labeled target data is limited.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary IV.4 Q7a", "SS24 4.5"],
+          "q": "Describe a scenario from the exercises where transfer learning was used, and how.",
+          "answer": "**Autoencoder pre-training:** train an autoencoder **unsupervised** to reconstruct a large *unlabeled* dataset, yielding an encoder that is a good **feature extractor**. Then remove the decoder, attach a small **classifier**, and train it on the smaller **labeled** dataset — transferring the representation learned from the big dataset.\n(Also: use a pre-trained network as a **backbone** for a segmentation/classification task and fine-tune.)",
+          "extend": "Two flavours: self-supervised pre-training (autoencoder) → fine-tune; or take a pretrained backbone, replace the head, freeze early layers, train on new data."
+        },
+        {
+          "type": "mc",
+          "freq": 2,
+          "sources": ["WS24 1.1"],
+          "q": "Which statements about transfer learning are true?",
+          "options": [
+            {"text": "It always involves fine-tuning all layers of the pre-trained model.", "correct": false},
+            {"text": "It can be applied to tasks with limited labeled data.", "correct": true},
+            {"text": "A pre-trained model used in the new task should be trained on similar data.", "correct": false},
+            {"text": "It can significantly reduce training time for a new task.", "correct": true}
+          ],
+          "answer": "**True:** transfer learning helps when **labeled data is limited** and **reduces training time**. **False:** you often **freeze** early layers (not fine-tune all), and the source data doesn't have to be *similar* — early-layer features (edges/textures) are generic and transfer broadly.",
+          "extend": "Common recipe: freeze the pretrained backbone, replace the final layer to match new classes, train just the head (cheap), optionally unfreeze for fine-tuning."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["SS24 4.6", "SS24 4.7"],
+          "q": "How do you adapt a pre-trained AlexNet (1000-class output) as a backbone for a 3-class classifier efficiently? Would you reuse a car-brand classifier for an animal task?",
+          "answer": "**Adapt AlexNet:** resize inputs to its expected size; **replace the last dense layer** with one matching 3 classes; **freeze** the pretrained weights for efficiency; train on the new data.\n**Car-brand → animals:** *No* — it learned car-specific high-level features, so it won't generalize; *or Yes* if you reuse only the **early layers** (generic low-level features) and retrain the rest.",
+          "extend": "Reusability decreases with depth: early conv layers (edges) transfer anywhere; the final layers are tied to the source task."
+        }
+      ]
+    }
+  ]
+}
