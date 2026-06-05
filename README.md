@@ -36,5 +36,21 @@ python tools/check_math.py # validate KaTeX delimiters / macros
 Content lives in `data/*.json`; `build.py` is the generator. To add a chapter, drop a
 `data/chXX_*.json` file and flip its `status` to `ready` in `data/chapters.json`.
 
+`python tools/check_sources.py` cross-checks every `SSyy x.y` citation against the original
+exam text, so a wrong reference (e.g. `SS20 P6b` vs `P7b`) is caught automatically.
+
+## Deploy (GitHub Pages)
+One-time GitHub login (only you can do this — GitHub security):
+
+```powershell
+& "C:\Program Files\GitHub CLI\gh.exe" auth login   # GitHub.com → HTTPS → web browser
+```
+
+Then publish (creates the repo, pushes, enables Pages, prints the URL):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\deploy.ps1
+```
+
 ---
 *For personal revision. Answers follow the official I2DL sample solutions; AI-generated items are marked and intended only as extra practice.*

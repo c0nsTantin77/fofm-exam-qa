@@ -133,7 +133,9 @@ def render_question(q) -> str:
         f"</div>"
     )
 
-    qbody = f"<div class='q-text'>{md_inline(q['q'])}</div>"
+    # md_block so questions that embed a ```code``` snippet render properly
+    qrender = md_block(q["q"]) if "```" in q["q"] else md_inline(q["q"])
+    qbody = f"<div class='q-text'>{qrender}</div>"
 
     # options for MC are shown with the answer (so it stays a quiz until opened)
     inner = []

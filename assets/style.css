@@ -122,6 +122,8 @@ details.q[open]{border-color:#bcd4f0}
 .src-ai{background:#e6fcf5;color:var(--ai);border:1px dashed var(--ai)}
 .q-text{font-weight:600;font-size:.98rem}
 .q-text code{font-weight:500}
+.q-text p{margin:0}
+.q-text pre.code{font-weight:400;margin:.5em 0 0}
 .badge{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px;color:#fff}
 .freq-hot{background:var(--hot)}
 .freq-mid{background:var(--mid)}
