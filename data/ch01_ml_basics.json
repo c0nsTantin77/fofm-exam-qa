@@ -1,0 +1,438 @@
+{
+  "id": "ch01",
+  "roman": "I",
+  "title": "Machine Learning Basics",
+  "blurb": "Tasks in ML (supervised/unsupervised, classification/regression), datasets & dataloaders, data splits, augmentation, and preprocessing. The single most frequently examined warm-up topic — almost every exam opens here.",
+  "knowledge_points": [
+    {
+      "id": "tasks",
+      "title": "Learning Paradigms & Task Types",
+      "recap": "**Supervised**: trained on data **with** ground-truth labels (classes, depth values, key-points, next token). **Unsupervised**: trained on data **without** labels; the model finds structure (clustering, dimensionality reduction, generative). **Classification** = discrete target (assign input to one of $C$ classes; also per-pixel for semantic segmentation). **Regression** = continuous target (depth estimation, facial key-points).",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 6,
+          "sources": ["Summary I.3 Q1", "Summary I.3 Q2"],
+          "q": "What is the difference between (a) supervised and unsupervised learning, and (b) classification and regression?",
+          "answer": "**Supervised vs unsupervised:** Supervised learning trains on data with a fixed ground truth relative to the task (classes for classification, depth values for depth estimation, key-points, next letter). Unsupervised learning trains on data **without any ground truth**; the model finds patterns usable for clustering, dimensionality reduction or generative tasks.\n\n**Classification vs regression:** Classification is a **discrete** goal — assign the input to one of $C$ classes (incl. semantic segmentation, one class per pixel). Regression is a **continuous** goal — predict a continuous value, bounded or unbounded (depth estimation, facial key-point detection).",
+          "extend": "Memory hook: *label present → supervised; output countable → classification*. Semantic segmentation is classification done per-pixel and is **supervised** (needs labels) — a common trap (see SS23 1.6)."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["SS22 4.11"],
+          "q": "A digit-sum task is solved as classification (19 output neurons). A friend suggests treating it as a regression task instead. Name two required changes to the network.",
+          "answer": "(1p) Use **1 output neuron** instead of 19, because regression predicts a single continuous value.\n(1p) Change the **loss function** to a regression loss: **MSE (L2)** or **L1**.",
+          "extend": "Classification→regression checklist: output dim → 1 (or target dim), softmax/CE → MSE/L1, and drop the final softmax. The output is no longer a probability over classes."
+        },
+        {
+          "type": "mc",
+          "freq": 2,
+          "sources": ["SS20 1f"],
+          "q": "Logistic regression (check all that apply).",
+          "options": [
+            {"text": "Is a linear function.", "correct": true},
+            {"text": "Is a supervised learning algorithm.", "correct": true},
+            {"text": "Uses a type of cross-entropy loss.", "correct": true},
+            {"text": "Allows to perform binary classification.", "correct": true}
+          ],
+          "answer": "All four are correct. Despite the name “regression”, logistic regression is a **linear, supervised, binary classifier** trained with (binary) cross-entropy.",
+          "extend": "Don't be fooled by the word *regression*: logistic regression outputs a probability via sigmoid and is used for **classification**. The decision boundary is linear in the inputs."
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": ["SS23 1.6"],
+          "q": "Which of the following statements are true about Semantic Segmentation?",
+          "options": [
+            {"text": "Semantic segmentation is an unsupervised technique that does not require labeled training data.", "correct": false},
+            {"text": "It classifies whole images into broad categories ('dog','cat','car') without pixel-level precision.", "correct": false},
+            {"text": "One architecture works for any number of classes without any change.", "correct": false},
+            {"text": "Its precision can be influenced by variations in lighting conditions and image quality.", "correct": true}
+          ],
+          "answer": "Only the last is true. Semantic segmentation is **supervised** (needs per-pixel labels), produces **pixel-level** predictions, and the output layer depends on the number of classes (so it is **not** class-count agnostic).",
+          "extend": "Segmentation = per-pixel classification → supervised. The number of output channels equals the number of classes, so changing class count changes the architecture."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "For each task, state whether it is supervised or unsupervised, and classification or regression: (a) predicting house price from features, (b) grouping customers into segments with no labels, (c) labeling each pixel of a street scene as road/car/pedestrian.",
+          "answer": "(a) **Supervised regression** — continuous price target with ground truth.\n(b) **Unsupervised** (clustering, e.g. K-means) — no labels, neither classification nor regression in the supervised sense.\n(c) **Supervised classification** (semantic segmentation, per-pixel).",
+          "extend": "Two independent axes: *supervision* (labels?) and *output type* (discrete vs continuous). Clustering sits outside the classification/regression dichotomy because it has no target."
+        }
+      ]
+    },
+    {
+      "id": "unsupervised-methods",
+      "title": "Unsupervised Methods: K-means, PCA, Autoencoders",
+      "recap": "Classic unsupervised algorithms. **K-means**: iteratively assign each point to the nearest cluster centre, then recompute centres; key hyperparameter $K$. **PCA**: *linear* dimensionality reduction keeping the most informative directions. **Autoencoder**: a *non-linear* neural alternative for dimensionality reduction / feature learning — encoder compresses to a bottleneck $z$, decoder reconstructs; trained with reconstruction (e.g. L2) loss, **no labels needed**.",
+      "questions": [
+        {
+          "type": "mc",
+          "freq": 3,
+          "sources": ["WS22 1.9", "SS21 1.1"],
+          "q": "Which of the following methods can be used in / are unsupervised learning?",
+          "options": [
+            {"text": "Autoencoder", "correct": true},
+            {"text": "PCA", "correct": true},
+            {"text": "K-means", "correct": true},
+            {"text": "Linear Regression", "correct": false},
+            {"text": "Maximum Likelihood Estimate", "correct": false}
+          ],
+          "answer": "Unsupervised: **Autoencoder, PCA, K-means**. **Linear regression** and **MLE/supervised classifiers** are supervised (they need targets). (Merged from WS22 1.9 and SS21 1.1, which share the same answer set.)",
+          "extend": "The three canonical I2DL unsupervised methods: K-means (clustering), PCA (linear dim-reduction), Autoencoder (non-linear dim-reduction / representation). Anything fitting an input→target mapping (linear/logistic regression) is supervised."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary I.3 Q5"],
+          "q": "K-means: (a) What is the algorithm? (b) What is its key hyperparameter? (c) What are the consequences of a too small or too large value?",
+          "answer": "(a) An unsupervised algorithm clustering data into $K$ clusters. **Iterative**: assign each point to the closest cluster centre, then recompute each centre; repeat until convergence.\n(b) The **number of clusters $K$**.\n(c) Too small $K$ → merges dissimilar clusters (**underfitting**); too large $K$ → splits similar clusters (**overfitting**).",
+          "extend": "K-means alternates an assignment step and an update step (a special case of EM). It only finds a local optimum, so initialization matters; result depends on $K$ and the distance metric."
+        },
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["SS20 P6b", "Summary I.3 Q6"],
+          "q": "How does an autoencoder differ from a linear dimensionality-reduction method such as PCA? Why is the deep method often preferable for real-world problems?",
+          "answer": "(1p) An autoencoder is built from neural networks **containing non-linearities**, so it is a **non-linear** function; PCA is **linear**. Because real data has non-linear structure, the autoencoder can learn richer, non-linear features useful for downstream tasks (classification, regression).\n\n*Note (SS20):* no point if you only say “parameters” or “conv layers” — the discriminating fact is **non-linearity**.",
+          "extend": "PCA ≈ a linear autoencoder with tied weights and MSE loss. Adding non-linear activations is exactly what lets an autoencoder capture curved manifolds PCA cannot."
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": ["SS23 1.1"],
+          "q": "Which of the following statements are true about Autoencoders?",
+          "options": [
+            {"text": "Only usable for image data, not other data types.", "correct": false},
+            {"text": "Autoencoders can be used for dimensionality reduction.", "correct": true},
+            {"text": "Autoencoders require labeled training data.", "correct": false},
+            {"text": "Autoencoders can be trained without a loss function.", "correct": false}
+          ],
+          "answer": "Only **“can be used for dimensionality reduction”** is true. Autoencoders work on any data type, are **unsupervised** (no labels — the input is its own target), and are trained with a **reconstruction loss** (e.g. L2).",
+          "extend": "Autoencoder bottleneck = learned low-dimensional code → dimensionality reduction / compression. “Self-supervised”: the label is the input itself."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["SS22 5.3", "SS22 5.4", "SS24 4.5"],
+          "q": "You have a large dataset but only a small fraction is labeled. Explain how an autoencoder lets you exploit the unlabeled data (and how this differs from training a classifier).",
+          "answer": "(1p) Main difference: training an autoencoder needs **no ground-truth labels** (unsupervised) vs a classifier (supervised).\n(1p) Train an autoencoder on the **whole unlabeled dataset** for reconstruction.\n(1p) Take the **encoder**, add classification layers, and **fine-tune** on the small labeled set.\n\n*Equivalent (SS24 4.5):* build/train the backbone yourself via an autoencoder (or other self-supervised method) on the 1M unlabeled images, then use it for transfer learning.",
+          "extend": "This is the classic *unsupervised pre-training → supervised fine-tuning* recipe. The encoder becomes a feature extractor learned for free from unlabeled data."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "You run K-means with K=1 and again with K=N (number of points). What does each degenerate case produce, and what does it tell you about choosing K?",
+          "answer": "$K=1$: every point in one cluster → the centre is the global mean; zero discrimination (extreme underfitting). $K=N$: every point is its own cluster → zero within-cluster distance but no generalization (extreme overfitting). → $K$ trades off bias and variance; use domain knowledge or an elbow/silhouette criterion.",
+          "extend": "Within-cluster distortion monotonically decreases as $K$ grows, so you cannot pick $K$ by minimizing it — hence the elbow method."
+        }
+      ]
+    },
+    {
+      "id": "splits",
+      "title": "Dataset Splits & the Validation Set",
+      "recap": "Split into **train / validation / test**. Train (largest, $>50\\%$) is the only data the model fits. Validation (unseen) detects over/underfitting and tunes hyperparameters **during** training. Test is the final, kept-unbiased estimate of generalization — ideally used once. Common ratios: $\\{80,10,10\\}\\%$, $\\{70,15,15\\}\\%$.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 4,
+          "sources": ["SS24 4.1", "SS20 P5a", "WS26 P3a", "Summary I.3 Q7b/c"],
+          "q": "How would you split your dataset? Give meaningful percentages and justify the largest split.",
+          "answer": "Mention **all three** splits: **training, validation, test** (0.5p). Give meaningful percentages with **training $>50\\%$** (0.5p), e.g. validation 10–20%, test 10–20% — common ratios $\\{80,10,10\\}$ or $\\{70,15,15\\}$. The **training set is the largest** because it is the only data the model is actually trained on.",
+          "extend": "Scoring points are identical across SS20/SS24/WS26: (1) name all three splits, (2) training must be the majority. You can relax toward more even ratios when the dataset is large and overfitting is not a concern."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["SS22 2.10", "SS22 2.11"],
+          "q": "A teammate suggests merging the validation set into the training set to make it bigger. What is the purpose of the validation set, and what problem will appear (and how does the validation set help avoid it)?",
+          "answer": "**Purpose (1p):** a sanity check — the validation set is **unseen data** used to determine whether the model has **overfitted or underfitted** (and to tune hyperparameters), without touching the test set.\n**If you merge it (1p):** training loss keeps dropping but test error is high → **overfitting**. The fix enabled by a validation set is **early stopping** (stop when validation loss stops improving).",
+          "extend": "Without a validation set you lose your in-training overfitting detector. Don't sacrifice it for marginally more training data — you'd be flying blind."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["Summary I.3 Q8"],
+          "q": "Why not put the validation set into the training set and just use the test set for validation?",
+          "answer": "Without a validation set we **cannot detect overfitting during training**. The test set has the distinct purpose of being the most **unbiased, truly-unseen** segment, used (ideally once) to report final generalization — it must **not** drive training decisions, or it stops being unbiased.",
+          "extend": "Three roles: train = fit, validation = tune/monitor, test = final unbiased report. Reusing test for tuning leaks information and inflates your reported score."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["WS21 2.1"],
+          "q": "In k-fold cross-validation, a larger k increases confidence in the validation score. What is a practical disadvantage, and why does it arise?",
+          "answer": "(1p) **Higher training time / more computation.** (1p) More folds means the model is **retrained and revalidated k times** on nearly the full dataset, so wall-clock cost grows roughly linearly with $k$ (leave-one-out, $k=N$, is the extreme).",
+          "extend": "Cross-validation trades compute for a lower-variance estimate of generalization — valuable on small datasets, expensive on large deep-learning ones (so rarely used for big nets)."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "You report a model's accuracy by picking the epoch with the best *test* accuracy. Why is the reported number optimistically biased, and what should you have done?",
+          "answer": "Selecting the epoch by test performance turns the test set into a **tuning signal**, so it is no longer unseen — the reported accuracy overestimates true generalization. You should select the best epoch on the **validation** set (early stopping) and evaluate the chosen model on test **once**.",
+          "extend": "Any decision (epoch, hyperparameter, architecture) made using the test set leaks information. Touch test exactly once, at the very end."
+        }
+      ]
+    },
+    {
+      "id": "shuffle-distribution",
+      "title": "Shuffling, Distribution Mismatch & i.i.d.",
+      "recap": "Shuffle **before** splitting so every split is representative of the overall distribution. If splits come from different distributions (e.g. train = day images, test = night images) the model generalizes poorly. Mini-batches should also be i.i.d. samples of the data; a batch of consecutive/homogeneous samples gives biased gradient updates.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 4,
+          "sources": ["SS23 7.1", "SS23 7.2", "SS20 P5b", "SS24 4.3"],
+          "q": "Your training set has only daytime images while validation/test has only nighttime images (or a batch contains only consecutive 'sunny' frames). State the problem and how to fix it. Why is shuffling before splitting important?",
+          "answer": "**Problem:** splits/batches come from **different distributions** (domain gap) → the data in a batch doesn't represent the dataset → **biased gradient updates** toward daytime and **bad generalization** / high validation error on nighttime.\n**Fix:** **mix** train+val(+test), **re-shuffle**, and **split again** so all splits share the same distribution.\n**Why shuffle before splitting (1p):** to make each split represent the general distribution and capture all the variance/cases; otherwise sorted data yields biased, mismatched splits.\n\n*Note (SS20):* **no points** for “cross validation” without re-shuffling, and **no points** for “data augmentation” (changing brightness won't create realistic night images).",
+          "extend": "This exact day/night scenario recurs in SS20, SS23, SS24. Key scoring words: *distribution mismatch / domain gap* and *re-shuffle then re-split*. Augmentation is explicitly the wrong fix here."
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": ["SS21 1.9"],
+          "q": "Which of the following datasets are NOT i.i.d. (independent and identically distributed)?",
+          "options": [
+            {"text": "A sequence of 10,000 biased coin flips, stored as (toss number, result).", "correct": false},
+            {"text": "(image, label) pairs where each image is a video frame and the label is whether the frame contains humans.", "correct": true},
+            {"text": "A monthly sample of Munich's population over the past 100 years.", "correct": true},
+            {"text": "(image, number) pairs, each a chest X-ray of a different person and their lung volume.", "correct": false}
+          ],
+          "answer": "**Not i.i.d.:** the **video frames** (consecutive frames are highly correlated — dependent) and the **monthly population over 100 years** (a time series with trend → not identically distributed). The biased-coin flips are still i.i.d. (independent draws, same biased distribution), and the distinct-patient X-rays are independent samples.",
+          "extend": "i.i.d. fails when samples are **temporally correlated** (video frames, time series). A *biased* coin is fine — bias doesn't break i.i.d. as long as every draw shares that same distribution."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Mock II.1", "WS22"],
+          "q": "You notice the validation error is significantly LOWER than the training error. Name two possible reasons.",
+          "answer": "This is abnormal (the model does better on unseen data). Possible reasons: (1) **training and validation sets come from different distributions** (e.g. validation is easier); (2) an **implementation/error bug** (e.g. regularization/dropout active in training but not validation, or a metric mismatch).",
+          "extend": "Subtle but real: dropout & data augmentation are on during training and off during validation, which can legitimately make validation loss lower — but a *large* gap points to a distribution mismatch or a bug."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "You train on medical scans from Hospital A and deploy at Hospital B with a different scanner. Accuracy drops sharply. Name the phenomenon and one mitigation.",
+          "answer": "**Distribution shift / domain gap** between training and deployment data. Mitigations: collect/label data from Hospital B and fine-tune (domain adaptation), use domain-invariant augmentation/normalization, or normalize scanner-specific statistics so the input distribution matches.",
+          "extend": "Same root cause as the day/night split problem, but across train→deployment instead of train→test. The cure is always: make the distributions match (more representative data or adaptation)."
+        }
+      ]
+    },
+    {
+      "id": "data-leakage",
+      "title": "Data Leakage & Split Integrity",
+      "recap": "Any path by which test/validation information reaches training **leaks** and inflates your scores. Common leaks: shuffling+splitting *every epoch* (so val samples appear in train), randomly resampling train/test at test time, or computing normalization statistics over the whole dataset.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["SS24 5.4"],
+          "q": "A friend reshuffles ALL data and re-splits into 80% train / 20% val *inside every epoch*. What is the problem and its consequence?\n```python\ndef generate_data_for_epoch(data):\n    np.random.shuffle(data)            # inplace\n    split = int(0.8*len(data))\n    return data[:split], data[split:]  # train, val\n```",
+          "answer": "Because the split is redrawn each epoch, samples that were in the validation set will, in later epochs, **leak into the training set** (and vice-versa). Over training, the model effectively sees the “validation” data, so the **validation accuracy no longer reflects generalization** to unseen data.",
+          "extend": "Split **once** and keep the splits fixed. Re-splitting per epoch defeats the entire purpose of holding data out."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["SS22 4.9"],
+          "q": "Instead of a fixed split you randomly sample input images each time you test the network. State one problem.",
+          "answer": "(2p) It **mixes train and test sets**, so the network trains on samples it is later tested on → the test score is **biased** and can't measure performance on unseen data. *(Alternative answer:)* results become **non-deterministic**, so two runs/architectures can't be compared fairly.",
+          "extend": "Either point earns full marks: leakage (biased test) or non-reproducibility. Both stem from not fixing the split."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["Summary I.3 Q12"],
+          "q": "Why are the mean and standard deviation used for normalization computed only over the training set?",
+          "answer": "To keep the **test set as unbiased as possible**: no information from the test set may influence training. The dataset mean and std are exactly such information — computing them over test (or all) data would **leak** test statistics into the pipeline.",
+          "extend": "Fit normalization stats on **train only**, then apply those same fixed stats to val and test. Computing stats on the full dataset is a classic, easy-to-miss leak."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "Before splitting, you remove exact-duplicate images that appear multiple times in your dataset by keeping one copy at random. You skip this step. How can duplicates cause leakage, and what should you do?",
+          "answer": "If duplicates land in both train and test, the model is tested on (near-)identical images it trained on → inflated test accuracy (a form of leakage). De-duplicate **before** splitting, and ensure all copies of an item go to the same split (group-aware splitting).",
+          "extend": "Generalize this to *grouped* data (e.g. multiple frames of the same patient/scene): split by group, never by individual sample, to avoid near-duplicate leakage."
+        }
+      ]
+    },
+    {
+      "id": "augmentation",
+      "title": "Data Augmentation",
+      "recap": "Artificially enlarge the training set by transforming inputs (flip, rotate, crop, color-jitter, add noise). It is a **regularization** technique that reduces overfitting and improves generalization. Applied to the **training set only**. It does not increase the dataset's physical size — each epoch the model sees a randomly transformed version with probability $p$. Augmentations must keep the data in the **same distribution** and must respect the task (don't flip MNIST vertically; don't mirror medical left/right; update the label if it is geometry-dependent).",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 9,
+          "sources": ["SS22 3.1", "SS21 2.1", "WS26 P2a", "SS20 P5c", "SS24 2.7", "Summary I.3 Q10/Q11"],
+          "q": "Explain the concept of data augmentation: what does it do, when would you use it, and what is crucial to keep? List several augmentation techniques (e.g. for RGB images / for audio).",
+          "answer": "**Concept:** a **regularization** technique that modifies training-set inputs to introduce more variety, artificially increasing dataset size to **reduce overfitting / minimize the generalization gap** and improve generalization. **Use it** when the dataset is too small.\n**Crucial:** augmented data must come from the **same distribution** as the original data, and the transform must suit the task.\n**RGB-image techniques (0.5p each):** rotation, cropping, flipping, color jittering / contrast change, adding Gaussian noise, translation jitter, mirroring.\n**Audio (SS24 2.7):** pitch/EQ tuning, volume tuning, add noise / environmental sound, change speed, add effects.",
+          "extend": "The most-examined Chapter I item — appears in nearly every exam. Always tie it to **regularization** and **same distribution**. Note it does *not* increase the physical dataset size; it shows a different random version each epoch."
+        },
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["SS22 3.2", "SS23 7.4", "Summary I.3 Q10"],
+          "q": "To which split(s) do you apply data augmentation, and why? How does this differ from preprocessing like normalization?",
+          "answer": "**Augmentation → training set only.** It increases training diversity to improve generalization / reduce overfitting; validation and test must stay **original and unmodified** so evaluation reflects the true data distribution.\n**Normalization → all splits.** It just rescales inputs to the range/distribution the network expects, so it must be applied consistently to train, val and test.\n*(Difference, Summary Q11):* augmentation enlarges the training set; data-processing (normalization) is a fixed preprocessing applied to every split.",
+          "extend": "One-liner: *augment train only, normalize everywhere*. Augmentation is randomized regularization; normalization is a deterministic preprocessing the model depends on at inference."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["SS22 3.3", "SS22 3.4", "SS23 7.6"],
+          "q": "You add 'Horizontal Flip' + 'Gaussian Blur' and BOTH training and test error go up. Explain why the training error rose and why the test error rose. (Variant: random horizontal flip makes a depth model train much worse.)",
+          "answer": "**Training error ↑:** augmentation injects harder, previously-unseen variations / more variance into the training data, so the model fits the (now harder) training set less perfectly.\n**Test error ↑:** the augmented samples (e.g. horizontally flipped) **leave the original (MNIST) distribution**, so they don't match the test distribution — the model is partly trained on out-of-distribution data.\n**Depth variant (SS23 7.6):** the flip wasn't applied to the **ground-truth label** too / flipping changes the geometry-dependent target → inconsistent (image, label) pairs.",
+          "extend": "Two failure modes of augmentation: (1) it changes the data distribution (flip is wrong for MNIST/asymmetric data), (2) for geometry-dependent labels (depth, key-points, segmentation) you must transform the label identically."
+        },
+        {
+          "type": "mc",
+          "freq": 2,
+          "sources": ["WS21 1.1", "SS23 1.7"],
+          "q": "Which data augmentation techniques are suitable for the MNIST handwritten-digit dataset?",
+          "options": [
+            {"text": "Add Gaussian noise to the images", "correct": true},
+            {"text": "Rotate the images by a small angle (~10°–30°)", "correct": true},
+            {"text": "Change the contrast of the images", "correct": true},
+            {"text": "Vertically flip the images", "correct": false}
+          ],
+          "answer": "Suitable: **Gaussian noise, small rotation, contrast change**. **Not** vertical flip — it produces unrealistic / wrong-class digits (and large rotations turn 6→19). Keep augmentations within the digit distribution and label-preserving.",
+          "extend": "MNIST rule of thumb: small geometric + photometric jitter is fine; any transform that creates an invalid or relabeled digit (vertical flip, 180° rotation) is not."
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": ["SS23 1.8"],
+          "q": "Which statements are true about data augmentation in a supervised setup?",
+          "options": [
+            {"text": "It is a technique used to generate additional labeled data for training.", "correct": true},
+            {"text": "It can help reduce overfitting by introducing variations in the training data.", "correct": true},
+            {"text": "It is only applicable to image data and not relevant for other data types.", "correct": false},
+            {"text": "It should only be applied to the testing set to evaluate generalization.", "correct": false}
+          ],
+          "answer": "True: it **generates additional labeled training data** and **reduces overfitting**. False: it is **not** image-only (audio/text too — see SS24 2.7) and is applied to **training**, never the test set.",
+          "extend": "Augmentation generalizes across modalities (audio: pitch/speed/noise; text: synonym swap). The label is preserved (or transformed consistently), which is why it counts as labeled data."
+        },
+        {
+          "type": "mc",
+          "freq": 2,
+          "sources": ["Mock I.1", "SS21 1.3"],
+          "q": "Which methods help avoid overfitting / will typically affect training vs validation loss? (combined MC facts about augmentation)",
+          "options": [
+            {"text": "Use data augmentation → helps avoid overfitting (lowers validation loss).", "correct": true},
+            {"text": "Stop training earlier (early stopping) → helps avoid overfitting.", "correct": true},
+            {"text": "Removing data augmentation → decreases *training* loss (model fits train more easily).", "correct": true},
+            {"text": "Increasing network size → avoids overfitting.", "correct": false}
+          ],
+          "answer": "Data augmentation and early stopping **reduce overfitting** (improve validation/generalization). Note the subtlety from SS21 1.3: **removing** augmentation makes the training set easier, which **decreases training loss** (but hurts generalization). Increasing network size generally **increases** overfitting risk.",
+          "extend": "Augmentation lowers *validation* loss but tends to raise *training* loss (training data is harder) — a frequently-tested distinction between the two curves."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "You augment a chest-X-ray classifier with random horizontal flips and accuracy on real data drops. Give a domain-specific reason this augmentation is inappropriate.",
+          "answer": "Anatomy is **left-right asymmetric** (heart on the left, organ positions). A horizontal flip creates anatomically impossible images outside the real distribution and can flip clinically meaningful left/right cues — so it injects label-corrupting, out-of-distribution data. Use only label- and anatomy-preserving augmentations (small rotation, intensity jitter).",
+          "extend": "Mirrors the lecture's medical-imaging caveat: augmentations must respect domain semantics. Same logic forbids 180° rotation of digits (6↔9)."
+        }
+      ]
+    },
+    {
+      "id": "preprocessing",
+      "title": "Data Processing: Normalization & Standardization",
+      "recap": "Preprocessing rescales inputs so gradients neither vanish nor explode and learning is stable. **Standardization (Z-score):** $x_{std}=\\dfrac{x-\\mu}{\\sigma}$ → zero mean, unit variance. **Min-max normalization:** $x_{norm}=\\dfrac{x-x_{min}}{x_{max}-x_{min}}$ → range $[0,1]$ (or $[-1,1]$). Stats ($\\mu,\\sigma$ or min/max) are computed on the **training set only** and applied to **all** splits.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["SS24 4.2", "SS23 7.4"],
+          "q": "Before training you normalize the input images. Explain the benefit.",
+          "answer": "Normalization makes the pixel values **zero-centered with unit variance** (a consistent range/distribution the network expects), which makes it **easier for the model to learn features**, improves convergence, and **prevents numerical instabilities** (gradients exploding/vanishing).",
+          "extend": "Normalized, zero-centered inputs keep activations and gradients in a healthy range, so optimization converges faster — the same motivation underlies BatchNorm later in the course."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["Summary I.2.d"],
+          "q": "Write the formulas for standardization (Z-score) and min-max normalization, and state which splits they are applied to.",
+          "answer": "**Standardization:** $x_{std}=\\dfrac{x-\\mu}{\\sigma}$, with $\\mu,\\sigma$ the training-set mean and std → zero mean, unit variance.\n**Min-max normalization:** $x_{norm}=\\dfrac{x-x_{min}}{x_{max}-x_{min}}$ → scales to $[0,1]$.\nBoth are applied **per sample to all splits** (train/val/test), unlike augmentation; the statistics are estimated on the training set only.",
+          "extend": "Standardization centers + scales by spread; min-max just rescales the range. Use the same train-derived constants everywhere so the model sees consistent inputs."
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": ["SS23 1.7"],
+          "q": "Regarding input data, check all that are true.",
+          "options": [
+            {"text": "Re-scaling inputs from [0,255] to [0,1] is reasonable preprocessing.", "correct": true},
+            {"text": "Training on [0,255] inputs beats [0,1] because the range is larger.", "correct": false},
+            {"text": "Re-scaling [0,255]→[0,1] mitigates overfitting.", "correct": false},
+            {"text": "CNNs are unsuitable for high-dimensional input channels.", "correct": false}
+          ],
+          "answer": "Only **re-scaling [0,255]→[0,1] is appropriate**. A larger raw range does **not** help (it can cause large activations/unstable gradients), and normalization is about **numerical stability/convergence**, not overfitting (that's augmentation/regularization).",
+          "extend": "Careful distinction: **normalization** → stability & convergence; **augmentation/regularization** → overfitting. The exam likes to swap these."
+        }
+      ]
+    },
+    {
+      "id": "dataloaders",
+      "title": "Datasets & Dataloaders (Programming)",
+      "recap": "A **Dataset** class defines how to access one sample: `__len__` returns the dataset size; `__getitem__(i)` returns the *i*-th sample (input + label), where loading/normalization/transforms happen — it returns a **single** sample, not a batch. A **DataLoader** wraps a Dataset and handles **batching, shuffling, parallel loading** (workers), collation and memory pinning.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["SS23 7.5", "WS26 P3e"],
+          "q": "In PyTorch, state the input and output of the Dataset's `__getitem__` for supervised learning, and explain the role of the DataLoader (list 3 functionalities).",
+          "answer": "**`__getitem__` input (0.5p):** an **index/key** identifying one example.\n**`__getitem__` output (0.5p):** a tuple/dict with the **input instance and its label / ground truth**.\n**DataLoader (1p):** wraps the Dataset to provide, e.g., **batching, shuffling, parallel/multiprocess loading (workers)** — also collation and memory pinning. (The Dataset defines single-sample access; the DataLoader assembles batches.)",
+          "extend": "`__len__` + `__getitem__` define the Dataset (single-sample access); the DataLoader is the batch/shuffle/parallelism engine on top. Naming **batching** is the key scoring point."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["SS23 7.3"],
+          "q": "Your high-resolution images cause 'CUDA Out of memory' at batch size 16. Name two ways to reduce memory usage.",
+          "answer": "Any two of: **downsample/resize/compress** the images; use **image crops** instead of full frames; **reduce the batch size**; use a **smaller model** (fewer parameters); **upgrade hardware** (GPU with more VRAM). *(Note: conv/pooling layers don't help — you still must load the high-res image into memory first.)*",
+          "extend": "Memory ≈ batch_size × sample_size × model_activations. Attack any factor: smaller inputs (downsample/crop), smaller batch, or smaller model."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "Why does the DataLoader (not the Dataset) handle shuffling and batching, and why should `__getitem__` return a single sample rather than a batch?",
+          "answer": "Separation of concerns: the **Dataset** only knows how to fetch one sample by index (easy to write, reusable), while the **DataLoader** orchestrates iteration — shuffling indices, grouping them into batches, and loading in parallel across workers. Returning one sample keeps `__getitem__` simple and lets the DataLoader freely choose batch size, shuffle order and parallelism without changing the Dataset.",
+          "extend": "This index-based design is what makes multi-worker parallel loading and arbitrary batch sizes possible — each worker just calls `__getitem__(i)` for different `i`."
+        }
+      ]
+    },
+    {
+      "id": "class-imbalance",
+      "title": "Class Imbalance",
+      "recap": "When some classes have far more samples than others, the model achieves high accuracy on majority classes but poor accuracy on minorities. Remedies: oversample the minority / undersample the majority, or use class weighting in the loss.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["SS22 4.10", "WS26 P3d"],
+          "q": "After training, test accuracy is 95% for one class but 35% for another (or: high for label 0, poor for label 1). What is the problem and how do you address it?",
+          "answer": "**Problem:** an **imbalanced dataset** — far more samples for the easy/majority class than the minority class, so the model underperforms on the minority.\n**Fixes:** **oversample the minority** class or **undersample the majority**; and/or use **class weighting** in the loss function.",
+          "extend": "Accuracy is misleading under imbalance (a trivial majority predictor scores high). Rebalance the data or reweight the loss; report per-class metrics."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "A fraud detector reaches 99% accuracy but catches almost no fraud (fraud is 1% of data). Explain and give two fixes.",
+          "answer": "Severe **class imbalance**: predicting 'not fraud' for everyone already gives 99% accuracy, so accuracy hides total failure on the minority. Fixes: oversample fraud / undersample non-fraud (or synthetic oversampling), class-weighted loss, and evaluate with precision/recall/F1 instead of accuracy.",
+          "extend": "Under imbalance, switch the *metric* (precision/recall/PR-AUC) as well as rebalancing — otherwise you optimize and report the wrong thing."
+        }
+      ]
+    }
+  ]
+}
