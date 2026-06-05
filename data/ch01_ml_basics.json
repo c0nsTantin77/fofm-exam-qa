@@ -28,7 +28,7 @@
         {
           "type": "mc",
           "freq": 2,
-          "sources": ["SS20 1f"],
+          "sources": ["SS20 P1f"],
           "q": "Logistic regression (check all that apply).",
           "options": [
             {"text": "Is a linear function.", "correct": true},
@@ -94,7 +94,7 @@
         {
           "type": "open",
           "freq": 3,
-          "sources": ["SS20 P6b", "Summary I.3 Q6"],
+          "sources": ["SS20 P7b", "Summary I.3 Q6"],
           "q": "How does an autoencoder differ from a linear dimensionality-reduction method such as PCA? Why is the deep method often preferable for real-world problems?",
           "answer": "(1p) An autoencoder is built from neural networks **containing non-linearities**, so it is a **non-linear** function; PCA is **linear**. Because real data has non-linear structure, the autoencoder can learn richer, non-linear features useful for downstream tasks (classification, regression).\n\n*Note (SS20):* no point if you only say “parameters” or “conv layers” — the discriminating fact is **non-linearity**.",
           "extend": "PCA ≈ a linear autoencoder with tied weights and MSE loss. Adding non-linear activations is exactly what lets an autoencoder capture curved manifolds PCA cannot."
@@ -143,6 +143,14 @@
           "q": "How would you split your dataset? Give meaningful percentages and justify the largest split.",
           "answer": "Mention **all three** splits: **training, validation, test** (0.5p). Give meaningful percentages with **training $>50\\%$** (0.5p), e.g. validation 10–20%, test 10–20% — common ratios $\\{80,10,10\\}$ or $\\{70,15,15\\}$. The **training set is the largest** because it is the only data the model is actually trained on.",
           "extend": "Scoring points are identical across SS20/SS24/WS26: (1) name all three splits, (2) training must be the majority. You can relax toward more even ratios when the dataset is large and overfitting is not a concern."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["WS22 8.1"],
+          "q": "Explain the purpose of each of the train / validation / test splits in detail and how each is used.",
+          "answer": "**Training (1p):** used to **train the model's parameters (weights)** — compute gradients and optimize the loss.\n**Validation (1p):** used for **hyperparameter tuning** and to **check generalization / performance on unseen data** during training (a sanity check) — *not* used to update weights.\n**Test (1p):** used for the **final, one-time evaluation** of overall performance on truly unseen data.\nMeaningful split (0.5p): training portion $>50\\%$, e.g. $\\{60,20,20\\}$, $\\{80,10,10\\}$, $\\{70,15,15\\}$.",
+          "extend": "Note the scoring nuance (WS22): for validation, you must mention *unseen data / hyperparameter tuning* — merely saying “check if it's overfitting” or “validate the model” scores 0. Each split has a distinct, non-overlapping job."
         },
         {
           "type": "open",
@@ -207,11 +215,19 @@
         },
         {
           "type": "open",
-          "freq": 2,
-          "sources": ["Mock II.1", "WS22"],
+          "freq": 1,
+          "sources": ["Mock II.1"],
           "q": "You notice the validation error is significantly LOWER than the training error. Name two possible reasons.",
           "answer": "This is abnormal (the model does better on unseen data). Possible reasons: (1) **training and validation sets come from different distributions** (e.g. validation is easier); (2) an **implementation/error bug** (e.g. regularization/dropout active in training but not validation, or a metric mismatch).",
           "extend": "Subtle but real: dropout & data augmentation are on during training and off during validation, which can legitimately make validation loss lower — but a *large* gap points to a distribution mismatch or a bug."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["WS22 8.4"],
+          "q": "You trained an image classifier on product photos collected from Amazon and it works well there, but it misclassifies most objects when you photograph them yourself. Give one reason it performs poorly on your own photos.",
+          "answer": "(1p) **Domain gap between the data distributions** — your self-taken photos differ from the Amazon product images (lighting, background, angle, resolution), so the test-time distribution doesn't match the training distribution and the model fails to generalize.",
+          "extend": "Train→deployment distribution shift, the same root cause as the day/night split issue. Fix by collecting/labeling in-domain data and fine-tuning, or by closing the gap with augmentation/normalization."
         },
         {
           "type": "ai",
