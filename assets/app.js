@@ -101,6 +101,25 @@
     });
   });
 
+  // ---- back-to-top button (mobile) ----
+  const toTop = document.getElementById("toTop");
+  if (toTop) {
+    const onScroll = () => { toTop.hidden = window.scrollY < 400; };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  }
+
+  // ---- mobile: collapse the TOC panel after tapping a topic link ----
+  const tocWrap = document.querySelector(".toc-wrap");
+  if (tocWrap) {
+    tocWrap.querySelectorAll(".toc a").forEach((a) =>
+      a.addEventListener("click", () => {
+        if (window.matchMedia("(max-width:860px)").matches) tocWrap.open = false;
+      })
+    );
+  }
+
   const expandBtn = document.getElementById("expandAll");
   if (expandBtn) {
     expandBtn.addEventListener("click", () => {

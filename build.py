@@ -256,7 +256,10 @@ def build():
       <span class="stat"><b>{len(data['knowledge_points'])}</b> topics</span>
       <span class="stat"><b>{nai}</b> AI practice</span>
     </div>
-    <nav class="toc"><ol>{toc}</ol></nav>
+    <details class="toc-wrap">
+      <summary>Jump to topic</summary>
+      <nav class="toc"><ol>{toc}</ol></nav>
+    </details>
     <div class="legend">
       <div><span class="badge freq-hot">★ n×</span> high frequency</div>
       <div><span class="src">SS22 3.1</span> source = exam + problem no.</div>
@@ -270,6 +273,7 @@ def build():
     <p class="noresults" hidden>No questions match your filter.</p>
   </main>
 </div>
+<button id="toTop" type="button" aria-label="Back to top" hidden>↑</button>
 {site_footer(manifest['exams'], base='../')}
 """
         out = page_shell(f"{data['roman']}. {data['title']} · I2DL Exam Q&A", body, depth=1)
