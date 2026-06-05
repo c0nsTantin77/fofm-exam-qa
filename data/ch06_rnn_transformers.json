@@ -1,0 +1,154 @@
+{
+  "id": "ch06",
+  "roman": "VI",
+  "title": "RNNs & Transformers",
+  "blurb": "Sequence models: vanilla RNNs and their gradient problems, how LSTMs fix them with a cell-state highway, and the Transformer (attention, cross-attention, positional encoding). The newest and increasingly-tested material.",
+  "knowledge_points": [
+    {
+      "id": "rnn",
+      "title": "Recurrent Neural Networks (RNNs)",
+      "recap": "A vanilla RNN cell is $h_t=\\tanh(V h_{t-1}+W x_t+b)$ — the same weights are reused at every step. Parameters in a cell with $x_t\\in\\mathbb{R}^{d}$, $h_t\\in\\mathbb{R}^{m}$: $d\\!\\cdot\\!m + m\\!\\cdot\\!m + m$ (input, recurrent, bias). RNNs suffer **vanishing/exploding gradients** over long sequences, have **few parameters** (limited capacity), and **short-term memory**.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["SS20 P6a"],
+          "q": "For a vanilla RNN $h_t=\\tanh(V h_{t-1}+W x_t+b)$ with $x_t\\in\\mathbb{R}^3$ and $h_t\\in\\mathbb{R}^5$, how many parameters are in the cell?",
+          "answer": "$W$ ($3\\times5$) + $V$ ($5\\times5$) + bias ($5$) $= 15 + 25 + 5 = \\mathbf{45}$.",
+          "extend": "Count the three pieces: input-to-hidden ($d\\cdot m$), hidden-to-hidden ($m\\cdot m$), and bias ($m$). The recurrent matrix $V$ is square ($m\\times m$)."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary VI.5 Q1"],
+          "q": "Give two drawbacks of RNNs that are NOT the exploding/vanishing gradient problem.",
+          "answer": "(1) **Too few parameters** — limited capacity (the same small weight set is reused at every timestep). (2) **Short-term memory** — they struggle to learn relationships between tokens that are far apart in the sequence.",
+          "extend": "Beyond gradient issues, RNNs forget long-range context (short memory) and have limited capacity — both motivate LSTMs and then attention."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["SS20 P6b"],
+          "q": "For $h_t=\\tanh(V h_{t-1}+W x_t+b)$: if $x_t$ and $b$ are the zero vector, is it true that $h_t=h_{t-1}$ for any $h_t$?",
+          "answer": "**False.** Even with $x_t=0$ and $b=0$, $h_t=\\tanh(V h_{t-1})$ — the multiplication by $V$ and the **non-linearity** $\\tanh$ change the value, so in general $h_t\\neq h_{t-1}$.",
+          "extend": "Only if $V$ were identity *and* there were no non-linearity would the state pass through unchanged. The recurrent weight + tanh transform the hidden state every step."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["SS22 9.1"],
+          "q": "RNNs over long sequences exhibit a training issue. What is the problem, and how do you address the vanishing vs exploding cases?",
+          "answer": "The problem is **vanishing / exploding gradients** (gradients shrink or blow up as they backprop through many timesteps).\n**If vanishing:** switch to an **LSTM** (cell-state gradient highway), or enforce the recurrent matrix eigenvalues ≈ 1.\n**If exploding:** apply **gradient clipping**.",
+          "extend": "Backprop-through-time multiplies many Jacobians → product shrinks (vanish) or grows (explode). Clipping caps explosion; LSTM/gating fixes vanishing."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "Why does using the *same* weights at every timestep make RNNs prone to vanishing/exploding gradients?",
+          "answer": "Backpropagation through time repeatedly multiplies by the same recurrent Jacobian (involving $V$). Over $T$ steps this is like raising $V$ to the $T$-th power — eigenvalues $<1$ shrink the gradient toward 0 (vanishing) and eigenvalues $>1$ blow it up (exploding), exponentially in sequence length.",
+          "extend": "Weight sharing across time = repeated multiplication = exponential growth/decay. Eigenvalues ≈ 1 is the knife-edge that keeps gradients stable."
+        }
+      ]
+    },
+    {
+      "id": "lstm",
+      "title": "LSTM",
+      "recap": "An LSTM adds a **cell state** $C_t$ — a gradient highway analogous to skip connections — plus gates (forget, input, output) using **sigmoid** to decide what to keep/add/output. This lets it carry long-range information and largely solves the vanishing-gradient problem of vanilla RNNs.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary VI.5 Q2"],
+          "q": "How did the LSTM solve the vanishing-gradient problem of RNNs?",
+          "answer": "By introducing the **cell state** — a **highway for gradients** (just like skip connections in ResNets). Information (and gradients) can flow along the cell state across many timesteps with minimal attenuation, so long-range dependencies are preserved.",
+          "extend": "Same core trick as ResNet's $+1$: an additive, near-identity path for gradients. The gates control what enters/leaves this highway."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary VI.5 Q3"],
+          "q": "Is it a good idea to use ReLU instead of Sigmoid as the activation of the LSTM input gate?",
+          "answer": "**No.** The **sigmoid** is bounded in $[0,1]$, so it acts as a **gate** deciding *what fraction* of information to pass (0 = block, 1 = pass). **ReLU** is unbounded above, which destroys this gating behaviour and can cause **numerical instabilities**.",
+          "extend": "Gates need a $[0,1]$ 'valve' → sigmoid. Candidate values (what to write) use tanh. ReLU's unbounded range breaks the valve metaphor."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "Name the three gates of an LSTM and what each controls.",
+          "answer": "**Forget gate** — how much of the previous cell state $C_{t-1}$ to keep. **Input gate** — how much of the new candidate information to write into the cell state. **Output gate** — how much of the cell state to expose as the hidden state $h_t$. All three use sigmoids to produce $[0,1]$ gating values.",
+          "extend": "Mnemonic: forget (erase old), input (write new), output (read out). The cell state is updated as $C_t = f\\odot C_{t-1} + i\\odot \\tilde C_t$."
+        }
+      ]
+    },
+    {
+      "id": "transformers-attention",
+      "title": "Transformers: Attention & Architecture",
+      "recap": "Transformers replace recurrence with **attention**. Self-attention computes $\\text{softmax}\\!\\big(\\frac{QK^\\top}{\\sqrt{d_k}}\\big)V$. The $\\sqrt{d_k}$ scaling and **layer normalization** (before/after attention blocks) keep gradients stable. **Cross-attention** in the decoder uses queries from the decoder and keys/values from the encoder. Predicting the next token is a **classification** task (one label per vocabulary word).",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary VI.5 Q4e"],
+          "q": "Why is the self-attention mechanism prone to exploding gradients, and how does the original Transformer architecture solve it?",
+          "answer": "Self-attention itself has **no normalization** besides the $\\frac{1}{\\sqrt{d_k}}$ scale, so the affine layers can produce **very large values → huge gradients**. The Transformer adds **layer normalization** (around the attention and feed-forward blocks), normalizing each embedding individually to keep activations/gradients stable.",
+          "extend": "Two stabilizers: the $\\sqrt{d_k}$ scale on the scores, and LayerNorm + residual connections around each sub-block. LayerNorm (per-token) suits variable-length sequences better than BatchNorm."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary VI.5 Q4c", "Summary VI.5 Q4d"],
+          "q": "Cross-attention: given encoder outputs $X_e\\in\\mathbb{R}^{N\\times M}$ and decoder outputs $X_d\\in\\mathbb{R}^{K\\times M}$, what is the output dimension? Is predicting the next token classification or regression?",
+          "answer": "Use $q=X_d$, $k=X_e$, $v=X_e$: $\\text{out}=(q\\,k^\\top)\\,v \\Rightarrow (K\\times M)(M\\times N)(N\\times M)=(K\\times N)(N\\times M)=\\mathbf{K\\times M}$.\n**Next-token prediction is classification** — each word in the vocabulary is its own class.",
+          "extend": "Cross-attention lets each decoder position ($K$) attend over all encoder positions ($N$); output keeps the decoder length $K$. Language modeling = classification over the vocabulary."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["Summary VI.5 Q4a", "Summary VI.5 Q4b"],
+          "q": "Can a Transformer take embeddings of different sizes? Can it take sequences of different lengths at the encoder/decoder?",
+          "answer": "**Embedding size:** **No** — the internal fully-connected layers expect a **fixed embedding dimension**.\n**Sequence length:** **Yes** — sequences of embeddings are like batches of tokens, and the FC layers handle different batch/sequence sizes; cross-attention also handles differing encoder/decoder lengths.",
+          "extend": "Fixed feature width, flexible sequence length — the opposite of FC-based CNNs (fixed spatial size). Attention is permutation/length-agnostic by construction."
+        }
+      ]
+    },
+    {
+      "id": "positional-encoding",
+      "title": "Positional Encoding",
+      "recap": "Self-attention is **permutation-invariant** — the scores don't depend on token order. To inject order, Transformers add **positional encodings** to the input embeddings, unlike RNNs which process tokens sequentially and get order for free.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary VI.5 Q4f"],
+          "q": "Why is positional encoding important in Transformers, in comparison to RNNs?",
+          "answer": "Transformers do **not** process the sequence sequentially — the attention scores between two embeddings are **invariant to token order (permutation-invariant)**. So we must add **positional encoding** to inject time/order information. RNNs get this for free because they consume tokens one-by-one in order.",
+          "extend": "No recurrence ⇒ no inherent order ⇒ add positional encodings. Without them, 'dog bites man' and 'man bites dog' would look identical to attention."
+        },
+        {
+          "type": "mc",
+          "freq": 2,
+          "sources": ["WS24 1.4"],
+          "q": "In the Transformer model, why is positional encoding added to the input embeddings?",
+          "options": [
+            {"text": "To reduce the dimensionality of the input embeddings.", "correct": false},
+            {"text": "To introduce information about the order of tokens in the sequence.", "correct": true},
+            {"text": "To improve the accuracy of the attention mechanism.", "correct": false},
+            {"text": "To make the embeddings compatible with the feed-forward network.", "correct": false}
+          ],
+          "answer": "Positional encoding **introduces information about the order of tokens**. Self-attention alone is order-agnostic, so without positional encoding the model couldn't tell sequence order.",
+          "extend": "It encodes *where* each token sits; it doesn't change dimensionality or directly 'boost accuracy'. Order is the whole point."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["Summary III.5 Q13"],
+          "q": "To feed a CNN feature map ($B\\times C\\times H\\times W$) into a Transformer, how do you turn pixels into tokens?",
+          "answer": "Move channels last and flatten the spatial dims: $(B\\times C\\times H\\times W)\\to(B\\times H\\times W\\times C)\\to(B\\times(H\\cdot W)\\times C)$. Each pixel becomes a $C$-dimensional **token**, giving a sequence of $H\\cdot W$ tokens per image.",
+          "extend": "This 'flatten spatial → tokens' reshape is the bridge from CNNs to Vision Transformers (cross-listed from Ch III)."
+        }
+      ]
+    }
+  ]
+}
