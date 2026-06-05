@@ -7,7 +7,7 @@
     {"id": "ch02", "roman": "II",  "title": "Neural Networks",              "file": "ch02_neural_networks.json", "status": "ready"},
     {"id": "ch03", "roman": "III", "title": "Convolutions",                 "file": "ch03_convolutions.json", "status": "ready"},
     {"id": "ch04", "roman": "IV",  "title": "Optimization",                 "file": "ch04_optimization.json", "status": "ready"},
-    {"id": "ch05", "roman": "V",   "title": "Popular Architectures",        "file": null, "status": "soon"},
+    {"id": "ch05", "roman": "V",   "title": "Popular Architectures",        "file": "ch05_architectures.json", "status": "ready"},
     {"id": "ch06", "roman": "VI",  "title": "RNNs & Transformers",          "file": null, "status": "soon"},
     {"id": "ch07", "roman": "VII", "title": "Appendix: Matrix Calculus",    "file": null, "status": "soon"}
   ]

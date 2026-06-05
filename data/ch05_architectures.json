@@ -1,0 +1,241 @@
+{
+  "id": "ch05",
+  "roman": "V",
+  "title": "Popular Architectures",
+  "blurb": "The canonical models: LeNet → AlexNet → VGG → ResNet (skip connections) → Inception, plus Autoencoders, U-Net, and the generative pair VAEs & GANs. Exams love the 'why' behind each design choice.",
+  "knowledge_points": [
+    {
+      "id": "cnn-architectures",
+      "title": "CNN Architectures (LeNet, AlexNet, VGG)",
+      "recap": "**LeNet** — early CNN, uses average pooling & tanh/sigmoid. **AlexNet** — deeper, big $11\\times11$ first filter, **ReLU** (enabling depth) + dropout. **VGG** — stacks of small $3\\times3$ convs; the conv part is a feature extractor, FC layers at the end do classification. Paradigm: Conv→Pool…→Conv→Pool→FC…→FC; channels grow, spatial size shrinks with depth.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary V.11 Q1a", "Summary V.11 Q1b"],
+          "q": "LeNet uses average pooling. Give one advantage and one disadvantage vs max pooling. What is the receptive field of a neuron in LeNet's first FC layer?",
+          "answer": "**Advantage** of avg pooling: every entry in the window receives a gradient. **Disadvantage:** it's a **linear** operation, while max pooling adds non-linearity.\n**Receptive field of the first FC layer:** the **entire input image** ($32\\times32$) — an FC layer connects to all positions, so it sees everything.",
+          "extend": "Any FC layer has a *global* receptive field by definition. Avg vs max pooling = linear/all-gradients vs non-linear/feature-selecting."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary V.11 Q1c", "Summary V.11 Q1d"],
+          "q": "AlexNet uses an $11\\times11$ first-layer filter and ReLU instead of sigmoid/tanh. Name two disadvantages of such a large filter, and explain why ReLU (with Kaiming init) lets AlexNet be deeper.",
+          "answer": "**Large $11\\times11$ filter disadvantages:** (1) very **expensive** in parameters and computation; (2) captures **global** rather than fine **local** features.\n**ReLU + Kaiming:** ReLU does not saturate for positive inputs, so it **prevents the vanishing-gradient problem** that sigmoid/tanh cause in deep nets — enabling AlexNet to train more layers than LeNet.",
+          "extend": "Modern nets replace one big filter with stacks of small $3\\times3$ ones (VGG) — same receptive field, fewer params, more non-linearity. ReLU = the depth enabler."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary V.11 Q1e"],
+          "q": "VGGNet: what is the purpose of the convolutional part of the model, and why do we still need the FC layers at the end?",
+          "answer": "The **convolutional part** acts as a **feature extractor** (local, hierarchical features). The **FC layers** have a **global receptive field**, which is what the final **classification** task needs to combine all features into class scores.",
+          "extend": "Conv = local features; FC head = global decision. This conv-backbone + FC-head split is the template most classifiers follow."
+        },
+        {
+          "type": "mc",
+          "freq": 2,
+          "sources": ["WS21 1.9"],
+          "q": "What is true for common architectures like VGG-16 or LeNet?",
+          "options": [
+            {"text": "The number of filters tends to increase as we go deeper into the network.", "correct": true},
+            {"text": "The width and height of the activation maps tend to increase with depth.", "correct": false},
+            {"text": "The input can be any size as long as width = height.", "correct": false},
+            {"text": "They follow Conv→Pool…→Conv→Pool→FC…→FC.", "correct": true}
+          ],
+          "answer": "**True:** filter/channel count **increases** with depth, and they follow the **Conv→Pool→…→FC** paradigm. **False:** spatial size **decreases** (not increases) with depth, and the FC layers fix the input size (so arbitrary sizes are not allowed).",
+          "extend": "Standard CNN trend: spatial ↓, channels ↑ as you go deeper — trading resolution for semantic richness."
+        }
+      ]
+    },
+    {
+      "id": "skip-resnet",
+      "title": "Skip Connections & ResNet",
+      "recap": "A residual block computes $X_{l+1}=X_l+F(X_l)$. The identity path is a 'highway' for gradients: $\\frac{\\partial L}{\\partial X_l}=\\frac{\\partial L}{\\partial X_{l+1}}\\big(1+\\frac{\\partial F(X_l)}{\\partial X_l}\\big)$ — the $+1$ lets the gradient bypass the block, mitigating vanishing gradients and enabling very deep nets.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["Summary V.11 Q2a", "Summary V.11 Q2b"],
+          "q": "Why do skip connections create a 'highway of gradients'? Show it in the chain rule for $\\frac{\\partial L}{\\partial X_l}$ given $X_{l+1}=X_l+F(X_l)$.",
+          "answer": "Skip connections add the input to the output, so the gradient of that input can **bypass** the block instead of being diminished by it:\n$\\frac{\\partial L}{\\partial X_l}=\\frac{\\partial L}{\\partial X_{l+1}}\\frac{\\partial X_{l+1}}{\\partial X_l}=\\frac{\\partial L}{\\partial X_{l+1}}\\Big(\\frac{\\partial X_l}{\\partial X_l}+\\frac{\\partial F(X_l)}{\\partial X_l}\\Big)=\\frac{\\partial L}{\\partial X_{l+1}}\\Big(1+\\frac{\\partial F(X_l)}{\\partial X_l}\\Big).$\nThe **$1$** guarantees gradient flow even if $\\frac{\\partial F}{\\partial X_l}\\to0$.",
+          "extend": "That additive $+1$ is the whole trick: the gradient is never fully attenuated, so 100+ layer ResNets train. Same idea reappears in LSTM cell state."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["Summary V.11 Q2c"],
+          "q": "Give a Python-like implementation of a residual block.",
+          "answer": "```python\nz = conv1(x)\nz = relu(z)\nz = conv2(z)\nx = relu(x + z)   # add the input (skip connection), then activate\n```\nThe key line is `x + z`: the block learns the residual $F(x)=z$ and adds it to the identity.",
+          "extend": "The convs must keep the spatial/channel shape so `x + z` aligns (use the $(3,1,1)$ trio, or a 1×1 conv on the skip to match channels)."
+        },
+        {
+          "type": "mc",
+          "freq": 2,
+          "sources": ["WS21 1.2"],
+          "q": "What is true about Residual Blocks?",
+          "options": [
+            {"text": "Reduce the number of computations in the forward pass.", "correct": false},
+            {"text": "Act as a highway for gradient flow.", "correct": true},
+            {"text": "Enable a more stable training of larger networks.", "correct": true},
+            {"text": "Act as a regularizer.", "correct": false}
+          ],
+          "answer": "**True:** residual blocks act as a **gradient highway** and **enable stable training of deeper networks**. They do **not** reduce forward computation (they add an addition), and are not primarily a regularizer.",
+          "extend": "Residual = solve vanishing gradients + degradation in deep nets. Their job is trainability of depth, not speed or regularization."
+        }
+      ]
+    },
+    {
+      "id": "inception",
+      "title": "GoogLeNet / Inception",
+      "recap": "Inception runs multiple kernel sizes in parallel and concatenates them. The first version was too expensive (large kernels); **1×1 convolutions** were added to reduce channels before costly $3\\times3/5\\times5$ convs. MaxPool inside the block uses the size-preserving trio $(k{=}3,s{=}1,p{=}1)$ so its output can be concatenated.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary V.11 Q1f"],
+          "q": "Inception: (i) what was the problem with the first version and how was it solved? (ii) MaxPool usually reduces spatial size — how was it used *inside* an Inception block and concatenated to the other outputs?",
+          "answer": "(i) The first InceptionNet was **too complex/expensive** (large-kernel convolutions). Solved by inserting **1×1 convolutions** to **reduce the channel count** before the more expensive convs (a bottleneck).\n(ii) By using the **size-preserving trio** $k{=}3,s{=}1,p{=}1$, the MaxPool keeps the spatial dimensions, so its output matches the others and can be **concatenated**.",
+          "extend": "1×1 bottlenecks made 'going deeper' (GoogLeNet) affordable. The size-preserving trio is reused everywhere to keep parallel branches concatenable."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "Why does the Inception module use several kernel sizes ($1\\times1, 3\\times3, 5\\times5$) in parallel instead of picking one?",
+          "answer": "Different kernel sizes capture features at **different scales/receptive fields**; running them in parallel and concatenating lets the network learn which scale matters at each location, rather than committing to a single fixed receptive field per layer.",
+          "extend": "Multi-scale in one layer = let the data choose the scale. The 1×1 bottlenecks keep this multi-branch design computationally feasible."
+        }
+      ]
+    },
+    {
+      "id": "autoencoders",
+      "title": "Autoencoders",
+      "recap": "An autoencoder encodes input to a bottleneck $z$ then decodes back, trained with a **reconstruction** loss (MSE/MAE) — **unsupervised** (input is its own target). Latent too small → blurry/underfit; too big → learns identity/overfits. It is the non-linear analogue of PCA; great for unsupervised feature extraction on unlabeled data.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["Summary V.11 Q3a", "Summary V.11 Q3c", "SS22 5.3"],
+          "q": "For an image-reconstruction autoencoder: what loss can you use, what do you compare, and is it supervised or unsupervised? What linear method does it resemble and what's its advantage?",
+          "answer": "**Loss:** MSE or MAE, comparing the **input** image with the **reconstructed** output. It is **unsupervised** (no labels — the input is the target).\n**Resembles PCA** (linear dimensionality reduction); the autoencoder's advantage is that it is **non-linear** and can learn more complex features.",
+          "extend": "Autoencoder = non-linear PCA. 'No ground-truth labels needed' is the recurring exam phrase (also Ch I, SS22 5.3)."
+        },
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["Summary V.11 Q3b", "SS22 5.1", "SS22 5.2", "SS20 P7c"],
+          "q": "What happens if the autoencoder's latent space (bottleneck) is too small? Too big?",
+          "answer": "**Too small:** too much information is lost → poor/blurry reconstruction → **underfitting**.\n**Too big:** the network can learn to **copy** the input (identity mapping) without learning meaningful features → **overfitting** / no useful compression.",
+          "extend": "The bottleneck size is the key hyperparameter — it forces a trade-off between compression (small) and reconstruction fidelity (large)."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary V.11 Q3d", "SS22 5.4", "SS20 P7g"],
+          "q": "Give a scenario where you'd use an autoencoder for feature extraction.",
+          "answer": "When you have **lots of unlabeled data** and little labeled data: train the autoencoder unsupervised to reconstruct the unlabeled data, then reuse the **encoder** as a pre-trained **feature extractor** for a supervised task (attach a small classifier, fine-tune on the labeled set).",
+          "extend": "This is the transfer-learning recipe of Ch IV: unsupervised pre-training → supervised fine-tuning, with the autoencoder encoder as backbone."
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": ["SS23 1.1"],
+          "q": "Which statements about Autoencoders are true?",
+          "options": [
+            {"text": "Only usable for image data, not other data types.", "correct": false},
+            {"text": "Autoencoders can be used for dimensionality reduction.", "correct": true},
+            {"text": "Autoencoders require labeled training data.", "correct": false},
+            {"text": "Autoencoders can be trained without a loss function.", "correct": false}
+          ],
+          "answer": "Only **dimensionality reduction** is true. Autoencoders work on any data type, are **unsupervised** (no labels), and need a **reconstruction loss** to train.",
+          "extend": "Bottleneck = compressed code → dimensionality reduction. 'Self-supervised': the label is the input itself."
+        }
+      ]
+    },
+    {
+      "id": "unet",
+      "title": "U-Net & Fully Convolutional Networks",
+      "recap": "U-Net is an encoder–decoder with **skip connections** between matching encoder/decoder levels, preserving fine spatial detail lost during downsampling. It accepts variable input sizes (fully convolutional) and processes most computation at low resolution. Channel count is increased to compensate for reduced spatial size.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary V.11 Q4a", "Summary V.11 Q4b"],
+          "q": "Give advantages of U-Net over a vanilla autoencoder. How do we mitigate the drop in spatial size so not too much information is lost?",
+          "answer": "**Advantages:** (i) **skip connections** between encoder and decoder preserve fine detail; (ii) most processing happens at **lower resolution** (cheaper); (iii) accepts **different input sizes** with no structural change; (iv) extracts meaningful **local** features instead of only global ones.\n**Mitigation:** **increase the number of channels** as spatial size shrinks, giving features more 'breathing room' to pass through.",
+          "extend": "Skip connections in U-Net carry high-resolution detail across the bottleneck — crucial for segmentation where pixel-precise boundaries matter."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["Summary V.11 Q4c"],
+          "q": "For plain image *reconstruction*, does it make sense to use encoder–decoder skip connections? Explain.",
+          "answer": "**No** — for pure reconstruction, skip connections let the model **copy** the input straight to the output (memorize/identity), so it never learns a meaningful compressed representation. Skip connections help **segmentation** (need detail) but defeat the purpose of a compressing autoencoder.",
+          "extend": "Skip connections + reconstruction target = trivial identity shortcut. They're beneficial only when the output needs the bypassed high-res detail (segmentation)."
+        }
+      ]
+    },
+    {
+      "id": "vae",
+      "title": "Variational Autoencoders (VAEs)",
+      "recap": "VAEs learn the data distribution **explicitly**. Two losses: a **reconstruction** loss (MSE/MAE) + a **KL-divergence** term forcing the latent toward a standard normal. The **reparameterization trick** $z=\\mu+\\sigma\\epsilon$ (with $\\epsilon\\sim\\mathcal{N}(0,1)$) makes sampling differentiable so backprop works.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary V.11 Q5d", "Summary V.11 Q5e", "Summary V.11 Q5f"],
+          "q": "VAE: what two losses are used and their purpose? What distribution do we assume for the latent? How does the reparameterization trick enable sampling?",
+          "answer": "**Two losses:** (1) **reconstruction** (MAE/MSE) to match the output to the input; (2) **KL divergence** to push the latent distribution toward the assumed prior.\n**Assumed distribution:** the **standard normal** $\\mathcal{N}(0,1)$.\n**Reparameterization trick:** sample $z=\\mu+\\sigma\\epsilon$ with $\\epsilon\\sim\\mathcal{N}(0,1)$ — the randomness is moved into $\\epsilon$, so $\\mu,\\sigma$ stay differentiable and gradients can flow (you can't backprop through a raw random sample).",
+          "extend": "KL keeps the latent space smooth/continuous so you can sample & interpolate; the reparam trick is what makes the stochastic node trainable by backprop."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["Summary V.11 Q5a"],
+          "q": "What is the difference between how GANs and VAEs learn the training-set distribution?",
+          "answer": "**VAEs** learn the distribution **explicitly (directly)** — they model $p(x)$ via an encoder/decoder and a KL-regularized latent. **GANs** learn it **implicitly (indirectly)** — the generator learns to produce samples that fool a discriminator, never writing down $p(x)$.",
+          "extend": "Explicit (VAE) → smoother, blurrier samples, tractable latent. Implicit (GAN) → sharper samples, harder/unstable training."
+        }
+      ]
+    },
+    {
+      "id": "gan",
+      "title": "Generative Adversarial Networks (GANs)",
+      "recap": "A GAN pits a **generator** (turns noise into fake images) against a **discriminator** (real vs fake), trained min-max. Discriminator loss is BCE on real(1)/fake(0); to train the generator we relabel fakes as **1** to fool D. Prone to **underfitting** and **mode collapse** (generator outputs one image that fools D). GANs give sharper images than VAEs but are unstable to train.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary V.11 Q5b", "Summary V.11 Q5c"],
+          "q": "In the vanilla GAN, why is it prone to underfitting and mode collapse? How do we train the generator to fool the discriminator?",
+          "answer": "**Underfitting / mode collapse:** generator and discriminator work **against each other** in a min-max game, so both can converge to **suboptimal** solutions; the generator may learn to produce a **single image** that reliably fools the discriminator (mode collapse), ignoring diversity.\n**Training the generator:** pass the fake image through the discriminator but label it as **class 1 (real)**, so the generator is pushed to make fakes the discriminator scores as real.",
+          "extend": "The 'relabel fakes as real' is the generator's objective. Mode collapse = generator exploits one D-fooling sample; WGAN/conditional GAN variants address instability."
+        },
+        {
+          "type": "mc",
+          "freq": 2,
+          "sources": ["WS21 1.4"],
+          "q": "What is true about Generative Adversarial Networks?",
+          "options": [
+            {"text": "The Generator minimizes the probability that the Discriminator is correct.", "correct": true},
+            {"text": "The Generator provides supervision for the Discriminator.", "correct": false},
+            {"text": "The Discriminator acts as a classifier.", "correct": true},
+            {"text": "The Discriminator samples from a latent space.", "correct": false}
+          ],
+          "answer": "**True:** the generator **minimizes the probability the discriminator is correct** (fools it), and the **discriminator is a classifier** (real vs fake). **False:** the *real data* (not the generator) supervises D, and it's the **generator** that samples from the latent space, not the discriminator.",
+          "extend": "Roles: G = noise→image (samples latent); D = image→real/fake (classifier). They train adversarially in a min-max game."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["Summary V.10"],
+          "q": "Write the discriminator and generator losses of a vanilla GAN.",
+          "answer": "**Discriminator (BCE, real=1/fake=0):** $L_D=-\\frac{1}{2N}\\sum_i\\big(y_i\\log D(x_i)+(1-y_i)\\log(1-D(G(z_i)))\\big)$.\n**Generator (relabel fakes as real):** $L_G=-\\frac{1}{N}\\sum_i\\log D(G(z_i))$ — maximize the discriminator's probability that the fake is real.",
+          "extend": "D wants $D(\\text{real})\\to1, D(\\text{fake})\\to0$; G wants $D(\\text{fake})\\to1$. The two losses pull D's output on fakes in opposite directions."
+        }
+      ]
+    }
+  ]
+}
