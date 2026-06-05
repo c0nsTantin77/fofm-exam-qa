@@ -4,7 +4,7 @@
   "exams": ["SS20", "SS21", "WS21", "SS22", "WS22", "SS23", "WS23", "SS24", "WS24", "SS25", "WS26", "Mock"],
   "chapters": [
     {"id": "ch01", "roman": "I",   "title": "Machine Learning Basics",      "file": "ch01_ml_basics.json", "status": "ready"},
-    {"id": "ch02", "roman": "II",  "title": "Neural Networks",              "file": null, "status": "soon"},
+    {"id": "ch02", "roman": "II",  "title": "Neural Networks",              "file": "ch02_neural_networks.json", "status": "ready"},
     {"id": "ch03", "roman": "III", "title": "Convolutions",                 "file": null, "status": "soon"},
     {"id": "ch04", "roman": "IV",  "title": "Optimization",                 "file": null, "status": "soon"},
     {"id": "ch05", "roman": "V",   "title": "Popular Architectures",        "file": null, "status": "soon"},
