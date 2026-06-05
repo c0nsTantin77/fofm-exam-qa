@@ -60,14 +60,54 @@ def md_block(s: str) -> str:
 
 def freq_badge(f: int) -> str:
     if f >= 6:
-        cls, lab = "freq-hot", f"★ {f}×"
+        cls, lab = "freq-hot", f"🔥 {f}×"
     elif f >= 3:
-        cls, lab = "freq-mid", f"{f}×"
+        cls, lab = "freq-mid", f"🔥 {f}×"
     elif f >= 1:
         cls, lab = "freq-low", f"{f}×"
     else:
         cls, lab = "freq-ai", "practice"
     return f"<span class='badge {cls}' title='Times this point appears across exams'>{lab}</span>"
+
+TUM_LOGO = "<img class='tum-logo' src='{base}assets/tum.svg' alt='TUM' width='44' height='23'>"
+
+EXAM_NAMES = {
+    "SS20": "SoSe 2020", "SS21": "SoSe 2021", "SS22": "SoSe 2022",
+    "SS23": "SoSe 2023", "SS24": "SoSe 2024", "SS25": "SoSe 2025",
+    "WS21": "WiSe 2021/22", "WS22": "WiSe 2022/23", "WS23": "WiSe 2023/24",
+    "WS24": "WiSe 2024/25", "WS26": "WiSe 2025/26", "Mock": "Mock exam",
+}
+
+def site_footer(exams, *, base) -> str:
+    rows = "".join(
+        f"<li><span class='src'>{esc(e)}</span> {esc(EXAM_NAMES.get(e, e))} endterm</li>"
+        for e in exams
+    )
+    return f"""
+<footer class="sources">
+  <div class="sources-inner">
+    {TUM_LOGO.format(base=base)}
+    <div class="sources-cols">
+      <div>
+        <h4>Sources</h4>
+        <ul class="src-list">
+          {rows}
+          <li><span class='src'>Summary</span> <em>Summary of the lecture I2DL</em> (per-chapter questions)</li>
+        </ul>
+      </div>
+      <div>
+        <h4>About</h4>
+        <p>Revision deck for <b>Introduction to Deep Learning (IN2346)</b>, TU&nbsp;München.
+        Answers follow the <b>official sample solutions</b>; for variant phrasings the scoring
+        points are merged. Items tagged <span class="src-ai">AI-generated</span> are model-written
+        practice and are not from past exams.</p>
+        <p>Formulas rendered with <a href="https://katex.org/" rel="noopener">KaTeX</a>.
+        Built from the official I2DL materials for personal study. Spotted a mistake? Open an issue on the repo.</p>
+      </div>
+    </div>
+  </div>
+  <div class="sources-bar">TUM IN2346 · I2DL Exam Q&amp;A · for educational use only — not affiliated with or endorsed by TUM.</div>
+</footer>"""
 
 def source_tags(sources) -> str:
     out = []
@@ -171,7 +211,7 @@ def build():
 
         body = f"""
 <header class="topbar">
-  <a class="home" href="../index.html">← All chapters</a>
+  <a class="brand" href="../index.html">{TUM_LOGO.format(base='../')}<span>← All chapters</span></a>
   <div class="filters">
     <input id="search" type="search" placeholder="Search questions…" autocomplete="off">
     <label><input type="checkbox" class="ftype" value="mc" checked> MC</label>
@@ -202,9 +242,9 @@ def build():
     <p class="hint">Knowledge points are ordered by the lecture syllabus; questions within each point are sorted by exam frequency. Click any question to reveal the answer.</p>
     {kps}
     <p class="noresults" hidden>No questions match your filter.</p>
-    <footer class="pagefoot">Answers follow the official sample solutions; for variant questions the scoring points are extracted. AI-generated items are clearly marked and meant for extra practice.</footer>
   </main>
 </div>
+{site_footer(manifest['exams'], base='../')}
 """
         out = page_shell(f"{data['roman']}. {data['title']} · I2DL Exam Q&A", body, depth=1)
         (CHAPTERS_DIR / f"{ch['id']}.html").write_text(out, encoding="utf-8")
@@ -233,9 +273,10 @@ def build():
     body = f"""
 <header class="hero">
   <div class="hero-inner">
-    <div class="kicker">TUM · IN2346</div>
+    <div class="hero-top">{TUM_LOGO.format(base='')}<span class="kicker">Technische Universität München · IN2346</span></div>
     <h1>Introduction to Deep Learning</h1>
-    <p class="lead">Exam Q&amp;A revision deck — every problem from 12 past exams + the course summary, classified by chapter and knowledge point, sorted by frequency, with standard answers and LaTeX-rendered formulas.</p>
+    <p class="tagline">Exam Q&amp;A Bank · closed-book revision · open &amp; free</p>
+    <p class="lead">Every problem from 12 past exams + the course summary, classified by chapter and knowledge point, sorted by exam frequency, answered from the official solutions, with LaTeX-rendered formulas.</p>
     <div class="exams">{exams}</div>
   </div>
 </header>
@@ -252,10 +293,9 @@ def build():
       <li><b>Closed-book ready:</b> click a question to reveal the answer and an “extended memory” hook.</li>
     </ul>
   </section>
-  <footer class="hubfoot">
-    Draft build — Chapter&nbsp;I complete. Built from official I2DL materials for personal revision.
-  </footer>
+  <p class="hubnote">Draft build — Chapter&nbsp;I complete (41 questions). Chapters II–VII are being added.</p>
 </main>
+{site_footer(manifest['exams'], base='')}
 """
     out = page_shell("I2DL Exam Q&A · TUM IN2346", body, depth=0)
     (ROOT / "index.html").write_text(out, encoding="utf-8")
