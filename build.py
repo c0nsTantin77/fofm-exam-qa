@@ -137,24 +137,48 @@ def render_question(q) -> str:
     qrender = md_block(q["q"]) if "```" in q["q"] else md_inline(q["q"])
     qbody = f"<div class='q-text'>{qrender}</div>"
 
-    # options for MC are shown with the answer (so it stays a quiz until opened)
-    inner = []
+    answer_html = f"<div class='answer'><div class='answer-label'>Answer</div>{md_block(q['answer'])}</div>"
+    extend_html = (
+        f"<div class='extend'><div class='extend-label'>💡 Extended memory</div>{md_block(q['extend'])}</div>"
+        if q.get("extend") else ""
+    )
+
     if qtype == "mc":
+        # Interactive quiz: blank options; reveal answer + analysis only after the
+        # learner picks option(s) and hits "Check". Any number of options may be correct.
         opts = []
         for o in q["options"]:
-            mark = "✅" if o["correct"] else "❌"
-            ocls = "opt-correct" if o["correct"] else "opt-wrong"
-            opts.append(f"<li class='{ocls}'><span class='mark'>{mark}</span>{md_inline(o['text'])}</li>")
-        inner.append("<ul class='options'>" + "".join(opts) + "</ul>")
-    inner.append(f"<div class='answer'><div class='answer-label'>Answer</div>{md_block(q['answer'])}</div>")
-    if q.get("extend"):
-        inner.append(f"<div class='extend'><div class='extend-label'>💡 Extended memory</div>{md_block(q['extend'])}</div>")
+            c = "true" if o["correct"] else "false"
+            opts.append(
+                "<li class='opt'><label>"
+                f"<input type='checkbox' data-correct='{c}'>"
+                f"<span class='opt-text'>{md_inline(o['text'])}</span>"
+                "<span class='opt-mark' aria-hidden='true'></span>"
+                "</label></li>"
+            )
+        body_inner = (
+            "<div class='quiz'>"
+            "<p class='quiz-hint'>Select all options you think are correct, then check.</p>"
+            "<ul class='options interactive'>" + "".join(opts) + "</ul>"
+            "<div class='quiz-actions'>"
+            "<button type='button' class='check-btn' disabled>Check answer</button>"
+            "<button type='button' class='reset-btn' hidden>Try again</button>"
+            "</div>"
+            "<div class='reveal' hidden>"
+            "<div class='verdict' role='status'></div>"
+            f"{answer_html}{extend_html}"
+            "</div>"
+            "</div>"
+        )
+    else:
+        # Open / AI: opening the card reveals the answer directly.
+        body_inner = f"{answer_html}{extend_html}"
 
     data_attr = f"data-type='{qtype}' data-freq='{q.get('freq',0)}'"
     return (
         f"<details class='q' {data_attr}>"
         f"<summary>{head}{qbody}</summary>"
-        f"<div class='q-body'>{''.join(inner)}</div>"
+        f"<div class='q-body'>{body_inner}</div>"
         f"</details>"
     )
 
