@@ -1,0 +1,93 @@
+{
+  "id": "ch07",
+  "roman": "VII",
+  "title": "Appendix: Matrix Calculus",
+  "blurb": "The math behind backpropagation: gradients vs Jacobians, why a scalar loss keeps every gradient the same shape as its variable, and the affine-layer derivatives $\\frac{\\partial L}{\\partial W}=X^\\top\\text{dout}$, $\\frac{\\partial L}{\\partial X}=\\text{dout}\\,W^\\top$, $\\frac{\\partial L}{\\partial b}=\\sum_n\\text{dout}$.",
+  "knowledge_points": [
+    {
+      "id": "gradients-jacobians",
+      "title": "Gradients, Jacobians & the Scalar-Loss Principle",
+      "recap": "For $f:\\mathbb{R}^{n\\times m}\\to\\mathbb{R}$ (scalar output), $\\frac{\\partial f}{\\partial x}$ is a **gradient** with the **same shape** as $x$. For $f:\\mathbb{R}^n\\to\\mathbb{R}^m$ (vector output) it is a **Jacobian** ($m\\times n$). Because a neural network always ends in a **scalar loss** $L\\in\\mathbb{R}$, we only ever compute gradients (same shape as the variable) — never full Jacobians.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary VII.1", "Summary II.8 Q4a"],
+          "q": "Why can backpropagation avoid computing full Jacobians, and what shape does the gradient of the loss w.r.t. a weight matrix have?",
+          "answer": "Because the loss is a **scalar** $L\\in\\mathbb{R}$. The derivative of a scalar by a matrix is a **gradient with the same shape as that matrix** (each entry $\\frac{\\partial L}{\\partial w_{ij}}$ is a scalar), not a Jacobian. So $\\frac{\\partial L}{\\partial W}$ has the same shape as $W$.\nA Jacobian would only appear for a **vector→vector** map (e.g. $\\frac{\\partial Y}{\\partial W}$ alone), but the scalar loss collapses it.",
+          "extend": "Shape-matching rule: $\\frac{\\partial L}{\\partial v}$ has the same shape as $v$, for any variable $v$. This is the single most useful sanity check in backprop."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["Summary VII.1"],
+          "q": "Distinguish a gradient from a Jacobian. Give the shapes for $f:\\mathbb{R}^n\\to\\mathbb{R}$ and $f:\\mathbb{R}^n\\to\\mathbb{R}^m$.",
+          "answer": "**Gradient** (scalar output $f:\\mathbb{R}^n\\to\\mathbb{R}$): a vector $\\frac{\\partial f}{\\partial x}\\in\\mathbb{R}^n$ (same shape as input). **Jacobian** (vector output $f:\\mathbb{R}^n\\to\\mathbb{R}^m$): a matrix $\\frac{\\partial f}{\\partial x}\\in\\mathbb{R}^{m\\times n}$ (one row per output, one column per input).",
+          "extend": "Scalar-out → gradient (input-shaped). Vector-out → Jacobian (out×in). Deep learning lives in the gradient world thanks to the scalar loss."
+        }
+      ]
+    },
+    {
+      "id": "affine-derivatives",
+      "title": "Affine-Layer Derivatives",
+      "recap": "For $Y=XW+b$ with upstream gradient $\\text{dout}=\\frac{\\partial L}{\\partial Y}$ (shape $N\\times M$): $\\frac{\\partial L}{\\partial W}=X^\\top\\,\\text{dout}$ ($D\\times M$), $\\frac{\\partial L}{\\partial X}=\\text{dout}\\,W^\\top$ ($N\\times D$), $\\frac{\\partial L}{\\partial b}=\\mathbf{1}_N^\\top\\,\\text{dout}=\\sum_{n}\\text{dout}$ ($1\\times M$).",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": ["Summary VII.1", "SS22 2.2", "SS22 2.3"],
+          "q": "For $Y=XW+b$ ($X_{N\\times D}$, $W_{D\\times M}$, $b_{1\\times M}$) and a scalar loss $L$, derive $\\frac{\\partial L}{\\partial W}$ and $\\frac{\\partial L}{\\partial X}$ with their shapes.",
+          "answer": "$\\frac{\\partial L}{\\partial W}=X^\\top\\cdot\\frac{\\partial L}{\\partial Y}=X^\\top\\,\\text{dout}$, shape $D\\times M$ (same as $W$).\n$\\frac{\\partial L}{\\partial X}=\\frac{\\partial L}{\\partial Y}\\cdot W^\\top=\\text{dout}\\,W^\\top$, shape $N\\times D$ (same as $X$).\nBoth hold **because $L$ is a scalar** — otherwise $\\frac{\\partial Y}{\\partial W}$ would be a Jacobian tensor.",
+          "extend": "Memorize by shape: to get $D\\times M$ from $X(N\\times D)$ and $\\text{dout}(N\\times M)$ you must use $X^\\top\\text{dout}$. The transpose and order are forced by shape-matching."
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary VII.1"],
+          "q": "How is the bias $b$ handled in $Y=XW+b$ (it's $1\\times M$ but $XW$ is $N\\times M$), and what is $\\frac{\\partial L}{\\partial b}$?",
+          "answer": "$b$ is **broadcast**: mathematically $Y=XW+\\mathbf{1}_N b$, where $\\mathbf{1}_N$ is a column of ones that copies $b$ across all $N$ rows (this is exactly NumPy broadcasting).\nTreating $\\mathbf{1}_N b$ like another $XW$, $\\frac{\\partial L}{\\partial b}=\\mathbf{1}_N^\\top\\cdot\\frac{\\partial L}{\\partial Y}=\\sum_{i=1}^{N}\\text{dout}_{i,:}$ — i.e. **sum the upstream gradient over the batch** → shape $1\\times M$.",
+          "extend": "Bias gradient = column-sum of dout (`np.sum(dout, axis=0)`), because $b$ contributed identically to every row of the batch."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["Summary VII.1"],
+          "q": "Why is the per-weight derivative $\\frac{\\partial L}{\\partial w_{u,v}}=\\sum_i\\sum_j\\frac{\\partial L}{\\partial y_{i,j}}\\frac{\\partial y_{i,j}}{\\partial w_{u,v}}$ a double sum?",
+          "answer": "Because $w_{u,v}$ can influence **multiple** entries $y_{i,j}$ of the output, and the chain rule must accumulate the contribution through **every** output entry it affects. The scalar $\\frac{\\partial L}{\\partial w_{u,v}}$ sums all those paths — this is the 'each neuron collects/sums the upstream gradients it took part in' picture.",
+          "extend": "Each parameter's gradient = sum over all outputs it touched. For $Y=XW$, $w_{u,v}$ only affects column $v$, which is why the matrix form collapses to $X^\\top\\text{dout}$."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": ["AI-generated"],
+          "q": "Given $X\\in\\mathbb{R}^{4\\times3}$, $W\\in\\mathbb{R}^{3\\times5}$ and $\\text{dout}\\in\\mathbb{R}^{4\\times5}$, state the shapes of $\\frac{\\partial L}{\\partial W}$, $\\frac{\\partial L}{\\partial X}$, $\\frac{\\partial L}{\\partial b}$ and how to compute each.",
+          "answer": "$\\frac{\\partial L}{\\partial W}=X^\\top\\text{dout}\\in\\mathbb{R}^{3\\times5}$; $\\frac{\\partial L}{\\partial X}=\\text{dout}\\,W^\\top\\in\\mathbb{R}^{4\\times3}$; $\\frac{\\partial L}{\\partial b}=\\sum_{n}\\text{dout}\\in\\mathbb{R}^{1\\times5}$ (`np.sum(dout, axis=0)`).",
+          "extend": "Each gradient matches its variable's shape (W:3×5, X:4×3, b:1×5). Use that to decide transposes/multiplication order without re-deriving."
+        }
+      ]
+    },
+    {
+      "id": "chain-rule-scope",
+      "title": "Chain Rule & the Upstream Gradient (dout)",
+      "recap": "Backprop treats each layer in its **own scope**. The upstream gradient $\\text{dout}=\\frac{\\partial L}{\\partial Y}$ (already computed by the layers above) enters the layer; the layer computes its parameter gradients and passes a new upstream gradient $\\frac{\\partial L}{\\partial X}$ to the layer below.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": ["Summary VII.1"],
+          "q": "Explain the 'upstream gradient' (dout) abstraction in backpropagation for a layer like Affine → ReLU → Affine → Sigmoid → Loss.",
+          "answer": "When deriving a given layer (say the Affine layer), we treat it as a function with its own **scope**. Everything above it has already produced $\\text{dout}=\\frac{\\partial L}{\\partial Y}$ (the **upstream gradient**). The layer uses dout to compute its local parameter gradients ($\\frac{\\partial L}{\\partial W}, \\frac{\\partial L}{\\partial b}$) and the gradient to send further down ($\\frac{\\partial L}{\\partial X}$), which becomes the next layer's dout.",
+          "extend": "Modular backprop: each layer only needs its forward inputs + the incoming dout. This local abstraction is exactly how autograd frameworks implement `backward()`."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": ["Summary VII.1"],
+          "q": "Compute a tiny chain-rule example: $f(X)=2X$, $g(z)=\\sum_i z_i$, $L=g(f(X))$ with $X\\in\\mathbb{R}^n$. What is $\\frac{\\partial L}{\\partial x_1}$?",
+          "answer": "$L=2x_1+2x_2+\\dots+2x_n$. Then $\\frac{\\partial L}{\\partial x_1}=\\sum_k\\frac{\\partial L}{\\partial f(x)_k}\\frac{\\partial f(x)_k}{\\partial x_1}=2\\cdot1+2\\cdot0+\\dots+2\\cdot0=\\mathbf{2}$ (only $f(x)_1=2x_1$ depends on $x_1$).",
+          "extend": "The chain rule sums over every intermediate that depends on $x_1$; here only one term survives because $f$ is element-wise."
+        }
+      ]
+    }
+  ]
+}

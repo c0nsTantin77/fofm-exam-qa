@@ -9,6 +9,6 @@
     {"id": "ch04", "roman": "IV",  "title": "Optimization",                 "file": "ch04_optimization.json", "status": "ready"},
     {"id": "ch05", "roman": "V",   "title": "Popular Architectures",        "file": "ch05_architectures.json", "status": "ready"},
     {"id": "ch06", "roman": "VI",  "title": "RNNs & Transformers",          "file": "ch06_rnn_transformers.json", "status": "ready"},
-    {"id": "ch07", "roman": "VII", "title": "Appendix: Matrix Calculus",    "file": null, "status": "soon"}
+    {"id": "ch07", "roman": "VII", "title": "Appendix: Matrix Calculus",    "file": "ch07_appendix_calculus.json", "status": "ready"}
   ]
 }

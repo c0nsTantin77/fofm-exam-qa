@@ -8,7 +8,17 @@ sample solutions** (scoring points merged for variant phrasings). Formulas rende
 🔗 **Live site:** https://c0nsTantin77.github.io/i2dl-exam-qa/
 
 ## Status
-Draft build — **Chapter I: Machine Learning Basics** is complete (39 questions across 9 knowledge points). Remaining chapters (II–VII) are scaffolded and marked *coming soon*.
+**All 7 chapters complete** — 168 questions across 44 knowledge points, extracted from 12 past exams + the course summary. Every source citation is auto-verified against the original exam text (`tools/check_sources.py`).
+
+| Ch | Topic | Questions |
+|----|-------|-----------|
+| I | Machine Learning Basics | 41 |
+| II | Neural Networks | 33 |
+| III | Convolutions | 19 |
+| IV | Optimization | 33 |
+| V | Popular Architectures | 20 |
+| VI | RNNs & Transformers | 14 |
+| VII | Appendix: Matrix Calculus | 8 |
 
 ## Features
 - **Index hub → per-chapter pages** (matches a clean, mobile-friendly review layout).

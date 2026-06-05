@@ -261,7 +261,7 @@ def build():
       <nav class="toc"><ol>{toc}</ol></nav>
     </details>
     <div class="legend">
-      <div><span class="badge freq-hot">★ n×</span> high frequency</div>
+      <div><span class="badge freq-hot">🔥 n×</span> high frequency</div>
       <div><span class="src">SS22 3.1</span> source = exam + problem no.</div>
       <div><span class="src-ai">AI-generated</span> AI practice question</div>
       <div>✅ correct option &nbsp; ❌ wrong option</div>
@@ -282,12 +282,15 @@ def build():
 
     # ---- index hub
     cards = []
+    total_q = total_topics = 0
     for ch in manifest["chapters"]:
         ready = ch["status"] == "ready"
         if ready:
             data = json.loads((DATA / ch["file"]).read_text(encoding="utf-8"))
             nq = sum(len(kp["questions"]) for kp in data["knowledge_points"])
             ntopic = len(data["knowledge_points"])
+            total_q += nq
+            total_topics += ntopic
             meta = f"<div class='card-meta'>{nq} questions · {ntopic} topics</div>"
             href = f"chapters/{ch['id']}.html"
             cls, badge = "card", ""
@@ -317,13 +320,13 @@ def build():
   <section class="how">
     <h2>How to use this deck</h2>
     <ul>
-      <li><b>Frequency-first:</b> within each topic, questions are ordered by how often they appear across exams — drill the ★ ones first.</li>
+      <li><b>Frequency-first:</b> within each topic, questions are ordered by how often they appear across exams — drill the 🔥 ones first.</li>
       <li><b>Source-tagged:</b> every question cites its origin, e.g. <span class="src">SS22 3.1</span> = SoSe&nbsp;2022 exam, problem 3.1.</li>
       <li><b>Answers = official solutions.</b> For variant phrasings, the scoring points are merged. <span class="src-ai">AI-generated</span> practice items are clearly marked.</li>
       <li><b>Closed-book ready:</b> click a question to reveal the answer and an “extended memory” hook.</li>
     </ul>
   </section>
-  <p class="hubnote">Draft build — Chapter&nbsp;I complete (41 questions). Chapters II–VII are being added.</p>
+  <p class="hubnote">All 7 chapters complete — {total_q} questions across {total_topics} knowledge points, from 12 past exams + the course summary.</p>
 </main>
 {site_footer(manifest['exams'], base='')}
 """
