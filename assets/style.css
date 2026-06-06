@@ -52,6 +52,24 @@ pre.code{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:10px;
 .exam{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);
   padding:3px 10px;border-radius:999px;font-size:.8rem;font-weight:600}
 .hub{max-width:980px;margin:0 auto;padding:36px 24px 64px}
+/* ---- global search (index) ---- */
+.gsearch{margin:0 0 22px;position:relative}
+#gsearch{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px 16px;
+  font-size:1rem;background:#fff;box-shadow:var(--shadow)}
+#gsearch:focus{outline:2px solid var(--tum);border-color:var(--tum)}
+.gresults{margin-top:8px;background:#fff;border:1px solid var(--line);border-radius:12px;
+  box-shadow:var(--shadow);overflow:hidden;max-height:60vh;overflow-y:auto}
+.ghit{display:block;padding:11px 14px;border-bottom:1px solid var(--line);color:inherit}
+.ghit:last-child{border-bottom:none}
+.ghit:hover{background:#f7faff;text-decoration:none}
+.ghit-tag{display:inline-block;font-size:.66rem;font-weight:700;text-transform:uppercase;
+  background:#eef2f7;color:var(--muted);border-radius:999px;padding:1px 7px;margin-right:7px;vertical-align:middle}
+.ghit-q{font-weight:600;font-size:.92rem}
+.ghit-meta{display:block;font-size:.76rem;color:var(--muted);margin-top:2px}
+.gempty{padding:16px;color:var(--muted);font-size:.9rem}
+details.q.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,100%{box-shadow:var(--shadow)}30%{box-shadow:0 0 0 3px var(--tum)}}
+
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
 .card{display:block;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
   padding:20px;box-shadow:var(--shadow);transition:transform .12s ease,box-shadow .12s ease;color:inherit}
@@ -73,7 +91,7 @@ pre.code{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:10px;
   border-bottom:1px solid var(--line);padding:10px 20px}
 .brand{display:flex;align-items:center;gap:9px;font-weight:600;white-space:nowrap;color:var(--tum)}
 .brand .tum-logo{height:20px}
-.brand span{font-size:.92rem}
+.brand-back{font-size:.92rem}
 .filters{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-left:auto}
 .filters label{font-size:.86rem;color:var(--muted);display:flex;align-items:center;gap:4px}
 #search{border:1px solid var(--line);border-radius:10px;padding:7px 12px;font-size:.9rem;min-width:200px;background:#fff}
@@ -147,8 +165,12 @@ details.q[open]{border-color:#bcd4f0}
   border:1px solid var(--line);border-radius:9px;font-size:.92rem;cursor:pointer;background:#fff;transition:background .12s,border-color .12s}
 .options.interactive .opt label:hover{background:#f7faff;border-color:#bcd4f0}
 .options.interactive input{margin:.2em 0 0;flex:none;width:16px;height:16px;accent-color:var(--tum);cursor:pointer}
+.opt-letter{flex:none;font-weight:700;color:var(--muted);min-width:1.1em}
 .opt-text{flex:1}
 .opt-mark{flex:none;font-size:.95rem}
+.correct-line{background:#ebfbee;border:1px solid #b2f2bb;border-radius:9px;
+  padding:8px 12px;font-size:.92rem;margin-bottom:8px}
+.correct-line b{letter-spacing:.04em}
 .quiz.done .opt label{cursor:default}
 .opt.is-correct label{background:#ebfbee;border-color:#b2f2bb}
 .opt.is-wrong label{background:#fff7f7;border-color:#ffd9d9}
@@ -224,7 +246,7 @@ details.q[open]{border-color:#bcd4f0}
   .cards{grid-template-columns:1fr 1fr;gap:11px}
   .layout{padding:16px 13px 70px}
   .topbar{padding:9px 13px;gap:10px}
-  .brand span{display:none}                     /* keep just the logo on small screens */
+  .brand-full{display:none}                     /* small screens: show "← All", drop "chapters" */
   #search{min-width:0;font-size:16px}           /* 16px stops iOS zoom-on-focus */
   .filters{gap:9px}
   .filters label{font-size:.9rem}

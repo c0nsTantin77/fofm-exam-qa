@@ -101,6 +101,56 @@
     });
   });
 
+  // ---- deep-link: open the target question when arriving via #anchor ----
+  function openHashTarget() {
+    if (!location.hash) return;
+    const el = document.querySelector(location.hash);
+    if (el && el.tagName === "DETAILS") {
+      el.open = true;
+      el.scrollIntoView({ block: "center" });
+      el.classList.add("flash");
+      setTimeout(() => el.classList.remove("flash"), 1600);
+    }
+  }
+  window.addEventListener("load", openHashTarget);
+  window.addEventListener("hashchange", openHashTarget);
+
+  // ---- global site-wide search (index page only) ----
+  const gbox = document.getElementById("gsearch");
+  const gres = document.getElementById("gresults");
+  if (gbox && gres) {
+    let index = null, loading = false;
+    const TYPE = { mc: "MC", open: "Open", ai: "AI" };
+    async function ensureIndex() {
+      if (index || loading) return;
+      loading = true;
+      try {
+        const r = await fetch("search-index.json");
+        index = await r.json();
+      } catch (e) { index = []; }
+      loading = false;
+    }
+    function runSearch() {
+      const term = gbox.value.trim().toLowerCase();
+      if (!term) { gres.hidden = true; gres.innerHTML = ""; return; }
+      const words = term.split(/\s+/);
+      const hits = (index || []).filter((e) => words.every((w) => e.txt.includes(w))).slice(0, 40);
+      if (!hits.length) {
+        gres.innerHTML = "<div class='gempty'>No questions match “" + gbox.value + "”.</div>";
+      } else {
+        gres.innerHTML = hits.map((e) =>
+          "<a class='ghit' href='chapters/" + e.c + ".html#" + e.a + "'>" +
+          "<span class='ghit-tag'>" + (TYPE[e.t] || e.t) + "</span>" +
+          "<span class='ghit-q'>" + e.q.replace(/</g, "&lt;") + "</span>" +
+          "<span class='ghit-meta'>" + e.kp + " · " + e.src + "</span></a>"
+        ).join("");
+      }
+      gres.hidden = false;
+    }
+    gbox.addEventListener("focus", ensureIndex);
+    gbox.addEventListener("input", async () => { await ensureIndex(); runSearch(); });
+  }
+
   // ---- back-to-top button (mobile) ----
   const toTop = document.getElementById("toTop");
   if (toTop) {

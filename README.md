@@ -8,24 +8,25 @@ sample solutions** (scoring points merged for variant phrasings). Formulas rende
 🔗 **Live site:** https://c0nsTantin77.github.io/i2dl-exam-qa/
 
 ## Status
-**All 7 chapters complete** — 168 questions across 44 knowledge points, extracted from 12 past exams + the course summary. Every source citation is auto-verified against the original exam text (`tools/check_sources.py`).
+**All 7 chapters complete** — 188 questions across 43 knowledge points (every knowledge point includes AI practice), extracted from 12 past exams + the course summary. Every source citation is auto-verified against the original exam text (`tools/check_sources.py`); `tools/coverage_report.py` writes a per-exam coverage table to [COVERAGE.md](COVERAGE.md).
 
 | Ch | Topic | Questions |
 |----|-------|-----------|
-| I | Machine Learning Basics | 41 |
-| II | Neural Networks | 33 |
-| III | Convolutions | 19 |
-| IV | Optimization | 33 |
-| V | Popular Architectures | 20 |
-| VI | RNNs & Transformers | 14 |
-| VII | Appendix: Matrix Calculus | 8 |
+| I | Machine Learning Basics | 42 |
+| II | Neural Networks | 34 |
+| III | Convolutions | 22 |
+| IV | Optimization | 38 |
+| V | Popular Architectures | 26 |
+| VI | RNNs & Transformers | 16 |
+| VII | Appendix: Matrix Calculus | 10 |
 
 ## Features
-- **Index hub → per-chapter pages** (matches a clean, mobile-friendly review layout).
-- **Frequency-first ordering** with ★ badges; **source tags** like `SS22 3.1` (= SoSe 2022, problem 3.1).
-- **Multiple-choice** answers marked ✅ / ❌ with extended-memory notes.
-- **AI-generated** practice questions per topic, clearly labelled.
-- **KaTeX** LaTeX rendering; live **search** and **MC/Open/AI** filters; collapsible answers.
+- **Index hub → per-chapter pages** with a **site-wide search** across all questions (deep-links straight to the answer).
+- **Frequency-first ordering** (enforced at render time) with 🔥 badges; **source tags** like `SS22 3.1` (= SoSe 2022, problem 3.1).
+- **Interactive multiple-choice**: pick options → check → reveal ✅/❌ marks, an explicit "Correct: A, C" line, the answer, and analysis.
+- **AI-generated** practice questions on **every** knowledge point, clearly labelled.
+- **KaTeX** LaTeX rendering (auto-verified); per-chapter **search** and **MC/Open/AI** filters; collapsible answers.
+- **Mobile-optimized**: collapsible TOC, large tap targets, back-to-top, no horizontal scroll.
 
 ## Sources
 | Tag | Exam |

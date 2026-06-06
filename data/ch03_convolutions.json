@@ -12,7 +12,12 @@
         {
           "type": "open",
           "freq": 5,
-          "sources": ["SS24 2.8", "SS22 1.3", "SS21 2.6", "SS23 6.1"],
+          "sources": [
+            "SS24 2.8",
+            "SS22 1.3",
+            "SS21 2.6",
+            "SS23 6.1"
+          ],
           "q": "Parameter-count drills (always include bias): (a) input $10\\times20\\times30\\times40$ (N×C×H×W), single $3\\times3$ filter, stride 2 — how many parameters? (b) input $16\\times32\\times64\\times64$, single $1\\times1$ filter — how many? (c) first conv on an RGB input, kernel $3\\times3$, $16$ output channels?",
           "answer": "Parameters depend only on $c_{in}, k, c_{out}$ — **not** on spatial size or stride.\n(a) $3\\times3\\times20 + 1 = \\mathbf{181}$ (SS24 2.8).\n(b) $1\\times1\\times32 + 1 = \\mathbf{33}$ (SS22 1.3).\n(c) $(3\\times3)\\times3\\times16 + 16 = 432+16 = \\mathbf{448}$ (SS23 6.1).",
           "extend": "Formula: $c_{out}(c_{in}k_h k_w + 1)$. Stride/padding/input-size change the *output dimensions*, never the parameter count. Don't forget one bias per output channel."
@@ -20,7 +25,10 @@
         {
           "type": "open",
           "freq": 3,
-          "sources": ["SS20 P4b", "SS20 P4c"],
+          "sources": [
+            "SS20 P4b",
+            "SS20 P4c"
+          ],
           "q": "(a) Conv with 5 filters, size 7, stride 3, padding 1 on input $26\\times26\\times26$ — output dimensionality? (b) Conv with 4 filters, kernel 5, stride 1, no padding on an RGB image — shape of the weight tensor and its dimensions?",
           "answer": "(a) $H_{out}=\\lfloor\\frac{26+2\\cdot1-7}{3}\\rfloor+1 = \\lfloor\\frac{21}{3}\\rfloor+1 = 7+1 = 8$ → output $\\mathbf{8\\times8\\times5}$ (5 output channels).\n(b) Weight tensor shape $(4,3,5,5)$ = (output channels, input/RGB channels, height, width).",
           "extend": "Output-size formula $\\lfloor(H+2p-k)/s\\rfloor+1$. Weight tensor = (c_out, c_in, k_h, k_w) — exactly 4 dimensions; naming all four earns the marks."
@@ -28,13 +36,28 @@
         {
           "type": "mc",
           "freq": 2,
-          "sources": ["SS24 1.1", "SS24 1.7"],
+          "sources": [
+            "SS24 1.1",
+            "SS24 1.7"
+          ],
           "q": "Which statements about a convolution layer's output are true?",
           "options": [
-            {"text": "The output size depends on the stride.", "correct": true},
-            {"text": "All layers in a CNN have the same receptive field size.", "correct": false},
-            {"text": "The number of parameters depends on the input's spatial size.", "correct": false},
-            {"text": "Padding can preserve the spatial size of the input.", "correct": true}
+            {
+              "text": "The output size depends on the stride.",
+              "correct": true
+            },
+            {
+              "text": "All layers in a CNN have the same receptive field size.",
+              "correct": false
+            },
+            {
+              "text": "The number of parameters depends on the input's spatial size.",
+              "correct": false
+            },
+            {
+              "text": "Padding can preserve the spatial size of the input.",
+              "correct": true
+            }
           ],
           "answer": "**True:** output size depends on stride; padding can preserve spatial size. **False:** receptive fields *grow* with depth (not equal across layers), and parameter count is independent of spatial size.",
           "extend": "Two independent facts the exam mixes: *output dimensions* depend on $k,s,p,$ input size; *parameter count* depends only on $c_{in},k,c_{out}$."
@@ -42,7 +65,9 @@
         {
           "type": "ai",
           "freq": 0,
-          "sources": ["AI-generated"],
+          "sources": [
+            "AI-generated"
+          ],
           "q": "An input $8\\times3\\times32\\times32$ passes through Conv($k{=}3,s{=}1,p{=}1$, 64 filters). Give the output shape and the parameter count.",
           "answer": "Output spatial: $\\lfloor(32+2-3)/1\\rfloor+1 = 32$, with 64 channels → output $\\mathbf{8\\times64\\times32\\times32}$. Parameters: $64\\times(3\\times3\\times3 + 1) = 64\\times28 = \\mathbf{1792}$.",
           "extend": "The $(k{=}3,s{=}1,p{=}1)$ 'magic trio' keeps $H,W$ unchanged — memorize it; it's everywhere in ResNet/VGG."
@@ -57,7 +82,9 @@
         {
           "type": "open",
           "freq": 2,
-          "sources": ["SS22 5.10"],
+          "sources": [
+            "SS22 5.10"
+          ],
           "q": "Why do convolutions fit semantic segmentation better than fully-connected layers?",
           "answer": "FC layers process **global** information from the entire image and require a fixed input size, whereas convolutions operate on **local neighbourhoods**, are translation-equivariant, and accept variable sizes — exactly what a dense, per-pixel task like segmentation needs. Convolutions also use far fewer parameters.",
           "extend": "Segmentation needs spatially-localized, size-flexible predictions → fully-convolutional. FC would destroy spatial structure and explode in parameters."
@@ -65,7 +92,10 @@
         {
           "type": "open",
           "freq": 2,
-          "sources": ["Summary III.5 Q6", "Summary III.5 Q4"],
+          "sources": [
+            "Summary III.5 Q6",
+            "Summary III.5 Q4"
+          ],
           "q": "State two differences between a convolutional layer and a pooling layer. Does reducing spatial size reduce the parameters of downstream conv layers?",
           "answer": "**Differences:** (1) a conv layer has **learnable parameters**, a pooling layer has **none**; (2) pooling works **channel-wise** (kernel depth 1, each channel independently), while a default conv filter spans the **full input depth**.\n**Spatial size vs conv params:** **No** — as long as the spatial size stays larger than the kernel, conv parameters depend on $c_{in},k,c_{out}$ only, so they don't change.",
           "extend": "Reducing spatial size cuts *computation* and shrinks downstream **FC** parameters (fixed channel count), but leaves **conv** parameter counts unchanged."
@@ -73,7 +103,10 @@
         {
           "type": "open",
           "freq": 2,
-          "sources": ["Summary III.5 Q7", "SS21 1.3"],
+          "sources": [
+            "Summary III.5 Q7",
+            "SS21 1.3"
+          ],
           "q": "For a fully-convolutional network: can you feed images at double the training resolution? Will performance be the same?",
           "answer": "**Yes**, fully-convolutional networks accept varying input sizes with no architectural change (the parameter count stays the same). **But performance will not be the same** — convolutions are **not scale-invariant**, so objects at a different scale than training won't be recognized as well.",
           "extend": "Size-flexible ≠ scale-invariant. Doubling resolution keeps the math valid but changes the effective object scale relative to the receptive field."
@@ -81,7 +114,9 @@
         {
           "type": "ai",
           "freq": 0,
-          "sources": ["AI-generated"],
+          "sources": [
+            "AI-generated"
+          ],
           "q": "Explain the difference between translation *invariance* and translation *equivariance*, and which one a convolution provides.",
           "answer": "**Invariance:** the input changes but the output stays the same. **Equivariance:** the input changes and the output changes the *same way*. A convolution is translation-**equivariant** — shift the input and the feature map shifts identically. (Global invariance is approached later via pooling and deep receptive fields.)",
           "extend": "Conv = equivariant; pooling adds a degree of local invariance. Neither gives rotation invariance by default."
@@ -96,7 +131,10 @@
         {
           "type": "open",
           "freq": 3,
-          "sources": ["SS24 2.2", "SS20 P4d"],
+          "sources": [
+            "SS24 2.2",
+            "SS20 P4d"
+          ],
           "q": "Explain the concept of receptive field. What happens if it is too small? (e.g. 3 consecutive $3\\times3$ stride-1 convs — how big is the receptive field?)",
           "answer": "The **receptive field** is the region in the input that affects a particular output feature. If it is **too small**, the output cannot capture information from the whole input, losing global context and hurting performance.\n**Example (SS20 P4d):** $1\\times1\\to3\\times3\\to5\\times5\\to7\\times7$ — three $3\\times3$ stride-1 convs give a $\\mathbf{7\\times7}$ receptive field.",
           "extend": "Each $3\\times3$ stride-1 conv adds $2$ to the receptive-field width. Stacking small kernels is the cheap way to grow it (VGG's insight)."
@@ -104,7 +142,10 @@
         {
           "type": "open",
           "freq": 2,
-          "sources": ["SS23 6.2", "SS21 2.7"],
+          "sources": [
+            "SS23 6.2",
+            "SS21 2.7"
+          ],
           "q": "Compute the receptive field of a neuron after several conv/maxpool layers (e.g. Conv3×3 → MaxPool2×2(s2) → Conv3×3 → MaxPool2×2(s2) → Conv3×3).",
           "answer": "Use $r_{out}=r_{in}+(k-1)\\cdot\\prod(\\text{strides so far})$, stepping forward:\nConv1: $3$ → MaxPool1: $3+1\\cdot(2-1)=4$ → Conv2: $4+2\\cdot(3-1)=8$ → MaxPool2: $8+2\\cdot(2-1)=10$ → Conv3: $10+4\\cdot(3-1)=\\mathbf{18}$ → receptive field $18\\times18$ (SS23 6.2).",
           "extend": "Track the running product of strides — each later layer's $(k-1)$ contribution is multiplied by all earlier strides, so pooling (stride 2) accelerates receptive-field growth."
@@ -112,10 +153,23 @@
         {
           "type": "open",
           "freq": 1,
-          "sources": ["WS26 P5a", "WS26 P5c"],
+          "sources": [
+            "WS26 P5a",
+            "WS26 P5c"
+          ],
           "q": "Name an architecture change that exactly doubles the receptive field of a conv layer without adding layers.",
           "answer": "Increase the **stride of an earlier layer**. E.g. changing Layer 1's stride from 1 to 3 gives receptive field $(6-1)\\times3 + 5 = 20$ — doubling it (WS26 P4c). (Alternatively increase an intermediate pooling stride, or enlarge a kernel / use dilation.)",
           "extend": "Larger stride or dilation grows the receptive field cheaply but reduces spatial resolution — a trade-off. Pooling layers also increase deeper layers' receptive fields (WS26 1.x)."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "You stack five $3\\times3$ stride-1 convolutions. What is the receptive field, and why is this preferred over a single large kernel of the same size?",
+          "answer": "Receptive field $=1+5\\cdot2=\\mathbf{11}\\times11$. Stacking small kernels is preferred because it uses **fewer parameters** and inserts **more non-linearities** (more ReLUs) than one $11\\times11$ kernel with the same receptive field.",
+          "extend": "VGG's core insight: many small $3\\times3$ convs beat one big kernel — cheaper and more expressive."
         }
       ]
     },
@@ -127,7 +181,9 @@
         {
           "type": "open",
           "freq": 2,
-          "sources": ["Summary III.5 Q9"],
+          "sources": [
+            "Summary III.5 Q9"
+          ],
           "q": "MaxPool with $k{=}2,s{=}2,p{=}0$, one unique max per window: what fraction of pixels get a live gradient, and what is its value?",
           "answer": "Each $2\\times2$ window has 4 entries, only the max gets a gradient → $\\frac{1}{4}$ of all entries have a live gradient, and that gradient's value is $1$ (the local derivative of the max w.r.t. its argmax input).",
           "extend": "MaxPool routes the upstream gradient entirely to the argmax position. That's why you cache positions in the forward pass — same idea as ReLU caching signs."
@@ -135,13 +191,27 @@
         {
           "type": "mc",
           "freq": 2,
-          "sources": ["SS22 1.7"],
+          "sources": [
+            "SS22 1.7"
+          ],
           "q": "Given a Max-Pool layer ($2\\times2$) on a window with all unique positive values:",
           "options": [
-            {"text": "To backpropagate, one needs the positions of the max values from the forward pass.", "correct": true},
-            {"text": "75% of the derivatives differ from zero.", "correct": false},
-            {"text": "The layer's weights are updated with the optimizer.", "correct": false},
-            {"text": "It performs feature selection.", "correct": true}
+            {
+              "text": "To backpropagate, one needs the positions of the max values from the forward pass.",
+              "correct": true
+            },
+            {
+              "text": "75% of the derivatives differ from zero.",
+              "correct": false
+            },
+            {
+              "text": "The layer's weights are updated with the optimizer.",
+              "correct": false
+            },
+            {
+              "text": "It performs feature selection.",
+              "correct": true
+            }
           ],
           "answer": "**True:** you need the argmax **positions** to backprop, and MaxPool performs a form of **feature selection** (keeps the strongest activation). **False:** only **25%** (1 of 4) of derivatives are non-zero, and MaxPool has **no weights** to update.",
           "extend": "MaxPool: no parameters, non-linear, sparse gradient (1/k² live), selects dominant features. AvgPool would give every entry a gradient."
@@ -149,10 +219,23 @@
         {
           "type": "open",
           "freq": 2,
-          "sources": ["Summary V.11 Q1a", "Summary III.5 Q8"],
+          "sources": [
+            "Summary V.11 Q1a",
+            "Summary III.5 Q8"
+          ],
           "q": "Give one advantage and one disadvantage of average pooling over max pooling. Can we pool without reducing spatial size?",
           "answer": "**Advantage of AvgPool:** every entry of the window receives a gradient (vs only the max). **Disadvantage:** average pooling is a **linear** operation, while max pooling adds **non-linearity**.\n**No size reduction:** yes — use a size-preserving trio like $(k{=}3,s{=}1,p{=}1)$, just like with convolutions.",
           "extend": "Pooling reduces size only because of stride. With stride 1 + matching padding it preserves resolution while still aggregating locally."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Compare how gradients flow back through MaxPool vs AvgPool for a $2\\times2$ window.",
+          "answer": "**MaxPool** routes the entire upstream gradient to the single **argmax** position (the other 3 entries get 0). **AvgPool** spreads the gradient **equally**, giving each of the 4 entries $\\frac{1}{4}$ of the upstream gradient.",
+          "extend": "Max = sparse/selective gradient (needs cached positions); Avg = evenly distributed gradient."
         }
       ]
     },
@@ -164,7 +247,11 @@
         {
           "type": "open",
           "freq": 3,
-          "sources": ["SS24 2.1", "Summary III.5 Q10", "Summary III.5 Q2"],
+          "sources": [
+            "SS24 2.1",
+            "Summary III.5 Q10",
+            "Summary III.5 Q2"
+          ],
           "q": "Explain the role of 1×1 convolutions. Advantage/disadvantage vs 3×3. For a 1×1 conv with 10 input → 5 output channels, give the weight shape and parameter count.",
           "answer": "**Role:** mix/reduce the number of **channels** at each pixel (cheap dimensionality reduction) while preserving spatial size.\n**vs 3×3:** advantage — far cheaper in parameters/compute; disadvantage — a **smaller receptive field** (no spatial context).\n**Shape/params:** weights $5\\times10\\times1\\times1$, bias $1\\times5$ → $5\\times10 + 5 = \\mathbf{55}$ parameters.",
           "extend": "1×1 conv = a per-pixel fully-connected layer across channels. Inception uses it to cut channels before expensive 3×3/5×5 convs."
@@ -172,7 +259,9 @@
         {
           "type": "open",
           "freq": 1,
-          "sources": ["Summary III.5 Q1"],
+          "sources": [
+            "Summary III.5 Q1"
+          ],
           "q": "How can we represent an FC layer with 5 output neurons as a convolutional layer over a $4\\times3\\times8\\times8$ batch? And with a 1×1 convolution?",
           "answer": "An FC layer uses **all** input neurons, so the equivalent conv needs a kernel matching the full input: $k_h{=}8, k_w{=}8, k_c{=}3$. Weight tensor $5\\times3\\times8\\times8$ (filters × $c_{in}$ × $k_h$ × $k_w$), output $4\\times5\\times1\\times1$. With a **1×1 conv**, first reshape the input to $4\\times(3\\cdot8\\cdot8)\\times1\\times1$ and convolve.",
           "extend": "FC ⇔ conv with a full-image kernel. This equivalence is why fully-convolutional nets can replace FC classifier heads."
@@ -180,7 +269,9 @@
         {
           "type": "ai",
           "freq": 0,
-          "sources": ["AI-generated"],
+          "sources": [
+            "AI-generated"
+          ],
           "q": "In an Inception module, why place a 1×1 convolution *before* a 5×5 convolution?",
           "answer": "The 1×1 conv first **reduces the channel count**, so the following 5×5 conv operates on far fewer input channels — drastically cutting its parameters and FLOPs (a 'bottleneck') while keeping spatial size. This made GoogLeNet deep yet efficient.",
           "extend": "1×1 bottlenecks decouple channel-mixing (cheap) from spatial filtering (expensive). Same trick in ResNet bottleneck blocks."
@@ -195,7 +286,10 @@
         {
           "type": "open",
           "freq": 2,
-          "sources": ["Summary III.5 Q11", "Summary III.5 Q12"],
+          "sources": [
+            "Summary III.5 Q11",
+            "Summary III.5 Q12"
+          ],
           "q": "Why don't we use handcrafted kernels (e.g. Sobel edge detector) inside deep models? Where can handcrafted kernels (e.g. Gaussian blur) still be used?",
           "answer": "Because handcrafted kernels are **not learnable** and thus can't adapt to the task — the whole point of deep learning is to *learn* the filters. They can still be used as the **initial weights** of conv layers (then fine-tuned), or in **data augmentation / preprocessing** (e.g. Gaussian blur).",
           "extend": "Learnable filters > fixed filters because they specialize to the data. Classical kernels survive only as priors/initialization or as augmentation operations."
@@ -203,10 +297,22 @@
         {
           "type": "open",
           "freq": 1,
-          "sources": ["Summary III.5 Q13"],
+          "sources": [
+            "Summary III.5 Q13"
+          ],
           "q": "To feed an intermediate feature map (output tensor of a conv layer) into a transformer to learn pixel relations, how do you reshape the tensor?",
           "answer": "Move the channels to the last dimension and flatten the spatial dims: $(B\\times C\\times H\\times W)\\to(B\\times H\\times W\\times C)\\to(B\\times (H\\cdot W)\\times C)$. Now each pixel — a $C$-dim vector across channels — is a **token** for the transformer.",
           "extend": "This 'patch/pixel → token' reshape is the bridge from CNN feature maps to attention (the core idea behind Vision Transformers)."
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Why might initializing a conv layer with a Sobel edge-detector kernel still be useful, even though we don't keep handcrafted kernels fixed?",
+          "answer": "It gives the layer a useful **prior** (edge detection) to start from; training then **adapts** it to the task. You get faster/better convergence while keeping **learnability** — unlike a frozen handcrafted kernel.",
+          "extend": "Handcrafted kernels survive only as initialization or in augmentation, never as frozen layers."
         }
       ]
     }

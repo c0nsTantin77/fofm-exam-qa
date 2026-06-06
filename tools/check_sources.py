@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """Cross-check every source tag in data/*.json against the exam text dumps,
 so a citation like 'SS22 3.1' is verified to actually exist in SS_2022."""
-import glob, json, re, pathlib
+import glob, json, re, pathlib, sys
+
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TXT = ROOT.parent / "AK" / "_txt"

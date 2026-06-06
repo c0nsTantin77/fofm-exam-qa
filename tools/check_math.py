@@ -3,6 +3,12 @@
 balance, and that every macro used is on the KaTeX-supported list."""
 import glob, json, re, sys, pathlib
 
+# Make output safe on a default GBK Windows console (no UnicodeEncodeError).
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 # A generous subset of KaTeX-supported macros we expect to use.
@@ -53,17 +59,17 @@ def main():
     print(f"math spans: {len(spans)}  (display={sum(1 for k,_ in spans if k=='display')}, inline={sum(1 for k,_ in spans if k=='inline')})")
     print(f"macros used: {sorted(macros)}")
     if unknown:
-        print(f"⚠ macros NOT in known-good list (verify manually): {unknown}")
+        print(f"[WARN] macros NOT in known-good list (verify manually): {unknown}")
     print("\nsample spans:")
     for kind, body in spans[:25]:
         print(f"  [{kind}] {body.strip()}")
 
     if errors:
-        print("\n❌ ERRORS:")
+        print("\n[FAIL] ERRORS:")
         for e in errors:
             print("  -", e)
         sys.exit(1)
-    print("\n✅ all delimiters balanced, all macros recognized")
+    print("\n[OK] all delimiters balanced, all macros recognized")
 
 if __name__ == "__main__":
     main()

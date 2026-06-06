@@ -11,6 +11,7 @@ KaTeX auto-render. Zero build dependencies beyond the Python stdlib.
 import html
 import json
 import pathlib
+import re
 
 ROOT = pathlib.Path(__file__).parent
 DATA = ROOT / "data"
@@ -41,6 +42,14 @@ def md_inline(s: str) -> str:
         return spans[int(m.group(1))]
     s = re.sub(r"\x00(\d+)\x00", pop, s)
     return s
+
+def plain(s: str) -> str:
+    """Strip markdown/LaTeX/code to plain text for the search index."""
+    s = re.sub(r"```.*?```", " ", s, flags=re.DOTALL)
+    s = re.sub(r"\$\$.*?\$\$|\$[^$]*\$", " ", s, flags=re.DOTALL)  # drop math
+    s = re.sub(r"[*`#>_]", "", s)
+    s = re.sub(r"\s+", " ", s)
+    return s.strip()
 
 def md_block(s: str) -> str:
     """Render a multi-line answer: fenced ```code``` blocks + paragraphs."""
@@ -102,7 +111,8 @@ def site_footer(exams, *, base) -> str:
         points are merged. Items tagged <span class="src-ai">AI-generated</span> are model-written
         practice and are not from past exams.</p>
         <p>Formulas rendered with <a href="https://katex.org/" rel="noopener">KaTeX</a>.
-        Built from the official I2DL materials for personal study. Spotted a mistake? Open an issue on the repo.</p>
+        Built from the official I2DL materials for personal study. Spotted a mistake?
+        <a href="https://github.com/c0nsTantin77/i2dl-exam-qa/issues" rel="noopener">Open an issue on the repo</a>.</p>
       </div>
     </div>
   </div>
@@ -119,9 +129,10 @@ def source_tags(sources) -> str:
 
 # ---------------------------------------------------------------- rendering
 
-def render_question(q) -> str:
+LETTERS = "ABCDEFGH"
+
+def render_question(q, anchor) -> str:
     qtype = q["type"]
-    primary = q["sources"][0]
     type_label = {"mc": "Multiple Choice", "open": "Open", "ai": "AI-generated"}[qtype]
     type_cls = {"mc": "t-mc", "open": "t-open", "ai": "t-ai"}[qtype]
 
@@ -146,16 +157,23 @@ def render_question(q) -> str:
     if qtype == "mc":
         # Interactive quiz: blank options; reveal answer + analysis only after the
         # learner picks option(s) and hits "Check". Any number of options may be correct.
-        opts = []
-        for o in q["options"]:
+        opts, correct_letters = [], []
+        for i, o in enumerate(q["options"]):
+            letter = LETTERS[i]
             c = "true" if o["correct"] else "false"
+            if o["correct"]:
+                correct_letters.append(letter)
             opts.append(
                 "<li class='opt'><label>"
                 f"<input type='checkbox' data-correct='{c}'>"
+                f"<span class='opt-letter'>{letter}</span>"
                 f"<span class='opt-text'>{md_inline(o['text'])}</span>"
                 "<span class='opt-mark' aria-hidden='true'></span>"
                 "</label></li>"
             )
+        # explicit, fixed reference for quick memorization
+        cl = ", ".join(correct_letters) if correct_letters else "none (all options are false)"
+        correct_line = f"<div class='correct-line'>✅ Correct: <b>{cl}</b></div>"
         body_inner = (
             "<div class='quiz'>"
             "<p class='quiz-hint'>Select all options you think are correct, then check.</p>"
@@ -166,7 +184,7 @@ def render_question(q) -> str:
             "</div>"
             "<div class='reveal' hidden>"
             "<div class='verdict' role='status'></div>"
-            f"{answer_html}{extend_html}"
+            f"{correct_line}{answer_html}{extend_html}"
             "</div>"
             "</div>"
         )
@@ -176,14 +194,21 @@ def render_question(q) -> str:
 
     data_attr = f"data-type='{qtype}' data-freq='{q.get('freq',0)}'"
     return (
-        f"<details class='q' {data_attr}>"
+        f"<details class='q' id='{anchor}' {data_attr}>"
         f"<summary>{head}{qbody}</summary>"
         f"<div class='q-body'>{body_inner}</div>"
         f"</details>"
     )
 
+def sorted_questions(kp):
+    """Render order: by exam frequency (desc), stable. AI practice (freq 0) sinks last."""
+    return sorted(kp["questions"], key=lambda q: q.get("freq", 0), reverse=True)
+
 def render_kp(kp) -> str:
-    qs = "\n".join(render_question(q) for q in kp["questions"])
+    qs = "\n".join(
+        render_question(q, f"{kp['id']}-{i}")
+        for i, q in enumerate(sorted_questions(kp))
+    )
     return (
         f"<section class='kp' id='{kp['id']}'>"
         f"<h2>{esc(kp['title'])}</h2>"
@@ -219,6 +244,7 @@ def page_shell(title, body, *, depth, extra_head="") -> str:
 def build():
     manifest = json.loads((DATA / "chapters.json").read_text(encoding="utf-8"))
     CHAPTERS_DIR.mkdir(exist_ok=True)
+    search_index = []
 
     # ---- chapter pages
     for ch in manifest["chapters"]:
@@ -227,6 +253,17 @@ def build():
         data = json.loads((DATA / ch["file"]).read_text(encoding="utf-8"))
         nq = sum(len(kp["questions"]) for kp in data["knowledge_points"])
         nai = sum(1 for kp in data["knowledge_points"] for q in kp["questions"] if q["type"] == "ai")
+
+        # search index: one entry per question, same anchor as render_kp
+        for kp in data["knowledge_points"]:
+            for i, q in enumerate(sorted_questions(kp)):
+                search_index.append({
+                    "c": ch["id"], "ct": data["title"], "kp": kp["title"],
+                    "a": f"{kp['id']}-{i}", "t": q["type"],
+                    "src": q["sources"][0],
+                    "q": plain(q["q"]),
+                    "txt": plain(q["q"] + " " + q.get("answer", "") + " " + kp["title"]).lower(),
+                })
 
         toc = "\n".join(
             f"<li><a href='#{kp['id']}'>{esc(kp['title'])}</a>"
@@ -237,7 +274,7 @@ def build():
 
         body = f"""
 <header class="topbar">
-  <a class="brand" href="../index.html">{TUM_LOGO.format(base='../')}<span>← All chapters</span></a>
+  <a class="brand" href="../index.html">{TUM_LOGO.format(base='../')}<span class="brand-back">← All<span class="brand-full"> chapters</span></span></a>
   <div class="filters">
     <input id="search" type="search" placeholder="Search questions…" autocomplete="off">
     <label><input type="checkbox" class="ftype" value="mc" checked> MC</label>
@@ -314,6 +351,10 @@ def build():
   </div>
 </header>
 <main class="hub">
+  <div class="gsearch">
+    <input id="gsearch" type="search" placeholder="🔍 Search all {total_q} questions (e.g. dropout, Adam, softmax)…" autocomplete="off" aria-label="Search all questions">
+    <div id="gresults" class="gresults" hidden></div>
+  </div>
   <div class="cards">
     {''.join(cards)}
   </div>
@@ -333,6 +374,10 @@ def build():
     out = page_shell("I2DL Exam Q&A · TUM IN2346", body, depth=0)
     (ROOT / "index.html").write_text(out, encoding="utf-8")
     print("built index.html")
+
+    (ROOT / "search-index.json").write_text(
+        json.dumps(search_index, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"built search-index.json  ({len(search_index)} entries)")
 
 if __name__ == "__main__":
     build()
