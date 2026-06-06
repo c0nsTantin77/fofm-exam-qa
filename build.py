@@ -8,12 +8,19 @@ emits index.html (hub) and chapters/<id>.html (one page per ready chapter).
 Formulas are written inline as $...$ / $$...$$ and rendered client-side by
 KaTeX auto-render. Zero build dependencies beyond the Python stdlib.
 """
+import hashlib
 import html
 import json
 import pathlib
 import re
 
 ROOT = pathlib.Path(__file__).parent
+
+def qid(kp_id, q):
+    """Stable per-question id (content hash) — survives reordering/insertions,
+    so it can key persistent study data (reviewed / notes / SRS)."""
+    h = hashlib.sha1((kp_id + "::" + q["q"]).encode("utf-8")).hexdigest()
+    return "q" + h[:9]
 DATA = ROOT / "data"
 CHAPTERS_DIR = ROOT / "chapters"
 
@@ -219,7 +226,7 @@ def render_question(q, anchor) -> str:
         chips = "".join(
             f"<a class='tag' href='../tags.html?t={_up.quote(t)}'>{esc(t)}</a>" for t in tags
         )
-        body_inner += f"<div class='tags'><span class='tags-label'>Tags</span>{chips}</div>"
+        body_inner += f"<div class='tags'>{chips}</div>"
 
     data_attr = f"data-type='{qtype}' data-freq='{q.get('freq',0)}'"
     return (
@@ -235,8 +242,8 @@ def sorted_questions(kp):
 
 def render_kp(kp) -> str:
     qs = "\n".join(
-        render_question(q, f"{kp['id']}-{i}")
-        for i, q in enumerate(sorted_questions(kp))
+        render_question(q, qid(kp["id"], q))
+        for q in sorted_questions(kp)
     )
     return (
         f"<section class='kp' id='{kp['id']}'>"
@@ -286,17 +293,19 @@ def build():
         nq = sum(len(kp["questions"]) for kp in data["knowledge_points"])
         nai = sum(1 for kp in data["knowledge_points"] for q in kp["questions"] if q["type"] == "ai")
 
-        # search index: one entry per question, same anchor as render_kp
+        # search index: one entry per question, same anchor (stable qid) as render_kp
         for kp in data["knowledge_points"]:
-            for i, q in enumerate(sorted_questions(kp)):
+            for q in sorted_questions(kp):
                 tagtext = " ".join(q.get("tags", []))
+                srcs = q["sources"]
                 search_index.append({
                     "c": ch["id"], "ct": data["title"], "kp": kp["title"],
-                    "a": f"{kp['id']}-{i}", "t": q["type"],
-                    "src": q["sources"][0],
+                    "a": qid(kp["id"], q), "t": q["type"],
+                    "src": srcs[0], "srcs": srcs,
                     "q": plain(q["q"]),
                     "tg": q.get("tags", []),
-                    "txt": (plain(q["q"] + " " + q.get("answer", "") + " " + kp["title"]) + " " + tagtext).lower(),
+                    "txt": (plain(q["q"] + " " + q.get("answer", "") + " " + kp["title"])
+                            + " " + tagtext + " " + " ".join(srcs)).lower(),
                 })
 
         toc = "\n".join(
@@ -374,7 +383,11 @@ def build():
             )
         cards.append(inner)
 
-    exams = " ".join(f"<span class='exam'>{esc(e)}</span>" for e in manifest["exams"])
+    import urllib.parse as _up0
+    exams = " ".join(
+        f"<a class='exam' href='exams.html?e={_up0.quote(e)}'>{esc(e)}</a>"
+        for e in manifest["exams"]
+    )
 
     # popular concept-tag chips (top by question count)
     import urllib.parse as _up
@@ -388,7 +401,10 @@ def build():
     poptags_html = (
         "<section class='poptags'><div class='poptags-head'>"
         "<span class='poptags-label'>Popular tags</span>"
-        f"<a class='poptags-all' href='tags.html'>All {len(tagc)} tags →</a></div>"
+        "<span class='poptags-links'>"
+        "<a class='poptags-all' href='exams.html'>By exam →</a>"
+        f"<a class='poptags-all' href='tags.html'>All {len(tagc)} tags →</a>"
+        "</span></div>"
         f"<div class='poptags-row'>{chips}</div></section>"
     )
 
@@ -426,7 +442,7 @@ def build():
   <div class="gsearch">
     <div class="gsearch-box">
       <svg class="gsearch-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M21 21l-4.3-4.3M11 18a7 7 0 100-14 7 7 0 000 14z"/></svg>
-      <input id="gsearch" type="search" placeholder="Search all {total_q} questions — try “dropout”, “Adam”, “softmax”" autocomplete="off" aria-label="Search all questions">
+      <input id="gsearch" type="search" placeholder="Search all {total_q} questions — try “dropout”, “Adam”, or “SS23 6.1”" autocomplete="off" aria-label="Search all questions">
     </div>
     <div id="gresults" class="gresults" hidden></div>
   </div>
@@ -472,6 +488,21 @@ def build():
     out = page_shell("Concept tags · I2DL Exam Q&A", tag_body, depth=0, need_index=True)
     (ROOT / "tags.html").write_text(out, encoding="utf-8")
     print(f"built tags.html  ({len(tag_counts)} tags)")
+
+    # ---- browse-by-exam page (standalone) ----
+    exam_meta = json.dumps({"order": manifest["exams"], "names": EXAM_NAMES}, ensure_ascii=False)
+    exam_body = f"""
+<header class="topbar">
+  <a class="brand" href="index.html">{TUM_LOGO.format(base='')}<span class="brand-back">← All<span class="brand-full"> chapters</span></span></a>
+</header>
+<main class="tagpage" id="exampage" data-exams='{exam_meta}'>
+  <div id="exampage-body"><p class="hint">Loading…</p></div>
+</main>
+{site_footer(manifest['exams'], base='')}
+"""
+    out = page_shell("Browse by exam · I2DL Exam Q&A", exam_body, depth=0, need_index=True)
+    (ROOT / "exams.html").write_text(out, encoding="utf-8")
+    print("built exams.html")
 
 if __name__ == "__main__":
     build()

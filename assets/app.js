@@ -125,10 +125,16 @@
       if (!term) { gres.hidden = true; gres.innerHTML = ""; return; }
       const words = term.split(/\s+/);
       const hits = INDEX.filter((e) => words.every((w) => e.txt.includes(w))).slice(0, 60);
-      if (!hits.length) {
+      // if the query starts with an exam code, offer the full exam view
+      const em = term.match(/^(ss\d\d|ws\d\d|mock)\b/);
+      const banner = em
+        ? "<a class='gbanner' href='exams.html?e=" + em[1].toUpperCase() +
+          "'>📄 Browse all " + em[1].toUpperCase() + " questions →</a>"
+        : "";
+      if (!hits.length && !banner) {
         gres.innerHTML = "<div class='gempty'>No questions match “" + esc(gbox.value) + "”.</div>";
       } else {
-        gres.innerHTML =
+        gres.innerHTML = banner +
           "<div class='gcount'>" + hits.length + " match" + (hits.length > 1 ? "es" : "") + "</div>" +
           hits.map((e) =>
             "<a class='ghit' href='" + qHref(e) + "'>" +
@@ -187,6 +193,66 @@
     }
 
     if (current && counts[current]) renderTag(current); else renderOverview();
+  }
+
+  // ---- standalone browse-by-exam page (exams.html) ----
+  const examPage = document.getElementById("exampage-body");
+  if (examPage) {
+    const meta = JSON.parse(document.getElementById("exampage").dataset.exams || "{}");
+    const order = meta.order || [], names = meta.names || {};
+    const examOf = (src) => { const m = src.match(/^(SS\d\d|WS\d\d|Mock)\b/); return m ? m[1] : null; };
+    const labelOf = (src) => src.replace(/^(SS\d\d|WS\d\d|Mock)\s*/, "");
+    const counts = {};
+    INDEX.forEach((e) => {
+      const seen = new Set();
+      (e.srcs || []).forEach((s) => { const x = examOf(s); if (x && !seen.has(x)) { seen.add(x); counts[x] = (counts[x] || 0) + 1; } });
+    });
+    const current = new URLSearchParams(location.search).get("e");
+
+    function renderOverview() {
+      document.title = "Browse by exam · I2DL Exam Q&A";
+      const cards = order.filter((ex) => counts[ex]).map((ex) =>
+        "<a class='examcard' href='exams.html?e=" + encodeURIComponent(ex) + "'>" +
+        "<span class='examcard-code'>" + esc(ex) + "</span>" +
+        "<span class='examcard-name'>" + esc(names[ex] || ex) + "</span>" +
+        "<span class='examcard-n'>" + counts[ex] + " questions</span></a>"
+      ).join("");
+      examPage.innerHTML =
+        "<h1 class='tp-title'>Browse by exam</h1>" +
+        "<p class='tp-sub'>Pick an exam to see its questions grouped by chapter. " +
+        "Tip: you can also type an exact code like <b>SS23 6.1</b> in the search on the home page.</p>" +
+        "<div class='examgrid'>" + cards + "</div>";
+    }
+    function renderExam(ex) {
+      document.title = ex + " · Browse by exam · I2DL";
+      const hits = INDEX.filter((e) => (e.srcs || []).some((s) => examOf(s) === ex));
+      // sort by the exam's own question number where possible
+      const num = (e) => {
+        const s = (e.srcs || []).find((x) => examOf(x) === ex) || "";
+        const m = labelOf(s).match(/(\d+)\.?(\d+)?/);
+        return m ? parseInt(m[1]) * 100 + (parseInt(m[2] || "0")) : 9999;
+      };
+      hits.sort((a, b) => num(a) - num(b));
+      const byChapter = {};
+      hits.forEach((e) => (byChapter[e.ct] = byChapter[e.ct] || []).push(e));
+      let html =
+        "<a class='tp-back' href='exams.html'>← All exams</a>" +
+        "<h1 class='tp-title'>" + esc(names[ex] || ex) + " <span class='tag'>" + esc(ex) + "</span></h1>" +
+        "<p class='tp-sub'>" + hits.length + " question" + (hits.length > 1 ? "s" : "") +
+        " across " + Object.keys(byChapter).length + " chapter(s).</p>";
+      Object.keys(byChapter).forEach((ct) => {
+        html += "<h2 class='tp-ch'>" + esc(ct) + "</h2><div class='tp-list'>" +
+          byChapter[ct].map((e) => {
+            const lbl = (e.srcs || []).filter((s) => examOf(s) === ex).map(labelOf).join(", ");
+            return "<a class='ghit' href='" + qHref(e) + "'>" +
+              "<span class='ghit-tag'>" + ex + " " + esc(lbl) + "</span>" +
+              "<span class='ghit-q'>" + esc(e.q) + "</span>" +
+              "<span class='ghit-meta'>" + esc(e.kp) + "</span></a>";
+          }).join("") + "</div>";
+      });
+      examPage.innerHTML = html;
+    }
+    if (current && counts[current]) renderExam(current); else renderOverview();
   }
 
   // ---- back-to-top button (mobile) ----
