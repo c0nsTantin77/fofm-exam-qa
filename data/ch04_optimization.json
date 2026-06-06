@@ -532,6 +532,41 @@
             "Regularization",
             "L1/L2"
           ]
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Which techniques help reduce overfitting?",
+          "answer": "**True:** dropout, data augmentation, and L2 weight decay all regularize. **False:** increasing model capacity generally **increases** overfitting risk.",
+          "extend": "Regularization toolbox: dropout, augmentation, weight decay, early stopping. Bigger model ⇒ more overfitting.",
+          "options": [
+            {
+              "text": "Dropout.",
+              "correct": true
+            },
+            {
+              "text": "Data augmentation.",
+              "correct": true
+            },
+            {
+              "text": "Increasing the model's capacity.",
+              "correct": false
+            },
+            {
+              "text": "L2 weight decay.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2",
+            "Overfitting",
+            "Data augmentation"
+          ]
         }
       ]
     },

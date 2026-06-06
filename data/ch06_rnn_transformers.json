@@ -408,6 +408,40 @@
             "Transformer",
             "Attention"
           ]
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Which statements about self-attention / Transformers are true?",
+          "answer": "**True:** self-attention is permutation-invariant (hence positional encoding), scores are scaled by $\\frac{1}{\\sqrt{d_k}}$, and any token can attend directly to any other. **False:** Transformers do **not** process tokens sequentially like RNNs — they run in parallel.",
+          "extend": "Attention: order-agnostic (needs positional encoding), $\\sqrt{d_k}$ scaling, all-to-all, fully parallel.",
+          "options": [
+            {
+              "text": "Self-attention is permutation-invariant unless positional encoding is added.",
+              "correct": true
+            },
+            {
+              "text": "Transformers process tokens sequentially, one at a time, like RNNs.",
+              "correct": false
+            },
+            {
+              "text": "The $QK^\\top$ scores are scaled by $\\frac{1}{\\sqrt{d_k}}$ for stability.",
+              "correct": true
+            },
+            {
+              "text": "Attention lets any token attend directly to any other token.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "RNN",
+            "Transformer",
+            "Attention",
+            "Positional encoding"
+          ]
         }
       ]
     },

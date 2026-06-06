@@ -247,6 +247,38 @@
           "tags": [
             "ResNet / skip connections"
           ]
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Which statements about ResNet skip connections are true?",
+          "answer": "**True:** they add an identity path that lets gradients bypass a block, enabling very deep nets to train without the degradation problem. **False:** they don't change spatial resolution, and they don't remove the need for non-linearities inside the block.",
+          "extend": "Skip connection = additive identity path ⇒ gradient highway + trainable depth. Non-linearities stay inside $F(x)$.",
+          "options": [
+            {
+              "text": "They create an additive identity path for gradients.",
+              "correct": true
+            },
+            {
+              "text": "They let very deep networks train without the degradation problem.",
+              "correct": true
+            },
+            {
+              "text": "They increase the spatial resolution of feature maps.",
+              "correct": false
+            },
+            {
+              "text": "They remove the need for any non-linearity in the block.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Activation functions",
+            "ResNet / skip connections"
+          ]
         }
       ]
     },

@@ -137,6 +137,38 @@
             "Convolution",
             "Parameter counting"
           ]
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Which statements about a convolutional layer are true?",
+          "answer": "**True:** parameter count is independent of input spatial size; stride affects the output spatial size; a $1\\times1$ conv changes the channel count. **False:** padding does **not** change the number of learnable parameters.",
+          "extend": "Params depend on $c_{in},k,c_{out}$ only. Stride/padding change output size, not params; $1\\times1$ mixes channels.",
+          "options": [
+            {
+              "text": "The number of parameters is independent of the input's spatial size.",
+              "correct": true
+            },
+            {
+              "text": "Stride affects the output spatial size.",
+              "correct": true
+            },
+            {
+              "text": "Padding increases the number of learnable parameters.",
+              "correct": false
+            },
+            {
+              "text": "A $1\\times1$ convolution can change the number of channels.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Convolution",
+            "Parameter counting"
+          ]
         }
       ]
     },

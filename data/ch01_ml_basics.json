@@ -119,6 +119,39 @@
             "Clustering / PCA",
             "Regression"
           ]
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Which of the following are unsupervised learning tasks?",
+          "answer": "**Unsupervised:** clustering customers (no labels) and PCA dimensionality reduction. Predicting house price (regression) and spam classification are **supervised** — they learn an input→label mapping.",
+          "extend": "Unsupervised = no targets (clustering, dimensionality reduction). Supervised = learns input→label.",
+          "options": [
+            {
+              "text": "Clustering customers by purchase behaviour (no labels).",
+              "correct": true
+            },
+            {
+              "text": "Predicting house price from features.",
+              "correct": false
+            },
+            {
+              "text": "Dimensionality reduction with PCA.",
+              "correct": true
+            },
+            {
+              "text": "Classifying emails as spam vs. not-spam.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Supervised vs unsupervised",
+            "Clustering / PCA",
+            "Regression"
+          ]
         }
       ]
     },

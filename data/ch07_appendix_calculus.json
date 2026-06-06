@@ -137,6 +137,38 @@
           "tags": [
             "Backpropagation"
           ]
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "For $Y=XW+b$ with a scalar loss $L$ and upstream $\\text{dout}=\\frac{\\partial L}{\\partial Y}$, which are true?",
+          "answer": "**True:** $\\frac{\\partial L}{\\partial W}$ has the same shape as $W$; $\\frac{\\partial L}{\\partial X}=\\text{dout}\\,W^\\top$; $\\frac{\\partial L}{\\partial b}=\\sum_n \\text{dout}$. **False:** because $L$ is scalar, $\\frac{\\partial L}{\\partial Y}$ is a **gradient** (shape of $Y$), not a full Jacobian.",
+          "extend": "Shape-matching: every $\\partial L/\\partial v$ matches $v$. Scalar loss ⇒ gradients, never Jacobians.",
+          "options": [
+            {
+              "text": "$\\frac{\\partial L}{\\partial W}$ has the same shape as $W$.",
+              "correct": true
+            },
+            {
+              "text": "$\\frac{\\partial L}{\\partial X}=\\text{dout}\\,W^\\top$.",
+              "correct": true
+            },
+            {
+              "text": "$\\frac{\\partial L}{\\partial b}$ sums dout over the batch.",
+              "correct": true
+            },
+            {
+              "text": "$\\frac{\\partial L}{\\partial Y}$ is a full Jacobian matrix, not a gradient.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Backpropagation",
+            "Jacobian"
+          ]
         }
       ]
     },

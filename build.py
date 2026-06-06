@@ -160,16 +160,29 @@ LETTERS = "ABCDEFGH"
 
 def render_question(q, anchor) -> str:
     qtype = q["type"]
-    type_label = {"mc": "Multiple Choice", "open": "Open", "ai": "AI-generated"}[qtype]
-    type_cls = {"mc": "t-mc", "open": "t-open", "ai": "t-ai"}[qtype]
+    is_ai = qtype == "ai"
+    is_mc = qtype == "mc" or (is_ai and "options" in q)   # AI questions can be MC too
+    fmt_label = "Multiple choice" if is_mc else "Open"
 
-    head = (
-        f"<div class='q-head'>"
-        f"<span class='qtype {type_cls}'>{type_label}</span>"
-        f"{freq_badge(q.get('freq', 0))}"
-        f"<span class='q-src'>{source_tags(q['sources'])}</span>"
-        f"</div>"
-    )
+    if is_ai:
+        # AI items: keep the "AI-generated" marker, show the format (Open/MC) as a
+        # badge instead of "practice", and drop the redundant right-side source chip.
+        head = (
+            f"<div class='q-head'>"
+            f"<span class='qtype t-ai'>AI-generated</span>"
+            f"<span class='fmt-badge'>{fmt_label}</span>"
+            f"</div>"
+        )
+    else:
+        type_label = {"mc": "Multiple Choice", "open": "Open"}[qtype]
+        type_cls = {"mc": "t-mc", "open": "t-open"}[qtype]
+        head = (
+            f"<div class='q-head'>"
+            f"<span class='qtype {type_cls}'>{type_label}</span>"
+            f"{freq_badge(q.get('freq', 0))}"
+            f"<span class='q-src'>{source_tags(q['sources'])}</span>"
+            f"</div>"
+        )
 
     # md_block so questions that embed a ```code``` snippet render properly
     qrender = md_block(q["q"]) if "```" in q["q"] else md_inline(q["q"])
@@ -181,7 +194,7 @@ def render_question(q, anchor) -> str:
         if q.get("extend") else ""
     )
 
-    if qtype == "mc":
+    if is_mc:
         # Interactive quiz: blank options; reveal answer + analysis only after the
         # learner picks option(s) and hits "Check". Any number of options may be correct.
         opts, correct_letters = [], []
@@ -228,6 +241,17 @@ def render_question(q, anchor) -> str:
         )
         body_inner += f"<div class='tags'>{chips}</div>"
 
+    # per-question study controls (state saved in the browser via app.js)
+    body_inner += (
+        "<div class='study'>"
+        "<label class='study-rev'><input type='checkbox' class='rev-box'> Reviewed</label>"
+        "<button type='button' class='wrong-btn'>★ Wrong book</button>"
+        "<button type='button' class='note-btn'>📝 Note</button>"
+        "<span class='srs-due'></span>"
+        "<div class='note-wrap' hidden><textarea class='note-area' rows='3' placeholder='Your notes for this question…'></textarea></div>"
+        "</div>"
+    )
+
     data_attr = f"data-type='{qtype}' data-freq='{q.get('freq',0)}'"
     return (
         f"<details class='q' id='{anchor}' {data_attr}>"
@@ -273,6 +297,7 @@ def page_shell(title, body, *, depth, extra_head="", need_index=False) -> str:
 {index_js}
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
+<script defer src="{base}assets/config.js"></script>
 <script defer src="{base}assets/app.js"></script>
 </body>
 </html>
@@ -336,6 +361,7 @@ def build():
       <span class="stat"><b>{len(data['knowledge_points'])}</b> topics</span>
       <span class="stat"><b>{nai}</b> AI practice</span>
     </div>
+    <div class="ch-progress" data-ch="{ch['id']}"></div>
     <details class="toc-wrap">
       <summary>Jump to topic</summary>
       <nav class="toc"><ol>{toc}</ol></nav>
@@ -374,8 +400,12 @@ def build():
             total_topics += ntopic
             meta = f"<div class='card-meta'>{nq} questions · {ntopic} topics</div>"
             href = f"chapters/{ch['id']}.html"
-            cls, badge = "card", ""
-            inner = f"<a class='{cls}' href='{href}'><div class='card-roman'>{esc(ch['roman'])}</div><h3>{esc(ch['title'])}</h3>{meta}</a>"
+            inner = (
+                f"<a class='card' href='{href}'>"
+                f"<div class='card-top'><span class='card-roman'>{esc(ch['roman'])}</span>"
+                f"<span class='card-prog' data-ch='{ch['id']}'></span></div>"
+                f"<h3>{esc(ch['title'])}</h3>{meta}</a>"
+            )
         else:
             inner = (
                 f"<div class='card card-soon'><div class='card-roman'>{esc(ch['roman'])}</div>"
@@ -401,10 +431,7 @@ def build():
     poptags_html = (
         "<section class='poptags'><div class='poptags-head'>"
         "<span class='poptags-label'>Popular tags</span>"
-        "<span class='poptags-links'>"
-        "<a class='poptags-all' href='exams.html'>By exam →</a>"
-        f"<a class='poptags-all' href='tags.html'>All {len(tagc)} tags →</a>"
-        "</span></div>"
+        f"<a class='poptags-all' href='tags.html'>All {len(tagc)} tags →</a></div>"
         f"<div class='poptags-row'>{chips}</div></section>"
     )
 
@@ -428,14 +455,15 @@ def build():
   <div class="hero-inner">
     <div class="hero-top">{TUM_LOGO.format(base='')}<span class="kicker">Technische Universität München · IN2346</span></div>
     <h1>Introduction to Deep Learning</h1>
-    <p class="tagline">Exam Q&amp;A Bank · closed-book revision · open &amp; free</p>
     <ul class="hero-points">
-      <li><b>Search by concept tag</b> — jump between related questions across chapters</li>
-      <li><b>Interactive multiple-choice</b> — pick, check, then reveal the answer</li>
-      <li><b>AI-generated practice</b> — extra questions on every knowledge point</li>
+      <li><span class="hp-ic">🔎</span><span class="hp-t">Search by concept tag</span><span class="hp-d">jump between related questions across chapters</span></li>
+      <li><span class="hp-ic">✅</span><span class="hp-t">Interactive multiple-choice</span><span class="hp-d">pick, check, then reveal the answer</span></li>
+      <li><span class="hp-ic">🤖</span><span class="hp-t">AI-generated practice</span><span class="hp-d">extra questions on every knowledge point</span></li>
     </ul>
-    <p class="lead">Every problem from 12 past exams + the course summary — frequency-sorted, with official answers.</p>
-    <div class="exams">{exams}</div>
+    <div class="exams-block">
+      <span class="exams-hint">Tap an exam to browse its questions ↓</span>
+      <div class="exams">{exams}</div>
+    </div>
   </div>
 </header>
 <main class="hub">
@@ -447,18 +475,47 @@ def build():
     <div id="gresults" class="gresults" hidden></div>
   </div>
   {poptags_html}
+  <details class="progress-card" id="progress" hidden open>
+    <summary class="prog-head"><span class="prog-title">Your progress</span><span id="authctl" class="authctl"></span></summary>
+    <div id="prog-body"></div>
+  </details>
   <div class="cards">
     {''.join(cards)}
   </div>
   {updates_html}
   <section class="how">
     <h2>How to use this deck</h2>
-    <ul>
-      <li><b>Frequency-first:</b> within each topic, questions are ordered by how often they appear across exams — drill the 🔥 ones first.</li>
-      <li><b>Source-tagged:</b> every question cites its origin, e.g. <span class="src">SS22 3.1</span> = SoSe&nbsp;2022 exam, problem 3.1.</li>
-      <li><b>Answers = official solutions.</b> For variant phrasings, the scoring points are merged. <span class="src-ai">AI-generated</span> practice items are clearly marked.</li>
-      <li><b>Closed-book ready:</b> click a question to reveal the answer and an “extended memory” hook.</li>
-    </ul>
+    <div class="how-grid">
+      <div class="how-col">
+        <h3>🔎 Find</h3>
+        <ul>
+          <li>Search any keyword or concept <b>tag</b> (e.g. <i>dropout</i>, <i>Adam</i>).</li>
+          <li>Jump to an exact question by code — type <span class="src">SS23 6.1</span>.</li>
+          <li>Browse <b>by exam</b> (tap a paper above) or <b>by tag</b> across all chapters.</li>
+        </ul>
+      </div>
+      <div class="how-col">
+        <h3>📝 Practice</h3>
+        <ul>
+          <li>Answers follow the <b>official solutions</b>; <span class="src-ai">AI-generated</span> items are marked.</li>
+          <li><b>Interactive multiple-choice</b> — pick options, check, then reveal.</li>
+          <li>Questions are ordered by <b>exam frequency</b> — drill the 🔥 ones first.</li>
+        </ul>
+      </div>
+      <div class="how-col">
+        <h3>📈 Track</h3>
+        <ul>
+          <li>Mark a question <b>Reviewed</b>, add it to your <b>wrong book</b>, or jot a <b>note</b>.</li>
+          <li><b>Spaced repetition</b> tells you what to review today.</li>
+          <li><b>Sign in</b> to sync your progress across devices.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <section class="feedback" id="feedback">
+    <div class="feedback-text"><span class="feedback-title">💬 Feedback</span>
+      <span class="feedback-sub">Spotted a wrong answer or have a suggestion? It goes straight to the author.</span></div>
+    <a class="feedback-link" id="feedback-link" target="_blank" rel="noopener">Open the feedback form →</a>
   </section>
   <p class="hubnote">All 7 chapters complete — {total_q} questions across {total_topics} knowledge points, from 12 past exams + the course summary.</p>
 </main>
@@ -503,6 +560,25 @@ def build():
     out = page_shell("Browse by exam · I2DL Exam Q&A", exam_body, depth=0, need_index=True)
     (ROOT / "exams.html").write_text(out, encoding="utf-8")
     print("built exams.html")
+
+    # ---- review page: due-today (Ebbinghaus) + wrong book + export/import ----
+    review_body = f"""
+<header class="topbar">
+  <a class="brand" href="index.html">{TUM_LOGO.format(base='')}<span class="brand-back">← All<span class="brand-full"> chapters</span></span></a>
+  <div class="filters">
+    <button id="exportBtn" type="button" class="io-btn">⬇ Export</button>
+    <label class="io-btn" for="importFile">⬆ Import</label>
+    <input id="importFile" type="file" accept="application/json" hidden>
+  </div>
+</header>
+<main class="tagpage" id="reviewpage">
+  <div id="reviewpage-body"><p class="hint">Loading…</p></div>
+</main>
+{site_footer(manifest['exams'], base='')}
+"""
+    out = page_shell("Review · I2DL Exam Q&A", review_body, depth=0, need_index=True)
+    (ROOT / "review.html").write_text(out, encoding="utf-8")
+    print("built review.html")
 
 if __name__ == "__main__":
     build()

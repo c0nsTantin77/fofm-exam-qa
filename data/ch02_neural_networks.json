@@ -431,6 +431,40 @@
             "Activation functions",
             "Backpropagation"
           ]
+        },
+        {
+          "type": "ai",
+          "freq": 0,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Which statements about activation functions are true?",
+          "answer": "**True:** ReLU units can 'die' (always-negative pre-activation → zero gradient); Tanh outputs lie in $(-1,1)$. **False:** Sigmoid is **not** zero-centred; a purely **linear** activation cannot give a deep net non-linear power (the layers collapse to one).",
+          "extend": "ReLU → dying units; Tanh → zero-centred (-1,1); Sigmoid → not zero-centred; linear activation → no added power.",
+          "options": [
+            {
+              "text": "ReLU can suffer from 'dying' units with zero gradient.",
+              "correct": true
+            },
+            {
+              "text": "Sigmoid is a zero-centred activation.",
+              "correct": false
+            },
+            {
+              "text": "Tanh outputs lie in the interval $(-1,1)$.",
+              "correct": true
+            },
+            {
+              "text": "A purely linear activation still lets a deep network learn non-linear boundaries.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions"
+          ]
         }
       ]
     },

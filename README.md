@@ -19,9 +19,9 @@ Popular Architectures (31) · RNNs & Transformers (26) · Appendix: Matrix Calcu
 - KaTeX formulas, collapsible answers, mobile-optimized.
 
 ## Recent updates
-- **2026-06-06** — Browse by exam paper (`exams.html`): pick `SS23` for its questions grouped by chapter, or search `SS23 6.1` to jump.
-- **2026-06-06** — Concept tags on every question + a tag index page (review a theme across chapters).
-- **2026-06-06** — Coverage pass: +45 questions from SS25 & WS23 → **233 questions**.
+- **2026-06-06** — Sign in with Google to sync progress (reviewed / wrong book / notes) across devices.
+- **2026-06-06** — Study tools: mark Reviewed, wrong book, per-question notes, spaced-repetition review, progress dashboard.
+- **2026-06-06** — Browse by exam paper (`SS23 6.1` jumps to a question), concept-tag pages, AI multiple-choice.
 
 ## Develop
 Pure Python stdlib — content lives in `data/*.json`, `build.py` generates the site.
