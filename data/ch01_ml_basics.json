@@ -598,6 +598,21 @@
           "tags": [
             "Data leakage"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 2.1"
+          ],
+          "q": "You observe the validation loss is *smaller* than the training loss and your supervisor suspects a bug. Name a potential problem in your code or data that could cause this.",
+          "answer": "Any of: **data leakage** — the validation set contains training samples; the **validation set has unusually easy samples**; **too-aggressive augmentation on the training set** inflates the training loss; or train and validation are drawn from **different distributions** / the validation set is **too small**.",
+          "extend": "Val < train is a red flag for leakage or an unrepresentative/easy validation split, or for heavy train-only augmentation.",
+          "tags": [
+            "Data augmentation",
+            "Dataset splits",
+            "Data leakage"
+          ]
         }
       ]
     },
@@ -818,6 +833,20 @@
             "Regularization",
             "Data augmentation"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 2.5"
+          ],
+          "q": "How can data augmentation improve model generalization (1p)? Give one example of an augmentation technique (1p).",
+          "answer": "It **increases the diversity of the training set** by creating modified versions of the inputs, making the model **robust to variations / introducing feature invariance** (and virtually increasing dataset size). Example: **random rotation, flipping, cropping, color jittering, or adding Gaussian noise**.",
+          "extend": "Augmentation = more in-distribution variety ⇒ invariance and less overfitting, without collecting new data.",
+          "tags": [
+            "Overfitting",
+            "Data augmentation"
+          ]
         }
       ]
     },
@@ -1013,6 +1042,22 @@
           "extend": "Re-weighting the loss toward the minority class counters imbalance — the loss-function counterpart to over/under-sampling.",
           "tags": [
             "Class imbalance"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 2.14"
+          ],
+          "q": "You have 4,000 cat images and 100 dog images for binary classification. What problem do you foresee with this distribution (1p)? Provide two solutions for training without acquiring more data (1p).",
+          "answer": "**Problem:** class imbalance → the network is **biased toward the majority class** (cats), giving poor accuracy on dogs. **Two solutions (any):** undersample cats / oversample dogs / augment the minority class / reweight the dataloader (e.g. `WeightedRandomSampler`) / reweight the loss function / use transfer learning.",
+          "extend": "Counter imbalance by rebalancing the data stream or the loss. (Per-class LR tweaks and k-fold do NOT fix imbalance.)",
+          "tags": [
+            "Dataloader",
+            "Class imbalance",
+            "Loss functions",
+            "Transfer learning"
           ]
         }
       ]

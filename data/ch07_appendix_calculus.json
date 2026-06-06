@@ -169,6 +169,43 @@
             "Backpropagation",
             "Jacobian"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 5.1",
+            "WS24 5.2",
+            "WS24 5.3"
+          ],
+          "q": "Backprop worked forward pass. (5.1) Compute $Z=XW+b$ with $X=\\begin{bmatrix}2&-2\\\\0&-4\\\\3&-1\\end{bmatrix}$, $W=\\begin{bmatrix}-2\\\\4\\end{bmatrix}$, $b=1$ (broadcast). (5.2) Apply Leaky ReLU ($0.5x$ if $x<0$) to $Z=[5,-2,0.5]^\\top$. (5.3) Compute $L=\\tfrac12\\sum_{i}(Y_i-\\hat Y_i)^2$ for $Y=[3,-2,1]^\\top,\\ \\hat Y=[2,0,1]^\\top$.",
+          "answer": "**5.1** $XW=[-12,-16,-10]^\\top$; add broadcast $b=[1,1,1]^\\top$ → $Z=[-11,-15,-9]^\\top$. **5.2** $\\sigma([5,-2,0.5])=[5,\\,-1,\\,0.5]^\\top$ (negative entry $\\times0.5$). **5.3** $L=\\tfrac12\\big[(3-2)^2+(-2-0)^2+(1-1)^2\\big]=\\tfrac12(1+4+0)=2.5$.",
+          "extend": "Affine → LeakyReLU → squared-error: the standard forward pass before computing gradients.",
+          "tags": [
+            "ReLU",
+            "Activation functions",
+            "Backpropagation",
+            "Data leakage"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 5.4",
+            "WS24 5.5",
+            "WS24 5.6",
+            "WS24 5.7"
+          ],
+          "q": "Backprop worked gradients (same toy net). (5.4) $\\frac{\\partial L}{\\partial Y}$ for $L=\\tfrac12\\sum(Y-\\hat Y)^2$, $Y=[3,-2,1]^\\top,\\hat Y=[2,0,1]^\\top$. (5.5) $\\frac{\\partial L}{\\partial Z}$ given $\\frac{\\partial L}{\\partial Y}=[-2,-1,1]^\\top$, $Z=[5,-2,0.5]^\\top$ through Leaky ReLU. (5.6) $\\frac{\\partial L}{\\partial W},\\frac{\\partial L}{\\partial X},\\frac{\\partial L}{\\partial b}$ given $\\frac{\\partial L}{\\partial Z}=[1,-1,0]^\\top$, $X,W$ as above. (5.7) What is $\\frac{\\partial L}{\\partial X}$ used for?",
+          "answer": "**5.4** $\\frac{\\partial L}{\\partial Y}=Y-\\hat Y=[1,-2,0]^\\top$. **5.5** LeakyReLU derivative is $1$ for $z\\ge0$, $0.5$ for $z<0$ → $[1,0.5,1]$; $\\frac{\\partial L}{\\partial Z}=\\frac{\\partial L}{\\partial Y}\\odot[1,0.5,1]=[-2,-0.5,1]^\\top$. **5.6** $\\frac{\\partial L}{\\partial W}=X^\\top\\frac{\\partial L}{\\partial Z}=[2,2]^\\top$; $\\frac{\\partial L}{\\partial X}=\\frac{\\partial L}{\\partial Z}\\,W^\\top=\\begin{bmatrix}-2&4\\\\2&-4\\\\0&0\\end{bmatrix}$; $\\frac{\\partial L}{\\partial b}=\\sum_i\\frac{\\partial L}{\\partial Z_i}=0$. **5.7** It is the **upstream gradient passed to the previous layer** to continue backpropagation.",
+          "extend": "Note the shapes: $\\partial L/\\partial W$ matches $W$, $\\partial L/\\partial X$ matches $X$; the bias gradient sums the upstream over the batch.",
+          "tags": [
+            "ReLU",
+            "Activation functions",
+            "Backpropagation",
+            "Data leakage"
+          ]
         }
       ]
     },

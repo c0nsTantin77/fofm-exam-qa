@@ -151,6 +151,38 @@
             "LSTM",
             "ResNet / skip connections"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 7.1"
+          ],
+          "q": "When training an RNN, the training loss doesn't decrease. What problem with RNNs could cause this?",
+          "answer": "**Vanishing or exploding gradients.** Repeated multiplication by the recurrent weight across timesteps makes gradients **shrink toward 0** (no learning) or **blow up** (unstable), so the loss fails to decrease.",
+          "extend": "Same recurrent weight applied every step ⇒ exponential decay/growth of gradients over the sequence.",
+          "tags": [
+            "Exploding gradient",
+            "RNN"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 7.2",
+            "WS24 7.3",
+            "WS24 7.4"
+          ],
+          "q": "For a simplified linear RNN $h_t=W_h h_{t-1}+W_x x_t$ with scalar states and $o=h_n$, $\\frac{\\partial L}{\\partial o}=1$: (7.2) derive $\\frac{\\partial L}{\\partial W_x}$ for $n=3$; (7.3) give the general-$n$ formula; (7.4) for which $W_h$ does the problem occur, the multi-dim condition, the problematic term, and an easy fix that doesn't change the architecture.",
+          "answer": "Since $\\frac{\\partial L}{\\partial o}=1$, $\\frac{\\partial L}{\\partial W_x}=\\frac{\\partial h_n}{\\partial W_x}$. **(7.2) $n=3$:** $\\;x_3+W_h x_2+W_h^2 x_1$. **(7.3) general:** $\\;\\frac{\\partial L}{\\partial W_x}=\\sum_{k=1}^{n}W_h^{\\,n-k}x_k=x_n+W_h x_{n-1}+\\dots+W_h^{\\,n-1}x_1$. **(7.4)** vanishing if $|W_h|<1$, exploding if $|W_h|>1$; multi-dim: the largest **$|$eigenvalue$|$** of $W_h$ is $<1$ or $>1$; the problematic part is the **exponential term $W_h^{\\,n-1}$**; an easy fix is **gradient clipping** (for the exploding case).",
+          "extend": "The $W_h^{\\,n-k}$ factors are exactly the source of vanishing/exploding gradients; LSTMs add a cell-state highway, clipping caps explosions.",
+          "tags": [
+            "Exploding gradient",
+            "RNN",
+            "LSTM",
+            "ResNet / skip connections"
+          ]
         }
       ]
     },
@@ -250,6 +282,37 @@
             "Sigmoid",
             "ReLU",
             "LSTM"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 2.7"
+          ],
+          "q": "In LSTMs, why do we apply Tanh to the cell state before using it (1p), but sigmoid for the gates (1p)?",
+          "answer": "**Tanh** bounds the cell-state values to $[-1,1]$, **preventing uncontrolled growth** over long sequences. **Sigmoid** (range $[0,1]$) makes the gates act as **soft switches**, controlling **how much information flows through** (forget / write / read fractions).",
+          "extend": "Tanh = bounded content; sigmoid = a valve in $[0,1]$. That's why ReLU (unbounded) is a poor gate activation.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "LSTM"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 7.5"
+          ],
+          "q": "Explain how the three gates in an LSTM control the cell state.",
+          "answer": "**Forget gate:** decides how much of the previous (long-term) cell state to **discard**. **Input gate:** controls how much **new information is written** into the cell state. **Output gate:** controls how much of the cell state is **exposed as the output** / short-term hidden state.",
+          "extend": "Forget→erase, input→write, output→read — three sigmoidal valves regulating the cell-state highway.",
+          "tags": [
+            "Sigmoid",
+            "LSTM",
+            "ResNet / skip connections"
           ]
         }
       ]
@@ -441,6 +504,80 @@
             "Transformer",
             "Attention",
             "Positional encoding"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 7.7"
+          ],
+          "q": "Given $Q,K,V$ of shape $N\\times C$, write the formula of (scaled dot-product) attention.",
+          "answer": "$\\text{Attention}(Q,K,V)=\\text{softmax}\\!\\Big(\\frac{QK^\\top}{\\sqrt{C}}\\Big)V$. The softmax is taken **over the rows** (each query over all keys), and the scores are divided by $\\sqrt{C}$ (the feature/channel dimension).",
+          "extend": "Memorize the exact form: $K$ transposed, divide by $\\sqrt{C}$, softmax inside, $V$ outside.",
+          "tags": [
+            "Softmax",
+            "Transformer",
+            "Attention"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 7.8"
+          ],
+          "q": "What is the role of dividing by the channel dimension ($\\sqrt{C}$) in the attention formula?",
+          "answer": "It **scales down the dot-product scores** (which grow with the dimension $C$) so the softmax input stays in a sensible range → **numerical stability**, avoiding an overly **peaked softmax** and the resulting **small / vanishing gradients**.",
+          "extend": "Without $1/\\sqrt{C}$, large-$C$ dot products saturate the softmax (near one-hot) and gradients vanish.",
+          "tags": [
+            "Softmax",
+            "Vanishing gradient",
+            "Transformer",
+            "Attention"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 7.9"
+          ],
+          "q": "Why does the self-attention mechanism become challenging for extremely long sequences?",
+          "answer": "It requires a **quadratic amount of memory and compute, $O(n^2)$**, in the sequence length $n$ — every token attends to every other token — so cost blows up for long sequences.",
+          "extend": "The $n\\times n$ attention matrix is the bottleneck; efficient-attention variants approximate it to scale.",
+          "tags": [
+            "Transformer",
+            "Attention"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 7.6"
+          ],
+          "q": "Multi-head attention with embedding dim 8, 3 heads, $Q/K$ dim 4, $V$ dim 6, weights multiplied from the right ($Y=XW$), output dimension must match the input for the residual. Give the shape of each weight matrix (use $k\\times(n\\times m)$ for per-head weights).",
+          "answer": "$W_q:\\ 3\\times(8\\times4)$, $W_k:\\ 3\\times(8\\times4)$, $W_v:\\ 3\\times(8\\times6)$, $W_o:\\ (18\\times8)$. Each head projects the 8-dim embedding to its $Q/K$ (4) or $V$ (6); the three heads' value outputs concatenate to $3\\cdot6=18$, then $W_o$ maps $18\\to8$ to restore the residual dimension.",
+          "extend": "Per-head projections are not shared (hence $3\\times$); the output projection $W_o$ merges concatenated heads back to the model dim.",
+          "tags": [
+            "Transformer",
+            "Attention",
+            "ResNet / skip connections"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 7.10"
+          ],
+          "q": "In a Transformer for machine translation (predicting the next word, full input+output sentence given), why must we mask the outputs fed into the decoder?",
+          "answer": "To **mask out future information**: the decoder must predict the next word using only the **already-generated (past) words and the encoder output**. Without masking the model could **'cheat'** by attending to / copying the future ground-truth tokens.",
+          "extend": "Causal (look-ahead) masking enforces autoregressive, left-to-right decoding so the model can't see the answer.",
+          "tags": [
+            "Transformer",
+            "Attention"
           ]
         }
       ]

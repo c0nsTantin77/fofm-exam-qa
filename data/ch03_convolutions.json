@@ -169,6 +169,51 @@
             "Convolution",
             "Parameter counting"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 2.8"
+          ],
+          "q": "For a convolutional layer with kernel size 3, how can you set the padding and stride so the output has the same size as the input? What is the shape of the weights if the output has only one channel?",
+          "answer": "**Padding = 1, stride = 1** (for $k=3$, $p=\\frac{k-1}{2}=1$ with $s=1$ preserves spatial size). Weight shape (PyTorch $[out,in,h,w]$): $\\mathbf{[1,\\,C_{in},\\,3,\\,3]}$ — with $C_{in}=1$ for grayscale or $3$ for RGB (TensorFlow $[h,w,in,out]=[3,3,C_{in},1]$).",
+          "extend": "'Same' padding for odd kernel $k$: $p=(k-1)/2$, $s=1$. One output channel ⇒ a single $C_{in}\\times3\\times3$ filter.",
+          "tags": [
+            "Convolution",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 2.9"
+          ],
+          "q": "Write down the conv weights (one output channel, RGB input, $3\\times3$, padding 1, stride 1) so the layer maps an RGB image to grayscale by $Y=0.30R+0.59G+0.11B$.",
+          "answer": "Three $3\\times3$ kernels (one per input channel), each **all zeros except the center**: R-kernel center $=0.30$, G-kernel center $=0.59$, B-kernel center $=0.11$. With padding 1 / stride 1, the center-only weight performs a **per-pixel weighted sum** of the three channels → grayscale.",
+          "extend": "Center-only kernels = a $1\\times1$-style channel combination embedded in a $3\\times3$ filter (the off-center weights are 0).",
+          "tags": [
+            "Convolution",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 3.4"
+          ],
+          "q": "Explain a pro (1p) and a con (1p) of using a larger kernel size in the convolutional layers.",
+          "answer": "**Pro:** a larger kernel gives a **larger receptive field per layer**, so the model can detect broader patterns earlier. **Con:** it has **more parameters** → higher computational cost and a greater risk of **overfitting** (which is why stacking small $3\\times3$ kernels is usually preferred).",
+          "extend": "Bigger kernel = bigger RF fast but costly; stacked small kernels reach the same RF with fewer params and more non-linearity.",
+          "tags": [
+            "Activation functions",
+            "Overfitting",
+            "Receptive field",
+            "Convolution",
+            "Parameter counting"
+          ]
         }
       ]
     },
@@ -284,6 +329,71 @@
             "Convolution",
             "CNN"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS24 1.6"
+          ],
+          "q": "You classify centered hieroglyphs, but some are slightly translated. Which layers help make the model robust to these translations?",
+          "answer": "**Convolutional layers combined with Max Pooling layers.** Convolutions are translation-**equivariant**, and max pooling adds **local translation invariance**, so small shifts don't change the prediction. Conv-only, pool-only, or conv+FC are weaker against translation.",
+          "extend": "Conv (equivariance) + pooling (local invariance) is the classic translation-robustness combo.",
+          "options": [
+            {
+              "text": "Only Convolutional layers.",
+              "correct": false
+            },
+            {
+              "text": "Only Max Pooling layers.",
+              "correct": false
+            },
+            {
+              "text": "Convolutional layers combined with Max Pooling layers.",
+              "correct": true
+            },
+            {
+              "text": "Convolutional layers combined with fully connected (FC) layers.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Pooling",
+            "Convolution",
+            "Fully-connected"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 2.6"
+          ],
+          "q": "Give two reasons why convolutional layers are more efficient for image-related tasks than dense (fully-connected) layers.",
+          "answer": "Any two: (1) convs operate on **neighboring, correlated pixels / extract local features** instead of connecting to all pixels; (2) **translation invariance/equivariance**; (3) **parameter sharing** → far **fewer parameters**; (4) they **don't require a fixed input size**.",
+          "extend": "Locality + weight sharing are the core inductive biases that make CNNs cheap and effective on images.",
+          "tags": [
+            "Convolution",
+            "CNN",
+            "Fully-connected"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 3.1"
+          ],
+          "q": "Explain the role of the convolutional layers, pooling layers, and fully connected layers in a CNN (one or two sentences each).",
+          "answer": "**Conv layers:** extract spatial features / detect patterns (edges, textures), building hierarchical representations. **Pooling layers:** reduce the spatial dimensions of feature maps → lower compute and overfitting while retaining essential info (and adding translation invariance). **FC layers:** integrate the extracted features into final class scores → make the classification/regression decision.",
+          "extend": "Conv = feature extraction, pool = spatial downsampling, FC = decision head.",
+          "tags": [
+            "Overfitting",
+            "Pooling",
+            "Convolution",
+            "CNN",
+            "Fully-connected"
+          ]
         }
       ]
     },
@@ -369,6 +479,22 @@
             "Receptive field",
             "Pooling",
             "Convolution"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 3.2",
+            "WS24 3.3"
+          ],
+          "q": "Explain the term 'receptive field' (1p). For a first conv layer with 6 filters, kernel size 5, stride 1, padding 1, what is its receptive field (1p)? What is the receptive field of a neuron in the final fully-connected layer (1p)?",
+          "answer": "**Receptive field** = the region of the input image that a particular output feature is sensitive to / depends on. **First conv layer:** RF $=$ kernel size $=\\mathbf{5\\times5}$. **Final FC neuron:** it connects to all features, so its receptive field is the **whole image** (e.g. $32\\times32$).",
+          "extend": "RF grows from the kernel size (first conv) to the entire image (a fully-connected neuron sees everything).",
+          "tags": [
+            "Receptive field",
+            "Convolution",
+            "Fully-connected"
           ]
         }
       ]
@@ -562,6 +688,40 @@
             "1×1 convolution",
             "Convolution",
             "Classic architectures"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS24 1.3"
+          ],
+          "q": "Which of the following is/are true about $1\\times1$ convolutions?",
+          "answer": "**True:** they **change the size of the channel dimension**, and they can perform **feature-map pooling across channels**. **False:** for an $H\\times W\\times C$ input the output keeps spatial size ($H\\times W\\times C_{out}$, not $1\\times1\\times C$); and their parameter count depends on $C_{in}\\cdot C_{out}$ (+bias), **not** on the input's spatial dimensions.",
+          "extend": "1×1 conv = per-pixel channel mixing: it reshapes the channel axis only, spatial size unchanged.",
+          "options": [
+            {
+              "text": "It is used to change the size of the channel dimension.",
+              "correct": true
+            },
+            {
+              "text": "Given an HxWxC input, the output of a 1x1 conv layer has dimensionality 1x1xC.",
+              "correct": false
+            },
+            {
+              "text": "It can be used for feature-map pooling.",
+              "correct": true
+            },
+            {
+              "text": "The number of parameters of a 1x1 conv layer depends on the input's spatial dimensions.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Pooling",
+            "1×1 convolution",
+            "Convolution",
+            "Parameter counting"
           ]
         }
       ]

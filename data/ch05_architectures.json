@@ -456,6 +456,35 @@
           "tags": [
             "Autoencoder"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 3.6",
+            "WS24 3.7"
+          ],
+          "q": "Explain the primary purpose of an autoencoder (3.6). What are its two main components and the role of each (3.7)?",
+          "answer": "**Purpose:** compress the input into a **lower-dimensional (bottleneck) representation** and **reconstruct** it, minimizing reconstruction error → dimensionality reduction / feature extraction. **Components:** the **Encoder** compresses the input, capturing the essential information as a latent code; the **Decoder** reconstructs the original input from that code.",
+          "extend": "Encoder ↓ to bottleneck, Decoder ↑ back to input; the bottleneck forces a compact representation.",
+          "tags": [
+            "Autoencoder",
+            "Clustering / PCA"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 3.8"
+          ],
+          "q": "How can you modify an autoencoder to perform classification (1p)? What difference does pretraining the autoencoder on the same dataset before fine-tuning make (1p)?",
+          "answer": "**Modification:** replace the **decoder** with a **fully-connected classification head** on top of the encoder's latent code. **Pretraining effect:** the encoder learns **good latent representations**, so the classifier **converges faster (and potentially better)** during fine-tuning.",
+          "extend": "Encoder-as-feature-extractor + new head is the standard AE→classifier recipe; pretraining warm-starts the encoder.",
+          "tags": [
+            "Fully-connected",
+            "Autoencoder"
+          ]
         }
       ]
     },
@@ -547,6 +576,22 @@
             "Upsampling",
             "Parameter counting"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 2.11"
+          ],
+          "q": "Describe the two steps involved in an upconvolution (transposed convolution).",
+          "answer": "In order: **(1) upsample** the input by inserting zeros between elements (intermediate zero-padding / unpooling); **(2)** apply a **regular convolution** over the upsampled feature map. (Calling it 'transposed convolution' is only accepted if broken down into these two steps.)",
+          "extend": "Upconv = zero-insertion upsampling **then** an ordinary conv; order matters.",
+          "tags": [
+            "Pooling",
+            "Convolution",
+            "U-Net",
+            "Upsampling"
+          ]
         }
       ]
     },
@@ -597,6 +642,21 @@
           "q": "Why can't a plain autoencoder generate new images by sampling random latent vectors, while a VAE can?",
           "answer": "A plain AE's latent space is **unstructured / has gaps**, so a random vector decodes to garbage. A VAE's **KL term** forces the latent toward a known prior $\\mathcal{N}(0,1)$, making it **continuous and structured**; you can then sample $z\\sim\\mathcal{N}(0,1)$ and decode realistic images (the reparameterization trick makes this trainable).",
           "extend": "KL regularization + reparameterization = a smooth, sampleable latent space.",
+          "tags": [
+            "Regularization",
+            "Autoencoder",
+            "VAE"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 2.2"
+          ],
+          "q": "What are the main differences between a standard autoencoder and a variational autoencoder?",
+          "answer": "A **standard AE** imposes **no structure on the latent space** — it only compresses and reconstructs the input (reconstruction loss only). A **VAE imposes a prior on the latent space** (learns a probability distribution), **samples from the latent distribution**, and adds a **KL-divergence term** to the loss → enabling generation of new samples.",
+          "extend": "VAE = AE + a regularized, samplable latent (KL to a prior). Plain AE's latent has 'holes', so it can't generate.",
           "tags": [
             "Regularization",
             "Autoencoder",

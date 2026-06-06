@@ -183,6 +183,38 @@
           "tags": [
             "Backpropagation"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS24 1.7"
+          ],
+          "q": "In PyTorch, what is/are the correct order(s) of steps when training a model with gradient descent?",
+          "answer": "**Valid:** any order where the gradients are **zeroed before backpropagation** and parameters are **updated after** it — both *zero → forward → backward → update* and *forward → zero → backward → update* work. **Invalid:** backprop before zeroing, or updating before backprop.",
+          "extend": "Invariant: `optimizer.zero_grad()` before `loss.backward()`, and `optimizer.step()` after it. The forward pass may sit before or after the zeroing.",
+          "options": [
+            {
+              "text": "Zero the gradients → forward pass → backpropagation → update parameters.",
+              "correct": true
+            },
+            {
+              "text": "Forward pass → zero the gradients → backpropagation → update parameters.",
+              "correct": true
+            },
+            {
+              "text": "Backpropagation → zero the gradients → update parameters.",
+              "correct": false
+            },
+            {
+              "text": "Forward pass → update parameters → backpropagation.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Backpropagation",
+            "Optimizers"
+          ]
         }
       ]
     },
@@ -465,6 +497,58 @@
             "Tanh",
             "Activation functions"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 2,
+          "sources": [
+            "WS24 1.2"
+          ],
+          "q": "Which of the following is/are true about activation functions?",
+          "answer": "**True:** *Sigmoid can lead to vanishing gradients* (it saturates). **False:** $\\log(\\text{ReLU}(x+1))$ is a poor activation (undefined where $\\text{ReLU}(x+1)=0$); *Parametric ReLU* avoids the Dead-ReLU problem via its learnable negative slope; *Tanh* still saturates and **does** suffer vanishing gradients despite being zero-centered.",
+          "extend": "Zero-centering (Tanh) helps optimization but does NOT remove saturation/vanishing gradients.",
+          "options": [
+            {
+              "text": "Sigmoid can lead to vanishing gradients.",
+              "correct": true
+            },
+            {
+              "text": "$\\log(\\text{ReLU}(x+1))$ is suitable to add non-linearity to a network.",
+              "correct": false
+            },
+            {
+              "text": "Parametric ReLU always has the 'Dead ReLU' problem.",
+              "correct": false
+            },
+            {
+              "text": "Tanh will not lead to vanishing gradients because it is zero-centered.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 2.10"
+          ],
+          "q": "Describe what 'vanishing gradient' is in the context of backpropagation through activation functions (1p). Give one example of a function that suffers from it (1p).",
+          "answer": "When activation functions **saturate**, their derivative becomes ~0, so by the **chain rule** the gradient of the loss w.r.t. parameters gets **extremely small in the early (shallow) layers** → those layers barely learn. **Example: Sigmoid or Tanh** (ReLU does not suffer this).",
+          "extend": "Vanishing gradient ≠ dead ReLU: it's saturation-driven shrinkage through many layers, classically from Sigmoid/Tanh.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
         }
       ]
     },
@@ -616,6 +700,34 @@
           "tags": [
             "Softmax",
             "Weight initialization",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 2.4"
+          ],
+          "q": "Explain why minimizing the cross-entropy $H(p,q)$ between class probabilities $q$ (network) and target $p$ is equivalent to minimizing the KL divergence $D_{KL}(p\\|q)=H(p,q)-H(p)$.",
+          "answer": "Because $H(p)$ — the **entropy of the fixed target distribution** $p$ — does **not depend on the model parameters**; it is a **constant** with zero gradient. So $\\min_\\theta D_{KL}(p\\|q)=\\min_\\theta\\big(H(p,q)-H(p)\\big)=\\min_\\theta H(p,q)$.",
+          "extend": "Dropping a parameter-independent constant doesn't change the argmin — that's why CE training = KL minimization.",
+          "tags": [
+            "VAE",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 2.13"
+          ],
+          "q": "Write down the formula for the binary cross-entropy loss (1p) and define all the variables (1p).",
+          "answer": "$L(\\hat y_i,y_i)=-\\big(y_i\\log\\hat y_i+(1-y_i)\\log(1-\\hat y_i)\\big)$, or batched $L=-\\frac1N\\sum_{i=1}^{N}\\big(y_i\\log\\hat y_i+(1-y_i)\\log(1-\\hat y_i)\\big)$. Here $y_i\\in\\{0,1\\}$ is the **ground-truth label**, $\\hat y_i\\in(0,1)$ is the **model's predicted probability**, and $N$ is the **batch size**.",
+          "extend": "BCE needs a single probability output $\\hat y_i$ (sigmoid); the two log terms reward the correct class for label 1 vs 0.",
+          "tags": [
+            "Sigmoid",
             "Loss functions"
           ]
         }

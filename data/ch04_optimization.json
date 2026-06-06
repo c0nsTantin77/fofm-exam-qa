@@ -249,6 +249,67 @@
             "Momentum",
             "Learning rate"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 6.1"
+          ],
+          "q": "Identify the optimizer from each pseudocode: **Alg1** updates $b_t\\!\\leftarrow\\!\\mu b_{t-1}+g_t,\\ \\theta_t\\!\\leftarrow\\!\\theta_{t-1}-\\gamma b_t$; **Alg2** uses $v_t\\!\\leftarrow\\!\\alpha v_{t-1}+(1-\\alpha)g_t^2,\\ \\theta_t\\!\\leftarrow\\!\\theta_{t-1}-\\gamma g_t/(\\sqrt{v_t}+\\epsilon)$; **Alg3** keeps $m_t,v_t$ with $\\beta_1,\\beta_2$ and bias-corrected $\\tilde m_t,\\tilde v_t$.",
+          "answer": "**Alg1 = GD/SGD with momentum** ($\\mu$ is the momentum coefficient; $b_t$ is a running average of gradients). **Alg2 = RMSprop** (EMA of squared gradients re-scales each step). **Alg3 = Adam** (first + second moment EMAs with bias correction).",
+          "extend": "Recognize by the state: velocity only ⇒ momentum; squared-grad EMA ⇒ RMSprop; both + bias correction ⇒ Adam.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 6.2",
+            "WS24 6.3"
+          ],
+          "q": "(6.2) What is the major difference between the momentum optimizer (Alg1) and RMSprop (Alg2), and the idea behind it? (6.3) What happens when the momentum coefficient $\\mu>0$ in Alg1?",
+          "answer": "**6.2:** RMSprop introduces **second-moment (squared-gradient / variance) information** to **re-scale each update by its variance**, dampening high-variance directions — Alg1 uses only a running average of gradients (first moment). **6.3:** With $\\mu>0$, Alg1 **accumulates a moving average of gradients (momentum)** → it **reduces oscillations and speeds up convergence**, but can **overshoot / diverge** past minima.",
+          "extend": "Momentum smooths the *direction* (1st moment); RMSprop adapts the *scale* (2nd moment). Adam fuses both.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 6.4"
+          ],
+          "q": "Explain the $\\beta_1$ and $\\beta_2$ hyperparameters of Adam.",
+          "answer": "$\\beta_1$ is the **decay-rate coefficient of the running average of the first moment** (gradient mean); $\\beta_2$ is the **decay-rate coefficient of the running average of the second moment** (squared gradients / variance). They control how much past vs current gradient information is retained.",
+          "extend": "Higher $\\beta$ ⇒ longer memory of past gradients. (Making $m,v$ biased is a *consequence*, not the purpose, of $\\beta$.)",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 6.5"
+          ],
+          "q": "What is the major difference between Newton's method and the first-order optimizers above, and why is it not widely used for deep learning?",
+          "answer": "Newton's method is **second-order** — it uses the **Hessian** (curvature), not just the gradient. It is impractical for deep learning because **computing and inverting the Hessian** over millions of parameters is **prohibitively expensive in compute and memory**.",
+          "extend": "Second-order = exact curvature (one-step on quadratics) but $O(\\text{params}^2)$ Hessian ⇒ infeasible at scale.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
         }
       ]
     },
@@ -372,6 +433,59 @@
             "L1/L2",
             "Overfitting",
             "Data augmentation"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS24 1.5"
+          ],
+          "q": "Training for a while, the training loss keeps decreasing but the validation loss is increasing. Which methods can optimize this issue?",
+          "answer": "This is **overfitting**. **Early stopping** and a **learning-rate schedule** help. **Increasing the learning rate** or **removing data augmentation** would make overfitting **worse**.",
+          "extend": "Falling train + rising val = overfitting; cure with early stopping / regularization, not by removing augmentation.",
+          "options": [
+            {
+              "text": "Early-stopping.",
+              "correct": true
+            },
+            {
+              "text": "Increase the learning rate.",
+              "correct": false
+            },
+            {
+              "text": "Use a learning-rate schedule.",
+              "correct": true
+            },
+            {
+              "text": "Remove data augmentation.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Regularization",
+            "Overfitting",
+            "Learning rate",
+            "Data augmentation"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 4.1",
+            "WS24 4.2",
+            "WS24 4.3"
+          ],
+          "q": "Two CNNs are trained with the same optimizer/hyperparameters. (4.1) After 200 epochs, Model 1 has high loss on **both** train and val — which is worse, what is the phenomenon, how to improve it? (4.2) After adding layers to Model 1, its **validation** loss rises while train falls — what is the phenomenon? (4.3) Which model would you deploy, and what technique gives the best performance?",
+          "answer": "**4.1** Model 1 is **underfitting** (too low capacity) → increase parameters/capacity, tune hyperparameters, add BatchNorm, normalize inputs. **4.2** Now Model 1 **overfits**. **4.3** Deploy the model with the **lowest validation loss** and use **early stopping** (keep the epoch with best val loss) to avoid the overfitting tail.",
+          "extend": "Underfit ⇒ add capacity; overfit ⇒ regularize + early stopping. Deployment choice is driven by validation loss.",
+          "tags": [
+            "Batch normalization",
+            "Regularization",
+            "Overfitting",
+            "Optimizers",
+            "CNN"
           ]
         }
       ]
@@ -741,6 +855,21 @@
             "L1/L2",
             "Weight initialization"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 2.3"
+          ],
+          "q": "A convolutional layer outputs shape $N,H,W,C$ and batch normalization is applied. Across which dimension(s) is the normalization performed? (Equivalently, state the shape of the mean array.)",
+          "answer": "Normalization is performed **across $N,H,W$** — one mean/variance **per channel** — so the **mean array has shape $(1,1,1,C)$**. Each channel is normalized using statistics pooled over the batch and the spatial dimensions.",
+          "extend": "Conv BN = per-channel: pool over batch + spatial; FC BN = per-feature (pool over batch only).",
+          "tags": [
+            "Batch normalization",
+            "Convolution",
+            "Normalization"
+          ]
         }
       ]
     },
@@ -907,6 +1036,46 @@
           "answer": "$5^4=\\mathbf{625}$ runs. **Random search** over the same budget is often as good or better, because not all hyperparameters matter equally — it samples more distinct values of the important ones.",
           "extend": "Grid search scales exponentially in #hyperparameters; random/Bayesian search scales far better.",
           "tags": [
+            "Learning rate"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS24 2.12"
+          ],
+          "q": "For GPU-memory reasons you decrease your mini-batch size. Should you increase or decrease your learning rate (1p)? Why (1p)?",
+          "answer": "**Decrease** the learning rate. A smaller mini-batch is **less representative of the full data** — its gradient estimate has **higher variance / more noise** — so a large LR on noisy gradients risks **overshooting / diverging**; lowering the LR keeps updates stable.",
+          "extend": "Smaller batch ⇒ noisier gradient ⇒ smaller, safer steps. (Linear-scaling rule: LR roughly scales with batch size.)",
+          "tags": [
+            "Learning rate"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 6.6"
+          ],
+          "q": "A scheduler computes `get_lr = base_lr * gamma ** (epoch // n)`. What class is this (1p)? Explain its role during training (1p) and give two variants (2p).",
+          "answer": "It is a **(step) learning-rate scheduler** (`StepLR`). **Role:** it **decays the learning rate by a factor `gamma` every `n` epochs**, which stabilizes training, avoids overshooting / oscillation around the minimum, and helps converge better. **Two variants (any):** `ExponentialLR`, `CosineAnnealingLR`, `MultiStepLR`, `PolynomialLR`, `LinearLR`, `CyclicLR`, `OneCycleLR`, `ReduceLROnPlateau`, `LambdaLR`.",
+          "extend": "Step decay drops LR in stages; cosine/exponential/plateau schedulers vary how the LR is annealed over training.",
+          "tags": [
+            "Learning rate"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS24 4.4"
+          ],
+          "q": "Grid-searching three learning rates $\\tau_1,\\tau_2,\\tau_3$ for vanilla SGD gives three training-accuracy curves. The official answer is $\\tau_1>\\tau_3>\\tau_2$. Explain the reasoning that orders learning rates from these curves.",
+          "answer": "A **larger LR** makes training accuracy **rise faster initially** but, if too large, plateaus lower or oscillates; a **smaller LR** rises **slowly and steadily**. Reading the curves: the fastest, stable climber is the largest stable LR ($\\tau_1$), the slowest climber is the smallest ($\\tau_2$), leaving the intermediate one ($\\tau_3$) in between → $\\tau_1>\\tau_3>\\tau_2$.",
+          "extend": "Larger LR ⇒ faster but rougher convergence; smaller LR ⇒ slower but smoother. Map curve speed/stability to LR magnitude.",
+          "tags": [
+            "Optimizers",
             "Learning rate"
           ]
         }

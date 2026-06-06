@@ -1,6 +1,6 @@
 {
-  "overall_pct": 31,
-  "cited": 168,
+  "overall_pct": 41,
+  "cited": 221,
   "detected": 536,
   "per_exam": [
     {
@@ -60,8 +60,8 @@
     {
       "exam": "WS24",
       "det": 56,
-      "cit": 2,
-      "pct": 4
+      "cit": 55,
+      "pct": 98
     },
     {
       "exam": "WS26",
