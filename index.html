@@ -16,18 +16,28 @@
     <div class="hero-top"><img class='tum-logo' src='assets/tum.svg' alt='TUM' width='44' height='23'><span class="kicker">Technische Universität München · IN2346</span></div>
     <h1>Introduction to Deep Learning</h1>
     <p class="tagline">Exam Q&amp;A Bank · closed-book revision · open &amp; free</p>
-    <p class="lead">Every problem from 12 past exams + the course summary, classified by chapter and knowledge point, sorted by exam frequency, answered from the official solutions, with LaTeX-rendered formulas.</p>
+    <ul class="hero-points">
+      <li><b>Search by concept tag</b> — jump between related questions across chapters</li>
+      <li><b>Interactive multiple-choice</b> — pick, check, then reveal the answer</li>
+      <li><b>AI-generated practice</b> — extra questions on every knowledge point</li>
+    </ul>
+    <p class="lead">Every problem from 12 past exams + the course summary — frequency-sorted, with official answers.</p>
     <div class="exams"><span class='exam'>SS20</span> <span class='exam'>SS21</span> <span class='exam'>WS21</span> <span class='exam'>SS22</span> <span class='exam'>WS22</span> <span class='exam'>SS23</span> <span class='exam'>WS23</span> <span class='exam'>SS24</span> <span class='exam'>WS24</span> <span class='exam'>SS25</span> <span class='exam'>WS26</span> <span class='exam'>Mock</span></div>
   </div>
 </header>
 <main class="hub">
   <div class="gsearch">
-    <input id="gsearch" type="search" placeholder="🔍 Search all 188 questions (e.g. dropout, Adam, softmax)…" autocomplete="off" aria-label="Search all questions">
+    <div class="gsearch-box">
+      <svg class="gsearch-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M21 21l-4.3-4.3M11 18a7 7 0 100-14 7 7 0 000 14z"/></svg>
+      <input id="gsearch" type="search" placeholder="Search all 233 questions — try “dropout”, “Adam”, “softmax”" autocomplete="off" aria-label="Search all questions">
+    </div>
     <div id="gresults" class="gresults" hidden></div>
   </div>
+  <section class='poptags'><div class='poptags-head'><span class='poptags-label'>Popular tags</span><a class='poptags-all' href='tags.html'>All 50 tags →</a></div><div class='poptags-row'><a class='ptag' href='tags.html?t=Convolution'>Convolution<span class='ptag-n'>43</span></a><a class='ptag' href='tags.html?t=Regularization'>Regularization<span class='ptag-n'>30</span></a><a class='ptag' href='tags.html?t=ReLU'>ReLU<span class='ptag-n'>30</span></a><a class='ptag' href='tags.html?t=Sigmoid'>Sigmoid<span class='ptag-n'>27</span></a></div></section>
   <div class="cards">
-    <a class='card' href='chapters/ch01.html'><div class='card-roman'>I</div><h3>Machine Learning Basics</h3><div class='card-meta'>42 questions · 9 topics</div></a><a class='card' href='chapters/ch02.html'><div class='card-roman'>II</div><h3>Neural Networks</h3><div class='card-meta'>34 questions · 7 topics</div></a><a class='card' href='chapters/ch03.html'><div class='card-roman'>III</div><h3>Convolutions</h3><div class='card-meta'>22 questions · 6 topics</div></a><a class='card' href='chapters/ch04.html'><div class='card-roman'>IV</div><h3>Optimization</h3><div class='card-meta'>38 questions · 7 topics</div></a><a class='card' href='chapters/ch05.html'><div class='card-roman'>V</div><h3>Popular Architectures</h3><div class='card-meta'>26 questions · 7 topics</div></a><a class='card' href='chapters/ch06.html'><div class='card-roman'>VI</div><h3>RNNs &amp; Transformers</h3><div class='card-meta'>16 questions · 4 topics</div></a><a class='card' href='chapters/ch07.html'><div class='card-roman'>VII</div><h3>Appendix: Matrix Calculus</h3><div class='card-meta'>10 questions · 3 topics</div></a>
+    <a class='card' href='chapters/ch01.html'><div class='card-roman'>I</div><h3>Machine Learning Basics</h3><div class='card-meta'>47 questions · 9 topics</div></a><a class='card' href='chapters/ch02.html'><div class='card-roman'>II</div><h3>Neural Networks</h3><div class='card-meta'>40 questions · 7 topics</div></a><a class='card' href='chapters/ch03.html'><div class='card-roman'>III</div><h3>Convolutions</h3><div class='card-meta'>29 questions · 6 topics</div></a><a class='card' href='chapters/ch04.html'><div class='card-roman'>IV</div><h3>Optimization</h3><div class='card-meta'>47 questions · 7 topics</div></a><a class='card' href='chapters/ch05.html'><div class='card-roman'>V</div><h3>Popular Architectures</h3><div class='card-meta'>31 questions · 7 topics</div></a><a class='card' href='chapters/ch06.html'><div class='card-roman'>VI</div><h3>RNNs &amp; Transformers</h3><div class='card-meta'>26 questions · 4 topics</div></a><a class='card' href='chapters/ch07.html'><div class='card-roman'>VII</div><h3>Appendix: Matrix Calculus</h3><div class='card-meta'>13 questions · 3 topics</div></a>
   </div>
+  <aside class='updates'><h2>📣 Recent updates</h2><ul class='up-list'><li><span class='up-date'>2026-06-06</span><span class='up-text'>Concept tags on every question + a tag index page to review a theme across chapters.</span></li><li><span class='up-date'>2026-06-06</span><span class='up-text'>Coverage pass: +45 questions from SS25 &amp; WS23 — now 233 questions.</span></li><li><span class='up-date'>2026-06-05</span><span class='up-text'>Interactive multiple-choice, site-wide search, and a mobile-friendly redesign.</span></li></ul></aside>
   <section class="how">
     <h2>How to use this deck</h2>
     <ul>
@@ -37,7 +47,7 @@
       <li><b>Closed-book ready:</b> click a question to reveal the answer and an “extended memory” hook.</li>
     </ul>
   </section>
-  <p class="hubnote">All 7 chapters complete — 188 questions across 43 knowledge points, from 12 past exams + the course summary.</p>
+  <p class="hubnote">All 7 chapters complete — 233 questions across 43 knowledge points, from 12 past exams + the course summary.</p>
 </main>
 
 <footer class="sources">
@@ -46,10 +56,8 @@
     <div class="sources-cols">
       <div>
         <h4>Sources</h4>
-        <ul class="src-list">
-          <li><span class='src'>SS20</span> SoSe 2020 endterm</li><li><span class='src'>SS21</span> SoSe 2021 endterm</li><li><span class='src'>WS21</span> WiSe 2021/22 endterm</li><li><span class='src'>SS22</span> SoSe 2022 endterm</li><li><span class='src'>WS22</span> WiSe 2022/23 endterm</li><li><span class='src'>SS23</span> SoSe 2023 endterm</li><li><span class='src'>WS23</span> WiSe 2023/24 endterm</li><li><span class='src'>SS24</span> SoSe 2024 endterm</li><li><span class='src'>WS24</span> WiSe 2024/25 endterm</li><li><span class='src'>SS25</span> SoSe 2025 endterm</li><li><span class='src'>WS26</span> WiSe 2025/26 endterm</li><li><span class='src'>Mock</span> Mock exam endterm</li>
-          <li><span class='src'>Summary</span> <em>Summary of the lecture I2DL</em> (per-chapter questions)</li>
-        </ul>
+        <p class='src-line'><span class='src'>SS25</span> SoSe 2025 endterm, <span class='src'>WS24</span> WiSe 2024/25 endterm, … — all 12 TUM IN2346 endterms (SS20–SS25, WS21–WS26, Mock) plus the <span class='src'>Summary</span> course summary.</p>
+        <div class='coverage'><h4>Coverage</h4><p><b>31%</b> of past-exam questions are cited directly (168/536); the remainder are covered through the course summary (the backbone) or folded into merged cards.</p><div class='cov-chips'><span class='cov-chip'>SS25 82%</span> <span class='cov-chip'>SS22 49%</span> <span class='cov-chip'>SS20 43%</span> <span class='cov-chip'>SS21 38%</span> <span class='cov-chip'>SS24 38%</span> <span class='cov-chip'>SS23 26%</span> <span class='cov-chip'>WS23 20%</span> <span class='cov-chip'>WS26 16%</span> <span class='cov-chip'>WS21 12%</span> <span class='cov-chip'>WS22 12%</span> <span class='cov-chip'>WS24 4%</span> <span class='cov-chip'>Mock 0%</span> <span class='cov-chip cov-chip-full'>Summary · backbone</span></div></div>
       </div>
       <div>
         <h4>About</h4>
@@ -60,12 +68,16 @@
         <p>Formulas rendered with <a href="https://katex.org/" rel="noopener">KaTeX</a>.
         Built from the official I2DL materials for personal study. Spotted a mistake?
         <a href="https://github.com/c0nsTantin77/i2dl-exam-qa/issues" rel="noopener">Open an issue on the repo</a>.</p>
+        <p><a class="gh-star" href="https://github.com/c0nsTantin77/i2dl-exam-qa" rel="noopener">
+          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          Star this project on GitHub</a></p>
       </div>
     </div>
   </div>
   <div class="sources-bar">TUM IN2346 · I2DL Exam Q&amp;A · for educational use only — not affiliated with or endorsed by TUM.</div>
 </footer>
 
+<script defer src="search-index.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
 <script defer src="assets/app.js"></script>

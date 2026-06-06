@@ -1,0 +1,79 @@
+{
+  "overall_pct": 31,
+  "cited": 168,
+  "detected": 536,
+  "per_exam": [
+    {
+      "exam": "SS20",
+      "det": 54,
+      "cit": 23,
+      "pct": 43
+    },
+    {
+      "exam": "SS21",
+      "det": 39,
+      "cit": 15,
+      "pct": 38
+    },
+    {
+      "exam": "SS22",
+      "det": 65,
+      "cit": 32,
+      "pct": 49
+    },
+    {
+      "exam": "SS23",
+      "det": 46,
+      "cit": 12,
+      "pct": 26
+    },
+    {
+      "exam": "SS24",
+      "det": 45,
+      "cit": 17,
+      "pct": 38
+    },
+    {
+      "exam": "SS25",
+      "det": 50,
+      "cit": 41,
+      "pct": 82
+    },
+    {
+      "exam": "WS21",
+      "det": 43,
+      "cit": 5,
+      "pct": 12
+    },
+    {
+      "exam": "WS22",
+      "det": 43,
+      "cit": 5,
+      "pct": 12
+    },
+    {
+      "exam": "WS23",
+      "det": 46,
+      "cit": 9,
+      "pct": 20
+    },
+    {
+      "exam": "WS24",
+      "det": 56,
+      "cit": 2,
+      "pct": 4
+    },
+    {
+      "exam": "WS26",
+      "det": 44,
+      "cit": 7,
+      "pct": 16
+    },
+    {
+      "exam": "Mock",
+      "det": 5,
+      "cit": 0,
+      "pct": 0
+    }
+  ]
+}

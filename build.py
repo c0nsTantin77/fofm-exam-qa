@@ -87,10 +87,29 @@ EXAM_NAMES = {
     "WS24": "WiSe 2024/25", "WS26": "WiSe 2025/26", "Mock": "Mock exam",
 }
 
+def _coverage_html():
+    """Full coverage list under Sources (from coverage-summary.json) — every exam + the summary."""
+    p = DATA / "coverage-summary.json"
+    if not p.exists():
+        return ""
+    s = json.loads(p.read_text(encoding="utf-8"))
+    allrows = sorted(s["per_exam"], key=lambda r: r["pct"], reverse=True)
+    chips = " ".join(f"<span class='cov-chip'>{esc(r['exam'])} {r['pct']}%</span>" for r in allrows)
+    chips += " <span class='cov-chip cov-chip-full'>Summary · backbone</span>"
+    return (
+        f"<div class='coverage'><h4>Coverage</h4>"
+        f"<p><b>{s['overall_pct']}%</b> of past-exam questions are cited directly "
+        f"({s['cited']}/{s['detected']}); the remainder are covered through the course summary "
+        f"(the backbone) or folded into merged cards.</p>"
+        f"<div class='cov-chips'>{chips}</div></div>"
+    )
+
 def site_footer(exams, *, base) -> str:
-    rows = "".join(
-        f"<li><span class='src'>{esc(e)}</span> {esc(EXAM_NAMES.get(e, e))} endterm</li>"
-        for e in exams
+    src_line = (
+        "<p class='src-line'>"
+        "<span class='src'>SS25</span> SoSe 2025 endterm, "
+        "<span class='src'>WS24</span> WiSe 2024/25 endterm, … — all 12 TUM IN2346 endterms "
+        "(SS20–SS25, WS21–WS26, Mock) plus the <span class='src'>Summary</span> course summary.</p>"
     )
     return f"""
 <footer class="sources">
@@ -99,10 +118,8 @@ def site_footer(exams, *, base) -> str:
     <div class="sources-cols">
       <div>
         <h4>Sources</h4>
-        <ul class="src-list">
-          {rows}
-          <li><span class='src'>Summary</span> <em>Summary of the lecture I2DL</em> (per-chapter questions)</li>
-        </ul>
+        {src_line}
+        {_coverage_html()}
       </div>
       <div>
         <h4>About</h4>
@@ -113,6 +130,9 @@ def site_footer(exams, *, base) -> str:
         <p>Formulas rendered with <a href="https://katex.org/" rel="noopener">KaTeX</a>.
         Built from the official I2DL materials for personal study. Spotted a mistake?
         <a href="https://github.com/c0nsTantin77/i2dl-exam-qa/issues" rel="noopener">Open an issue on the repo</a>.</p>
+        <p><a class="gh-star" href="https://github.com/c0nsTantin77/i2dl-exam-qa" rel="noopener">
+          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          Star this project on GitHub</a></p>
       </div>
     </div>
   </div>
@@ -176,10 +196,10 @@ def render_question(q, anchor) -> str:
         correct_line = f"<div class='correct-line'>✅ Correct: <b>{cl}</b></div>"
         body_inner = (
             "<div class='quiz'>"
-            "<p class='quiz-hint'>Select all options you think are correct, then check.</p>"
+            "<p class='quiz-hint'>Select the options you think are correct (it may be none), then check.</p>"
             "<ul class='options interactive'>" + "".join(opts) + "</ul>"
             "<div class='quiz-actions'>"
-            "<button type='button' class='check-btn' disabled>Check answer</button>"
+            "<button type='button' class='check-btn'>Check answer</button>"
             "<button type='button' class='reset-btn' hidden>Try again</button>"
             "</div>"
             "<div class='reveal' hidden>"
@@ -191,6 +211,15 @@ def render_question(q, anchor) -> str:
     else:
         # Open / AI: opening the card reveals the answer directly.
         body_inner = f"{answer_html}{extend_html}"
+
+    # cross-cutting concept tags → link to a site-wide search on the index
+    tags = q.get("tags", [])
+    if tags:
+        import urllib.parse as _up
+        chips = "".join(
+            f"<a class='tag' href='../tags.html?t={_up.quote(t)}'>{esc(t)}</a>" for t in tags
+        )
+        body_inner += f"<div class='tags'><span class='tags-label'>Tags</span>{chips}</div>"
 
     data_attr = f"data-type='{qtype}' data-freq='{q.get('freq',0)}'"
     return (
@@ -217,8 +246,10 @@ def render_kp(kp) -> str:
         f"</section>"
     )
 
-def page_shell(title, body, *, depth, extra_head="") -> str:
+def page_shell(title, body, *, depth, extra_head="", need_index=False) -> str:
     base = "../" if depth else ""
+    # search index is inlined as a JS global (works under file:// and http — no fetch)
+    index_js = f'<script defer src="{base}search-index.js"></script>' if need_index else ""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -232,6 +263,7 @@ def page_shell(title, body, *, depth, extra_head="") -> str:
 </head>
 <body>
 {body}
+{index_js}
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
 <script defer src="{base}assets/app.js"></script>
@@ -257,12 +289,14 @@ def build():
         # search index: one entry per question, same anchor as render_kp
         for kp in data["knowledge_points"]:
             for i, q in enumerate(sorted_questions(kp)):
+                tagtext = " ".join(q.get("tags", []))
                 search_index.append({
                     "c": ch["id"], "ct": data["title"], "kp": kp["title"],
                     "a": f"{kp['id']}-{i}", "t": q["type"],
                     "src": q["sources"][0],
                     "q": plain(q["q"]),
-                    "txt": plain(q["q"] + " " + q.get("answer", "") + " " + kp["title"]).lower(),
+                    "tg": q.get("tags", []),
+                    "txt": (plain(q["q"] + " " + q.get("answer", "") + " " + kp["title"]) + " " + tagtext).lower(),
                 })
 
         toc = "\n".join(
@@ -301,6 +335,7 @@ def build():
       <div><span class="badge freq-hot">🔥 n×</span> high frequency</div>
       <div><span class="src">SS22 3.1</span> source = exam + problem no.</div>
       <div><span class="src-ai">AI-generated</span> AI practice question</div>
+      <div><span class="tag" style="cursor:default">tag</span> click to find related Qs site-wide</div>
       <div>✅ correct option &nbsp; ❌ wrong option</div>
     </div>
   </aside>
@@ -340,24 +375,66 @@ def build():
         cards.append(inner)
 
     exams = " ".join(f"<span class='exam'>{esc(e)}</span>" for e in manifest["exams"])
+
+    # popular concept-tag chips (top by question count)
+    import urllib.parse as _up
+    from collections import Counter
+    tagc = Counter(t for e in search_index for t in e.get("tg", []))
+    poptags = [t for t, _ in tagc.most_common(4)]
+    chips = "".join(
+        f"<a class='ptag' href='tags.html?t={_up.quote(t)}'>{esc(t)}"
+        f"<span class='ptag-n'>{tagc[t]}</span></a>" for t in poptags
+    )
+    poptags_html = (
+        "<section class='poptags'><div class='poptags-head'>"
+        "<span class='poptags-label'>Popular tags</span>"
+        f"<a class='poptags-all' href='tags.html'>All {len(tagc)} tags →</a></div>"
+        f"<div class='poptags-row'>{chips}</div></section>"
+    )
+
+    # recent updates widget (optional)
+    updates_html = ""
+    upath = DATA / "updates.json"
+    if upath.exists():
+        ups = json.loads(upath.read_text(encoding="utf-8"))[:3]
+        items = "".join(
+            f"<li><span class='up-date'>{esc(u['date'])}</span>"
+            f"<span class='up-text'>{esc(u['text'])}</span></li>"
+            for u in ups
+        )
+        updates_html = (
+            "<aside class='updates'><h2>📣 Recent updates</h2>"
+            f"<ul class='up-list'>{items}</ul></aside>"
+        )
+
     body = f"""
 <header class="hero">
   <div class="hero-inner">
     <div class="hero-top">{TUM_LOGO.format(base='')}<span class="kicker">Technische Universität München · IN2346</span></div>
     <h1>Introduction to Deep Learning</h1>
     <p class="tagline">Exam Q&amp;A Bank · closed-book revision · open &amp; free</p>
-    <p class="lead">Every problem from 12 past exams + the course summary, classified by chapter and knowledge point, sorted by exam frequency, answered from the official solutions, with LaTeX-rendered formulas.</p>
+    <ul class="hero-points">
+      <li><b>Search by concept tag</b> — jump between related questions across chapters</li>
+      <li><b>Interactive multiple-choice</b> — pick, check, then reveal the answer</li>
+      <li><b>AI-generated practice</b> — extra questions on every knowledge point</li>
+    </ul>
+    <p class="lead">Every problem from 12 past exams + the course summary — frequency-sorted, with official answers.</p>
     <div class="exams">{exams}</div>
   </div>
 </header>
 <main class="hub">
   <div class="gsearch">
-    <input id="gsearch" type="search" placeholder="🔍 Search all {total_q} questions (e.g. dropout, Adam, softmax)…" autocomplete="off" aria-label="Search all questions">
+    <div class="gsearch-box">
+      <svg class="gsearch-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M21 21l-4.3-4.3M11 18a7 7 0 100-14 7 7 0 000 14z"/></svg>
+      <input id="gsearch" type="search" placeholder="Search all {total_q} questions — try “dropout”, “Adam”, “softmax”" autocomplete="off" aria-label="Search all questions">
+    </div>
     <div id="gresults" class="gresults" hidden></div>
   </div>
+  {poptags_html}
   <div class="cards">
     {''.join(cards)}
   </div>
+  {updates_html}
   <section class="how">
     <h2>How to use this deck</h2>
     <ul>
@@ -371,13 +448,30 @@ def build():
 </main>
 {site_footer(manifest['exams'], base='')}
 """
-    out = page_shell("I2DL Exam Q&A · TUM IN2346", body, depth=0)
+    out = page_shell("I2DL Exam Q&A · TUM IN2346", body, depth=0, need_index=True)
     (ROOT / "index.html").write_text(out, encoding="utf-8")
     print("built index.html")
 
-    (ROOT / "search-index.json").write_text(
-        json.dumps(search_index, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    print(f"built search-index.json  ({len(search_index)} entries)")
+    # search index — inlined as a JS global (no fetch; works under file:// + http)
+    blob = json.dumps(search_index, ensure_ascii=False, separators=(",", ":"))
+    (ROOT / "search-index.js").write_text(f"window.SEARCH_INDEX={blob};", encoding="utf-8")
+    print(f"built search-index.js  ({len(search_index)} entries)")
+
+    # ---- tags overview page (standalone) ----
+    from collections import Counter
+    tag_counts = Counter(t for e in search_index for t in e.get("tg", []))
+    tag_body = f"""
+<header class="topbar">
+  <a class="brand" href="index.html">{TUM_LOGO.format(base='')}<span class="brand-back">← All<span class="brand-full"> chapters</span></span></a>
+</header>
+<main class="tagpage" id="tagpage" data-tagcount="{len(tag_counts)}">
+  <div id="tagpage-body"><p class="hint">Loading…</p></div>
+</main>
+{site_footer(manifest['exams'], base='')}
+"""
+    out = page_shell("Concept tags · I2DL Exam Q&A", tag_body, depth=0, need_index=True)
+    (ROOT / "tags.html").write_text(out, encoding="utf-8")
+    print(f"built tags.html  ({len(tag_counts)} tags)")
 
 if __name__ == "__main__":
     build()

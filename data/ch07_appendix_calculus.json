@@ -18,7 +18,11 @@
           ],
           "q": "Why can backpropagation avoid computing full Jacobians, and what shape does the gradient of the loss w.r.t. a weight matrix have?",
           "answer": "Because the loss is a **scalar** $L\\in\\mathbb{R}$. The derivative of a scalar by a matrix is a **gradient with the same shape as that matrix** (each entry $\\frac{\\partial L}{\\partial w_{ij}}$ is a scalar), not a Jacobian. So $\\frac{\\partial L}{\\partial W}$ has the same shape as $W$.\nA Jacobian would only appear for a **vector→vector** map (e.g. $\\frac{\\partial Y}{\\partial W}$ alone), but the scalar loss collapses it.",
-          "extend": "Shape-matching rule: $\\frac{\\partial L}{\\partial v}$ has the same shape as $v$, for any variable $v$. This is the single most useful sanity check in backprop."
+          "extend": "Shape-matching rule: $\\frac{\\partial L}{\\partial v}$ has the same shape as $v$, for any variable $v$. This is the single most useful sanity check in backprop.",
+          "tags": [
+            "Backpropagation",
+            "Jacobian"
+          ]
         },
         {
           "type": "open",
@@ -28,7 +32,10 @@
           ],
           "q": "Distinguish a gradient from a Jacobian. Give the shapes for $f:\\mathbb{R}^n\\to\\mathbb{R}$ and $f:\\mathbb{R}^n\\to\\mathbb{R}^m$.",
           "answer": "**Gradient** (scalar output $f:\\mathbb{R}^n\\to\\mathbb{R}$): a vector $\\frac{\\partial f}{\\partial x}\\in\\mathbb{R}^n$ (same shape as input). **Jacobian** (vector output $f:\\mathbb{R}^n\\to\\mathbb{R}^m$): a matrix $\\frac{\\partial f}{\\partial x}\\in\\mathbb{R}^{m\\times n}$ (one row per output, one column per input).",
-          "extend": "Scalar-out → gradient (input-shaped). Vector-out → Jacobian (out×in). Deep learning lives in the gradient world thanks to the scalar loss."
+          "extend": "Scalar-out → gradient (input-shaped). Vector-out → Jacobian (out×in). Deep learning lives in the gradient world thanks to the scalar loss.",
+          "tags": [
+            "Jacobian"
+          ]
         },
         {
           "type": "ai",
@@ -38,7 +45,10 @@
           ],
           "q": "For a layer $y=f(x)$ with $x\\in\\mathbb{R}^n,\\ y\\in\\mathbb{R}^m$, what is the shape of $\\frac{\\partial y}{\\partial x}$? After composing with a scalar loss $L$, what is the shape of $\\frac{\\partial L}{\\partial x}$?",
           "answer": "$\\frac{\\partial y}{\\partial x}$ is the **Jacobian**, shape $m\\times n$. After the scalar loss, $\\frac{\\partial L}{\\partial x}$ is a **gradient** of shape $n$ (same as $x$): $\\frac{\\partial L}{\\partial x}=\\big(\\frac{\\partial y}{\\partial x}\\big)^\\top\\frac{\\partial L}{\\partial y}$.",
-          "extend": "Vector→vector gives a Jacobian; the scalar loss contracts it into an input-shaped gradient."
+          "extend": "Vector→vector gives a Jacobian; the scalar loss contracts it into an input-shaped gradient.",
+          "tags": [
+            "Jacobian"
+          ]
         }
       ]
     },
@@ -57,7 +67,11 @@
           ],
           "q": "For $Y=XW+b$ ($X_{N\\times D}$, $W_{D\\times M}$, $b_{1\\times M}$) and a scalar loss $L$, derive $\\frac{\\partial L}{\\partial W}$ and $\\frac{\\partial L}{\\partial X}$ with their shapes.",
           "answer": "$\\frac{\\partial L}{\\partial W}=X^\\top\\cdot\\frac{\\partial L}{\\partial Y}=X^\\top\\,\\text{dout}$, shape $D\\times M$ (same as $W$).\n$\\frac{\\partial L}{\\partial X}=\\frac{\\partial L}{\\partial Y}\\cdot W^\\top=\\text{dout}\\,W^\\top$, shape $N\\times D$ (same as $X$).\nBoth hold **because $L$ is a scalar** — otherwise $\\frac{\\partial Y}{\\partial W}$ would be a Jacobian tensor.",
-          "extend": "Memorize by shape: to get $D\\times M$ from $X(N\\times D)$ and $\\text{dout}(N\\times M)$ you must use $X^\\top\\text{dout}$. The transpose and order are forced by shape-matching."
+          "extend": "Memorize by shape: to get $D\\times M$ from $X(N\\times D)$ and $\\text{dout}(N\\times M)$ you must use $X^\\top\\text{dout}$. The transpose and order are forced by shape-matching.",
+          "tags": [
+            "Backpropagation",
+            "Jacobian"
+          ]
         },
         {
           "type": "open",
@@ -67,7 +81,10 @@
           ],
           "q": "How is the bias $b$ handled in $Y=XW+b$ (it's $1\\times M$ but $XW$ is $N\\times M$), and what is $\\frac{\\partial L}{\\partial b}$?",
           "answer": "$b$ is **broadcast**: mathematically $Y=XW+\\mathbf{1}_N b$, where $\\mathbf{1}_N$ is a column of ones that copies $b$ across all $N$ rows (this is exactly NumPy broadcasting).\nTreating $\\mathbf{1}_N b$ like another $XW$, $\\frac{\\partial L}{\\partial b}=\\mathbf{1}_N^\\top\\cdot\\frac{\\partial L}{\\partial Y}=\\sum_{i=1}^{N}\\text{dout}_{i,:}$ — i.e. **sum the upstream gradient over the batch** → shape $1\\times M$.",
-          "extend": "Bias gradient = column-sum of dout (`np.sum(dout, axis=0)`), because $b$ contributed identically to every row of the batch."
+          "extend": "Bias gradient = column-sum of dout (`np.sum(dout, axis=0)`), because $b$ contributed identically to every row of the batch.",
+          "tags": [
+            "Backpropagation"
+          ]
         },
         {
           "type": "open",
@@ -77,7 +94,10 @@
           ],
           "q": "Why is the per-weight derivative $\\frac{\\partial L}{\\partial w_{u,v}}=\\sum_i\\sum_j\\frac{\\partial L}{\\partial y_{i,j}}\\frac{\\partial y_{i,j}}{\\partial w_{u,v}}$ a double sum?",
           "answer": "Because $w_{u,v}$ can influence **multiple** entries $y_{i,j}$ of the output, and the chain rule must accumulate the contribution through **every** output entry it affects. The scalar $\\frac{\\partial L}{\\partial w_{u,v}}$ sums all those paths — this is the 'each neuron collects/sums the upstream gradients it took part in' picture.",
-          "extend": "Each parameter's gradient = sum over all outputs it touched. For $Y=XW$, $w_{u,v}$ only affects column $v$, which is why the matrix form collapses to $X^\\top\\text{dout}$."
+          "extend": "Each parameter's gradient = sum over all outputs it touched. For $Y=XW$, $w_{u,v}$ only affects column $v$, which is why the matrix form collapses to $X^\\top\\text{dout}$.",
+          "tags": [
+            "Backpropagation"
+          ]
         },
         {
           "type": "ai",
@@ -87,7 +107,36 @@
           ],
           "q": "Given $X\\in\\mathbb{R}^{4\\times3}$, $W\\in\\mathbb{R}^{3\\times5}$ and $\\text{dout}\\in\\mathbb{R}^{4\\times5}$, state the shapes of $\\frac{\\partial L}{\\partial W}$, $\\frac{\\partial L}{\\partial X}$, $\\frac{\\partial L}{\\partial b}$ and how to compute each.",
           "answer": "$\\frac{\\partial L}{\\partial W}=X^\\top\\text{dout}\\in\\mathbb{R}^{3\\times5}$; $\\frac{\\partial L}{\\partial X}=\\text{dout}\\,W^\\top\\in\\mathbb{R}^{4\\times3}$; $\\frac{\\partial L}{\\partial b}=\\sum_{n}\\text{dout}\\in\\mathbb{R}^{1\\times5}$ (`np.sum(dout, axis=0)`).",
-          "extend": "Each gradient matches its variable's shape (W:3×5, X:4×3, b:1×5). Use that to decide transposes/multiplication order without re-deriving."
+          "extend": "Each gradient matches its variable's shape (W:3×5, X:4×3, b:1×5). Use that to decide transposes/multiplication order without re-deriving.",
+          "tags": [
+            "Backpropagation"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS25 4.1"
+          ],
+          "q": "For an MLP $z_1=W_1 x_i+b_1$, $a=\\text{ReLU}(z_1)$, $z_2=W_2 a+b_2$, $\\hat y=\\sigma(z_2)$ on a flattened $w\\times h\\times3$ image with $z_1\\in\\mathbb{R}^d$ (binary output), give the shapes of $W_1,b_1,W_2,b_2$.",
+          "answer": "$W_1:(d,\\,3wh)$, $b_1:(d,1)$; $W_2:(1,d)$, $b_2:(1,1)$. (Input flattened to $3wh$; hidden size $d$; single output for binary classification.)",
+          "extend": "Layer shapes follow input→hidden→output dims; one bias per output unit of each layer.",
+          "tags": [
+            "ReLU"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS25 4.3"
+          ],
+          "q": "Given upstream $\\frac{\\partial L}{\\partial z_1}$ for $z_1=W_1 x_i+b_1$: (a) write $\\frac{\\partial L}{\\partial W_1},\\frac{\\partial L}{\\partial x_i},\\frac{\\partial L}{\\partial b_1}$; (b) which need not be computed in training, and why?",
+          "answer": "(a) $\\frac{\\partial L}{\\partial W_1}=\\frac{\\partial L}{\\partial z_1}x_i^\\top$, $\\frac{\\partial L}{\\partial x_i}=W_1^\\top\\frac{\\partial L}{\\partial z_1}$, $\\frac{\\partial L}{\\partial b_1}=\\frac{\\partial L}{\\partial z_1}$.\n(b) $\\frac{\\partial L}{\\partial x_i}$ is **not needed** — it's the gradient w.r.t. the **input**, which is not a learnable parameter (you'd only need it to pass gradients further back, but here $x_i$ is the network input).",
+          "extend": "You only need gradients w.r.t. **parameters** to update them; the input gradient matters only for propagating to earlier layers.",
+          "tags": [
+            "Backpropagation"
+          ]
         }
       ]
     },
@@ -104,7 +153,13 @@
           ],
           "q": "Explain the 'upstream gradient' (dout) abstraction in backpropagation for a layer like Affine → ReLU → Affine → Sigmoid → Loss.",
           "answer": "When deriving a given layer (say the Affine layer), we treat it as a function with its own **scope**. Everything above it has already produced $\\text{dout}=\\frac{\\partial L}{\\partial Y}$ (the **upstream gradient**). The layer uses dout to compute its local parameter gradients ($\\frac{\\partial L}{\\partial W}, \\frac{\\partial L}{\\partial b}$) and the gradient to send further down ($\\frac{\\partial L}{\\partial X}$), which becomes the next layer's dout.",
-          "extend": "Modular backprop: each layer only needs its forward inputs + the incoming dout. This local abstraction is exactly how autograd frameworks implement `backward()`."
+          "extend": "Modular backprop: each layer only needs its forward inputs + the incoming dout. This local abstraction is exactly how autograd frameworks implement `backward()`.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Backpropagation",
+            "Fully-connected"
+          ]
         },
         {
           "type": "open",
@@ -114,7 +169,10 @@
           ],
           "q": "Compute a tiny chain-rule example: $f(X)=2X$, $g(z)=\\sum_i z_i$, $L=g(f(X))$ with $X\\in\\mathbb{R}^n$. What is $\\frac{\\partial L}{\\partial x_1}$?",
           "answer": "$L=2x_1+2x_2+\\dots+2x_n$. Then $\\frac{\\partial L}{\\partial x_1}=\\sum_k\\frac{\\partial L}{\\partial f(x)_k}\\frac{\\partial f(x)_k}{\\partial x_1}=2\\cdot1+2\\cdot0+\\dots+2\\cdot0=\\mathbf{2}$ (only $f(x)_1=2x_1$ depends on $x_1$).",
-          "extend": "The chain rule sums over every intermediate that depends on $x_1$; here only one term survives because $f$ is element-wise."
+          "extend": "The chain rule sums over every intermediate that depends on $x_1$; here only one term survives because $f$ is element-wise.",
+          "tags": [
+            "Backpropagation"
+          ]
         },
         {
           "type": "ai",
@@ -124,7 +182,28 @@
           ],
           "q": "In a Conv→ReLU→Conv block, the second conv receives dout. List what it must compute and what it passes to the ReLU below it.",
           "answer": "The second conv uses its incoming $\\text{dout}=\\frac{\\partial L}{\\partial Y}$ to compute its **parameter gradients** ($\\frac{\\partial L}{\\partial W},\\frac{\\partial L}{\\partial b}$) and its **input gradient** $\\frac{\\partial L}{\\partial X}$; it then passes $\\frac{\\partial L}{\\partial X}$ **down** as the dout for the ReLU below.",
-          "extend": "Each layer: receive dout → compute local param grads → emit input-grad as the next layer's dout. This locality is exactly how autograd works."
+          "extend": "Each layer: receive dout → compute local param grads → emit input-grad as the next layer's dout. This locality is exactly how autograd works.",
+          "tags": [
+            "ReLU",
+            "Backpropagation"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS25 4.4"
+          ],
+          "q": "At one iteration $z_2\\approx10^6$ for all samples before a sigmoid output. Estimate the gradient of the learnable parameters.",
+          "answer": "**≈ 0.** The sigmoid is deep in its **saturated 'dead zone'** where $\\sigma'(z_2)\\approx0$, so every upstream gradient gets multiplied by ~0 → the parameter gradients are essentially zero (no learning this step).",
+          "extend": "Saturated sigmoid/tanh kills gradients (vanishing). Keep pre-activations near 0 via normalization/good init.",
+          "tags": [
+            "Sigmoid",
+            "Tanh",
+            "Vanishing gradient",
+            "Backpropagation",
+            "Normalization"
+          ]
         }
       ]
     }

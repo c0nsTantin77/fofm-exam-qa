@@ -17,7 +17,11 @@
           ],
           "q": "Given two affine layers $y_1 = XW_1 + B_1$ and $y_2 = y_1 W_2 + B_2$, show they can be written as a single affine layer. What does this imply?",
           "answer": "$y_2 = (XW_1+B_1)W_2 + B_2 = X(W_1 W_2) + (B_1 W_2 + B_2)$, which is again of the form $XW' + b'$ with $W' = W_1W_2$ and $b' = B_1W_2+B_2$.\n\n**Implication:** stacking linear layers without a non-linearity between them gives no extra expressive power — you need **non-linear activation functions** to build deep, expressive networks.",
-          "extend": "This is *the* justification for activation functions. Without them a 100-layer net = one linear layer. Composition of linear maps is linear."
+          "extend": "This is *the* justification for activation functions. Without them a 100-layer net = one linear layer. Composition of linear maps is linear.",
+          "tags": [
+            "Activation functions",
+            "Fully-connected"
+          ]
         },
         {
           "type": "mc",
@@ -45,7 +49,13 @@
             }
           ],
           "answer": "Only **“can be represented as a convolutional layer”** is true (a FC layer = a conv with kernel covering the whole input). FC layers are **linear** (not non-linear), require a **fixed input size**, and after $XW$ the feature dimension is $M$, so batch-norm parameters have length $M$, not $D$.",
-          "extend": "FC ⇔ convolution: an FC layer on a flattened $C\\times H\\times W$ input equals a conv filter of kernel size $H\\times W$ over $C$ channels. The fixed-input-size limitation is exactly what fully-convolutional nets remove."
+          "extend": "FC ⇔ convolution: an FC layer on a flattened $C\\times H\\times W$ input equals a conv filter of kernel size $H\\times W$ over $C$ channels. The fixed-input-size limitation is exactly what fully-convolutional nets remove.",
+          "tags": [
+            "Batch normalization",
+            "Weight initialization",
+            "Convolution",
+            "Fully-connected"
+          ]
         },
         {
           "type": "open",
@@ -56,7 +66,11 @@
           ],
           "q": "Given a batch of images $(8\\times3\\times8\\times8)$ and the task of detecting eyes of people, name two disadvantages of using a fully-connected network. (Why do convolutions fit segmentation/detection better than FC?)",
           "answer": "(i) FC layers extract only **global features**, while detecting eyes requires **local features** of small windows.\n(ii) The resolution is too small / FC throws away spatial structure, so fine local detail is lost.\n\n*(SS22 5.10 equivalent:)* fully-connected layers process global information from the entire image, whereas convolutions look at local neighbourhoods — better suited to localized tasks like semantic segmentation/detection.",
-          "extend": "FC = global + fixed size + many parameters; convolutions = local + translation-equivariant + parameter-efficient. Localized vision tasks want locality."
+          "extend": "FC = global + fixed size + many parameters; convolutions = local + translation-equivariant + parameter-efficient. Localized vision tasks want locality.",
+          "tags": [
+            "Convolution",
+            "Fully-connected"
+          ]
         },
         {
           "type": "open",
@@ -67,7 +81,13 @@
           ],
           "q": "Given a batch of images of shape $(8\\times3\\times8\\times8)$, how do you process them through a fully-connected layer? What is the shape of $W$ for logistic regression with BCE loss?",
           "answer": "**Flatten** each image to a vector of size $3\\times8\\times8 = 192$, giving $X_{8\\times192}$. For logistic regression (1 output logit) the weight matrix is $W_{192\\times1}$ (plus a scalar bias), and a sigmoid + BCE produces the binary prediction.",
-          "extend": "FC layers need flattened, fixed-size inputs: $(N, C, H, W) \\to (N, C\\cdot H\\cdot W)$. Output neurons = classes (or 1 for binary/regression)."
+          "extend": "FC layers need flattened, fixed-size inputs: $(N, C, H, W) \\to (N, C\\cdot H\\cdot W)$. Output neurons = classes (or 1 for binary/regression).",
+          "tags": [
+            "Sigmoid",
+            "Fully-connected",
+            "Loss functions",
+            "Regression"
+          ]
         },
         {
           "type": "ai",
@@ -77,7 +97,12 @@
           ],
           "q": "A network is `Linear(100→50) → Linear(50→10)` with no activation in between. How many effective layers does it have, and how would you fix it to learn non-linear patterns?",
           "answer": "Effectively **one** linear layer ($100\\to10$), since composing two affine maps yields a single affine map $X(W_1W_2)+\\dots$. To learn non-linear patterns, insert a **non-linear activation** (e.g. ReLU) between the two linear layers.",
-          "extend": "More layers ≠ more capacity unless separated by non-linearities. The activation is what breaks the linear collapse."
+          "extend": "More layers ≠ more capacity unless separated by non-linearities. The activation is what breaks the linear collapse.",
+          "tags": [
+            "ReLU",
+            "Activation functions",
+            "Fully-connected"
+          ]
         }
       ]
     },
@@ -95,7 +120,11 @@
           ],
           "q": "For a FC layer $Y = XW + b$ ($X_{N\\times D}$, $W_{D\\times M}$) with upstream gradient $\\text{dout}=\\frac{\\partial L}{\\partial Y}$: (a) what are the dimensions of $b$ and $\\text{dout}$? (b) what is $\\frac{\\partial L}{\\partial X}$ and its dimensions?",
           "answer": "(a) $b$ has shape $1\\times M$; $\\text{dout}=\\frac{\\partial L}{\\partial Y}$ has shape $N\\times M$.\n(b) $\\frac{\\partial L}{\\partial X} = \\text{dout}\\cdot W^\\top$, of shape $N\\times D$.",
-          "extend": "Dimension trick: the gradient w.r.t. a variable has the **same shape** as that variable. $\\frac{\\partial L}{\\partial X}$ is $N\\times D$ like $X$; $\\frac{\\partial L}{\\partial W}=X^\\top\\text{dout}$ is $D\\times M$ like $W$."
+          "extend": "Dimension trick: the gradient w.r.t. a variable has the **same shape** as that variable. $\\frac{\\partial L}{\\partial X}$ is $N\\times D$ like $X$; $\\frac{\\partial L}{\\partial W}=X^\\top\\text{dout}$ is $D\\times M$ like $W$.",
+          "tags": [
+            "Backpropagation",
+            "Fully-connected"
+          ]
         },
         {
           "type": "open",
@@ -105,7 +134,10 @@
           ],
           "q": "For $y = XW + ZR + T + A$ (with $X,Z\\in\\mathbb{R}^{N\\times D}$, $W,R\\in\\mathbb{R}^{D\\times M}$, $T,A\\in\\mathbb{R}^{N\\times M}$) and $L=\\sum_{i,j}y_{ij}$, what are $\\frac{\\partial L}{\\partial Z}$ and $\\frac{\\partial L}{\\partial A}$?",
           "answer": "$\\frac{\\partial L}{\\partial Z} = \\frac{\\partial L}{\\partial y}\\cdot R^\\top$ (matrix multiplication), and $\\frac{\\partial L}{\\partial A} = \\mathbf{1}_{N\\times M}\\odot\\frac{\\partial L}{\\partial y}$ (element-wise). Since $L=\\sum y_{ij}$, $\\frac{\\partial L}{\\partial y}=\\mathbf{1}_{N\\times M}$.",
-          "extend": "Each additive term backprops independently. A matrix-multiply term ($ZR$) gives $\\text{dout}\\,R^\\top$; an additive term ($A$) just passes the gradient through element-wise."
+          "extend": "Each additive term backprops independently. A matrix-multiply term ($ZR$) gives $\\text{dout}\\,R^\\top$; an additive term ($A$) just passes the gradient through element-wise.",
+          "tags": [
+            "Backpropagation"
+          ]
         },
         {
           "type": "open",
@@ -115,7 +147,12 @@
           ],
           "q": "Which property of loss functions lets us perform backpropagation without computing full Jacobians?",
           "answer": "The loss is a **scalar function** $L:\\mathbb{R}^{N}\\times\\mathbb{R}^{M}\\to\\mathbb{R}$, and all variables in a network are ultimately **scalars** assembled into matrices/tensors. We only ever need $\\frac{\\partial L}{\\partial v}$ for scalar $v$, so gradients have the same shape as the variables — no Jacobian matrices required.",
-          "extend": "A vector→vector layer would need a Jacobian, but a scalar loss collapses everything to gradients (one number per parameter), making backprop cheap."
+          "extend": "A vector→vector layer would need a Jacobian, but a scalar loss collapses everything to gradients (one number per parameter), making backprop cheap.",
+          "tags": [
+            "Backpropagation",
+            "Jacobian",
+            "Loss functions"
+          ]
         },
         {
           "type": "open",
@@ -125,7 +162,14 @@
           ],
           "q": "(Toy network, Leaky ReLU $\\alpha=0.5$) Backpropagation problems ask you to do a forward pass then update a weight via SGD. What is the derivative of Leaky ReLU used in the backward pass?",
           "answer": "Leaky ReLU $f(x)=\\max(\\alpha x, x)$ has derivative $f'(x)=1$ for $x>0$ and $f'(x)=\\alpha$ for $x<0$ (here $\\alpha=0.5$). In backprop you multiply the upstream gradient by this local derivative element-wise, depending on the sign of each pre-activation from the forward pass.",
-          "extend": "Always cache forward-pass signs/positions: ReLU/Leaky-ReLU need the input sign, MaxPool needs the argmax position, to route gradients correctly."
+          "extend": "Always cache forward-pass signs/positions: ReLU/Leaky-ReLU need the input sign, MaxPool needs the argmax position, to route gradients correctly.",
+          "tags": [
+            "ReLU",
+            "Activation functions",
+            "Backpropagation",
+            "Optimizers",
+            "Pooling"
+          ]
         },
         {
           "type": "ai",
@@ -135,7 +179,10 @@
           ],
           "q": "During backprop through $Y=XW+b$ you are given $\\text{dout}$ of shape $N\\times M$. Write $\\frac{\\partial L}{\\partial W}$ and verify its shape.",
           "answer": "$\\frac{\\partial L}{\\partial W} = X^\\top\\,\\text{dout}$. Shapes: $X^\\top$ is $D\\times N$, $\\text{dout}$ is $N\\times M$, product is $D\\times M$ — the same shape as $W$. ✓",
-          "extend": "Use the shape-matching rule to remember whether to transpose and which side to multiply: the result must match the parameter's shape."
+          "extend": "Use the shape-matching rule to remember whether to transpose and which side to multiply: the result must match the parameter's shape.",
+          "tags": [
+            "Backpropagation"
+          ]
         }
       ]
     },
@@ -153,7 +200,13 @@
           ],
           "q": "What is the purpose of activation functions in a neural network?",
           "answer": "They introduce **non-linearity**, allowing the network to learn complex (non-linear) patterns. Without them, a stack of layers collapses to a single linear transformation regardless of depth.",
-          "extend": "One sentence the exam loves: *activations make the network non-linear, so depth adds expressive power.*"
+          "extend": "One sentence the exam loves: *activations make the network non-linear, so depth adds expressive power.*",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions"
+          ]
         },
         {
           "type": "open",
@@ -163,7 +216,14 @@
           ],
           "q": "Give two advantages of Tanh over Sigmoid.",
           "answer": "(1) Tanh is **zero-centered** (range $(-1,1)$), while Sigmoid is not (range $(0,1)$) — zero-centered activations avoid the zig-zag gradient problem. (2) Tanh has a **larger maximum gradient** than Sigmoid, so gradients vanish a little less aggressively.",
-          "extend": "Both still saturate at the tails → both suffer vanishing gradients in deep nets. Zero-centering is Tanh's main edge; ReLU later beats both on the vanishing-gradient front."
+          "extend": "Both still saturate at the tails → both suffer vanishing gradients in deep nets. Zero-centering is Tanh's main edge; ReLU later beats both on the vanishing-gradient front.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
         },
         {
           "type": "open",
@@ -173,7 +233,14 @@
           ],
           "q": "Explain the differences between ReLU, LeakyReLU and Parametric ReLU.",
           "answer": "**ReLU:** outputs constant $0$ for negative inputs. **LeakyReLU:** uses a small **pre-defined** slope $\\alpha$ for negative values (e.g. $0.01$). **Parametric ReLU (PReLU):** the negative slope is a **learnable** parameter (one per channel, or one shared).",
-          "extend": "Progression: ReLU (dead for $x<0$) → LeakyReLU (fixed leak) → PReLU (learned leak). The leak fixes the dying-ReLU problem by keeping a non-zero gradient for negatives."
+          "extend": "Progression: ReLU (dead for $x<0$) → LeakyReLU (fixed leak) → PReLU (learned leak). The leak fixes the dying-ReLU problem by keeping a non-zero gradient for negatives.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Data leakage"
+          ]
         },
         {
           "type": "open",
@@ -183,7 +250,14 @@
           ],
           "q": "Mention 2 drawbacks of ReLU and explain how they affect optimization.",
           "answer": "(1) **Not zero-centered** → all weights of a neuron can only change with the same sign, causing a **zig-zag** path and slower training.\n(2) **Dying ReLU**: neurons stuck at $0$ output have **zero gradient** → those weights never update (a form of vanishing gradient).\n(Also: ReLU is **not differentiable at $0$**.)",
-          "extend": "Dying ReLU is fixed by Leaky/Parametric ReLU or careful (He/Kaiming) initialization. The non-zero-centered issue motivates BatchNorm and zero-centered activations."
+          "extend": "Dying ReLU is fixed by Leaky/Parametric ReLU or careful (He/Kaiming) initialization. The non-zero-centered issue motivates BatchNorm and zero-centered activations.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
         },
         {
           "type": "open",
@@ -193,7 +267,14 @@
           ],
           "q": "Explain the vanishing gradient problem and describe one method to help solve it.",
           "answer": "**Vanishing gradients:** as gradients propagate backward through many layers (especially through saturating activations like Sigmoid/Tanh), they become exponentially smaller, so early (shallow) layers update very slowly or not at all.\n**One solution:** **skip connections** (residual blocks) that create a 'highway' for gradients to flow directly. (Also: ReLU activations, BatchNorm, proper initialization.)",
-          "extend": "Causes: saturating activations + deep stacks + bad init. Fixes: ReLU, He/Xavier init, BatchNorm, residual/skip connections."
+          "extend": "Causes: saturating activations + deep stacks + bad init. Fixes: ReLU, He/Xavier init, BatchNorm, residual/skip connections.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
         },
         {
           "type": "open",
@@ -203,7 +284,14 @@
           ],
           "q": "For LeakyReLU, if we take $\\alpha < 0$, what property of the function do we lose?",
           "answer": "We lose **monotonicity** — with $\\alpha<0$ the negative branch slopes the wrong way, so the function is no longer monotonically increasing (and behaves erratically). (The intended behaviour of a small positive leak is to keep a non-zero, same-sign gradient for negatives.)",
-          "extend": "LeakyReLU wants a small **positive** $\\alpha$ (e.g. 0.01–0.2). A negative slope breaks the 'pass a bit of the negative signal through' intent."
+          "extend": "LeakyReLU wants a small **positive** $\\alpha$ (e.g. 0.01–0.2). A negative slope breaks the 'pass a bit of the negative signal through' intent.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Data leakage"
+          ]
         },
         {
           "type": "mc",
@@ -231,7 +319,14 @@
             }
           ],
           "answer": "**None are correct.** Sigmoid maps to $(0,1)$ (not $[-0.5,0.5]$), is **not** zero-centered, is not restricted to only the logits, and squashing a regression output through sigmoid would hurt (it bounds and distorts the output). A valid I2DL multiple-choice can have **zero** correct answers.",
-          "extend": "Remember: any number of options (including none) can be correct in I2DL MC. Sigmoid: range $(0,1)$, not zero-centered, saturates."
+          "extend": "Remember: any number of options (including none) can be correct in I2DL MC. Sigmoid: range $(0,1)$, not zero-centered, saturates.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
         },
         {
           "type": "mc",
@@ -260,7 +355,14 @@
             }
           ],
           "answer": "LeakyReLU introduces non-linearity. **Convolution is linear** (so it does not). MaxPool is non-linear but is a pooling op, not an activation. $\\text{ReLU}(x)-\\text{ReLU}(-x) = x$ — the identity — so it is **linear** and adds no non-linearity.",
-          "extend": "Trap functions: $\\text{ReLU}(x)-\\text{ReLU}(-x)=x$ and $\\log(\\text{ReLU}(x)+1)$-type expressions. Check whether the composition actually bends the line."
+          "extend": "Trap functions: $\\text{ReLU}(x)-\\text{ReLU}(-x)=x$ and $\\log(\\text{ReLU}(x)+1)$-type expressions. Check whether the composition actually bends the line.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Pooling"
+          ]
         },
         {
           "type": "ai",
@@ -270,7 +372,65 @@
           ],
           "q": "You build a deep net with Sigmoid activations and training stalls — early layers barely change. Name the likely cause and two concrete fixes.",
           "answer": "Likely **vanishing gradients** from sigmoid saturation across many layers. Fixes: (1) replace Sigmoid with **ReLU/LeakyReLU**; (2) add **skip/residual connections** and/or **BatchNorm**, and use **He/Xavier initialization**.",
-          "extend": "Sigmoid's derivative peaks at $0.25$, so each layer can shrink the gradient by ≥4×; 10 layers → ≥$4^{10}$ attenuation."
+          "extend": "Sigmoid's derivative peaks at $0.25$, so each layer can shrink the gradient by ≥4×; 10 layers → ≥$4^{10}$ attenuation.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS25 3.4"
+          ],
+          "q": "What is the 'dead ReLU' problem and how do you solve it?",
+          "answer": "Some ReLU units have **always-negative pre-activations**, so they output 0 for every input and their **gradient is always 0** — those weights never update ('dead'). Fix: use **Leaky ReLU** (non-zero negative slope) or **Kaiming/He initialization**.",
+          "extend": "Dead ReLU = permanently-zero neuron. Leaky/Parametric ReLU keep a small negative-side gradient so units can recover.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS25 3.5"
+          ],
+          "q": "Is $f(z)=-0.25z$ a suitable activation function? Explain.",
+          "answer": "**No.** It is a **linear** function, so it introduces **no non-linearity** — stacking such layers collapses to a single linear map, defeating the purpose of a deep network.",
+          "extend": "Any purely linear activation is useless as a non-linearity; the network would be equivalent to one affine layer.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Fully-connected"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS23 2.3"
+          ],
+          "q": "Is $y=\\cos(x)$ appropriate as an activation function in a backprop network? Why or why not?",
+          "answer": "**Not a good choice.** $\\cos$ is **non-monotonic and periodic**, so very different inputs map to the same output and its derivative $-\\sin(x)$ oscillates in sign — making optimization unstable and ambiguous. Standard activations are monotonic.",
+          "extend": "Good activations are typically monotonic with well-behaved gradients; periodic functions create many equivalent inputs and sign-flipping gradients.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Backpropagation"
+          ]
         }
       ]
     },
@@ -287,7 +447,10 @@
           ],
           "q": "Softmax can suffer numerical instability. Show that subtracting $\\max(x)$ from every logit does not change the output: $\\text{Softmax}(x-\\max(x))_i = \\text{Softmax}(x)_i$.",
           "answer": "$\\text{Softmax}(x-\\max(x))_i = \\dfrac{e^{x_i-\\max(x)}}{\\sum_j e^{x_j-\\max(x)}} = \\dfrac{e^{x_i}e^{-\\max(x)}}{e^{-\\max(x)}\\sum_j e^{x_j}} = \\dfrac{e^{x_i}}{\\sum_j e^{x_j}} = \\text{Softmax}(x)_i.$ The common factor $e^{-\\max(x)}$ cancels.",
-          "extend": "Subtracting the max makes the largest exponent $e^0=1$, so no overflow — the standard 'log-sum-exp' stabilization trick, output identical."
+          "extend": "Subtracting the max makes the largest exponent $e^0=1$, so no overflow — the standard 'log-sum-exp' stabilization trick, output identical.",
+          "tags": [
+            "Softmax"
+          ]
         },
         {
           "type": "ai",
@@ -297,7 +460,26 @@
           ],
           "q": "Why is Softmax paired with cross-entropy rather than MSE for multi-class classification?",
           "answer": "Softmax outputs a probability distribution; **cross-entropy** is the natural log-likelihood loss for distributions and yields a clean, well-scaled gradient (softmax+CE gives gradient $\\hat y - y$). MSE on probabilities has small, vanishing gradients when predictions saturate and does not correspond to maximum likelihood for categorical targets.",
-          "extend": "Softmax + cross-entropy is a matched pair: the combined backward pass simplifies to (prediction − one-hot target)."
+          "extend": "Softmax + cross-entropy is a matched pair: the combined backward pass simplifies to (prediction − one-hot target).",
+          "tags": [
+            "Softmax",
+            "Vanishing gradient",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS25 3.3"
+          ],
+          "q": "For a 3-class problem with softmax probabilities $y_k$ and cross-entropy loss $L=-\\ln(y_3)$ (true label 3), compute $\\frac{\\partial L}{\\partial z_k}$. What would you cache in the forward pass?",
+          "answer": "$\\frac{\\partial L}{\\partial z_k}=y_k-\\mathbb{1}[k=3]$: i.e. $y_3-1$ for the true class and $y_k$ for the others. **Cache** the ground-truth label and the softmax outputs $y_k$ to accelerate the backward pass.",
+          "extend": "The clean softmax+CE gradient is $\\hat y - y$ (prediction minus one-hot) — one of the most important results to memorize.",
+          "tags": [
+            "Softmax",
+            "Loss functions"
+          ]
         }
       ]
     },
@@ -333,7 +515,14 @@
             }
           ],
           "answer": "Correct: **(Sigmoid, BCE)** — one logit for binary; and **(Softmax, Cross-Entropy)** — two logits as a multi-class problem. TanH/ReLU outputs aren't probabilities, and MSE is a regression loss.\n*(SS22 4.4 equivalent for >2 classes:)* use **(Multi-class) Cross-Entropy.*",
-          "extend": "Classification heads: binary → Sigmoid + BCE (1 neuron); multi-class → Softmax + CE ($C$ neurons). Regression → linear output + MSE/MAE."
+          "extend": "Classification heads: binary → Sigmoid + BCE (1 neuron); multi-class → Softmax + CE ($C$ neurons). Regression → linear output + MSE/MAE.",
+          "tags": [
+            "Softmax",
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Loss functions"
+          ]
         },
         {
           "type": "open",
@@ -345,7 +534,11 @@
           ],
           "q": "Using cross-entropy on $C$ classes, what is the expected loss after the very first iteration (random init), and why? (e.g. $C=100$; $C=4$; binary BCE.)",
           "answer": "A randomly-initialized network outputs roughly uniform probabilities $1/C$, so expected CE $= -\\log(1/C)=\\log C$.\n• $C=100$: $-\\log(0.01)\\approx 4.6$.\n• $C=4$: $-\\ln(0.25)\\approx 1.39$.\n• Binary BCE: $-\\log(0.5)=\\log 2\\approx 0.69$ (SS21 2.2).",
-          "extend": "Sanity-check your training: if initial loss ≫ $\\log C$, something is wrong (bad init/scaling). $\\log C$ is the 'no information' baseline."
+          "extend": "Sanity-check your training: if initial loss ≫ $\\log C$, something is wrong (bad init/scaling). $\\log C$ is the 'no information' baseline.",
+          "tags": [
+            "Weight initialization",
+            "Loss functions"
+          ]
         },
         {
           "type": "open",
@@ -357,7 +550,10 @@
           ],
           "q": "BCE/CE: (a) what causes numerical instability and how to fix it? (b) how many output neurons does BCE use? (c) why multiply by $-1$?",
           "answer": "(a) **Instability** comes from $\\log(0)$. Fix by **clipping** logits/probabilities to $[\\,\\epsilon, 1-\\epsilon\\,]$.\n(b) BCE uses **1** output neuron (binary).\n(c) We multiply by $-1$ because $-\\log(x)\\ge 0$ for $0<x\\le 1$, making the loss positive and minimized as $\\hat y\\to$ target.",
-          "extend": "$-\\log$ of a probability is a positive 'surprise' — small for confident-correct, large for confident-wrong. We minimize surprise."
+          "extend": "$-\\log$ of a probability is a positive 'surprise' — small for confident-correct, large for confident-wrong. We minimize surprise.",
+          "tags": [
+            "Loss functions"
+          ]
         },
         {
           "type": "ai",
@@ -367,7 +563,27 @@
           ],
           "q": "Your multi-class classifier shows a near-zero training loss but only ~10% accuracy on 10 balanced classes. (Hint: it uses Sigmoid instead of Softmax with CE.) What went wrong?",
           "answer": "With independent **sigmoids** (instead of softmax) the network can push every class output toward 1, so a per-class CE that doesn't penalize false positives reports a tiny loss while argmax accuracy stays at chance. Use **Softmax + multi-class CE** so the outputs compete and sum to 1.",
-          "extend": "Mirrors SS24 5.3: CCE with sigmoid outputs ‘doesn't punish false positives’. Match the output activation to the loss."
+          "extend": "Mirrors SS24 5.3: CCE with sigmoid outputs ‘doesn't punish false positives’. Match the output activation to the loss.",
+          "tags": [
+            "Softmax",
+            "Sigmoid",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS25 2.2"
+          ],
+          "q": "A softmax classifier over 20 classes is randomly initialized and trained with categorical cross-entropy. What is the approximate loss in the first epoch?",
+          "answer": "$L\\approx-\\log\\!\\big(\\tfrac{1}{20}\\big)=\\log 20\\approx 3.0$ — a random init outputs roughly uniform probabilities $1/C$, so the expected initial CE is $-\\log(1/C)=\\log C$.",
+          "extend": "Sanity check: initial CE should sit near $\\log C$. Far above ⇒ bad init/scaling; this is the 'no information' baseline.",
+          "tags": [
+            "Softmax",
+            "Weight initialization",
+            "Loss functions"
+          ]
         }
       ]
     },
@@ -384,7 +600,12 @@
           ],
           "q": "In depth estimation most pixels have very small loss but a few have very large loss. Out of [MAE, MSE, BCE, CE], which loss is better and why?",
           "answer": "**MAE (L1)** is better: it is **less sensitive to outliers** than MSE (which squares the large errors), so it fits the majority of small-residual pixels better instead of being dominated by a few huge residuals.",
-          "extend": "MSE punishes outliers quadratically → a few bad pixels dominate. MAE weights all residuals linearly → robust. (BCE/CE are classification losses, irrelevant here.)"
+          "extend": "MSE punishes outliers quadratically → a few bad pixels dominate. MAE weights all residuals linearly → robust. (BCE/CE are classification losses, irrelevant here.)",
+          "tags": [
+            "ResNet / skip connections",
+            "Loss functions",
+            "Regression"
+          ]
         },
         {
           "type": "open",
@@ -395,7 +616,12 @@
           ],
           "q": "(a) Using MSE on a batch of images of shape $(4\\times3\\times8\\times8)$, what value $N$ do we divide by? (b) Why can MAE still be used despite not being differentiable at $x=0$?",
           "answer": "(a) $N = 4\\times3\\times8\\times8 = 768$ — the **total number of residuals** (every scalar output element across the batch).\n(b) We assume **local differentiability**; the single non-differentiable point $x=0$ is handled with a sub-gradient and almost never hit exactly, so optimization is fine.",
-          "extend": "MSE/MAE average over *all* output scalars, not just batch size. The $x=0$ kink in MAE is measure-zero and harmless in practice."
+          "extend": "MSE/MAE average over *all* output scalars, not just batch size. The $x=0$ kink in MAE is measure-zero and harmless in practice.",
+          "tags": [
+            "ResNet / skip connections",
+            "Loss functions",
+            "Regression"
+          ]
         },
         {
           "type": "open",
@@ -405,7 +631,14 @@
           ],
           "q": "First iteration: some logits are above 1000 while ground-truth values are in $[0,1]$. Using MSE, what optimization problem do you expect?",
           "answer": "The residuals (and thus gradients) are **enormous**, so you should expect the **exploding gradient** problem — the update step is far too large and the network diverges.",
-          "extend": "Always normalize inputs/targets and initialize sensibly; gigantic residuals → gigantic gradients → divergence. (Mirrors the need for normalization in Ch I.)"
+          "extend": "Always normalize inputs/targets and initialize sensibly; gigantic residuals → gigantic gradients → divergence. (Mirrors the need for normalization in Ch I.)",
+          "tags": [
+            "Exploding gradient",
+            "Weight initialization",
+            "ResNet / skip connections",
+            "Normalization",
+            "Loss functions"
+          ]
         },
         {
           "type": "open",
@@ -415,7 +648,13 @@
           ],
           "q": "Compared to the L1 loss, the L2 loss... (which statements hold?)",
           "answer": "L2 (MSE) **has a different optimum** than L1 and is **more sensitive to outliers** (it is *not* robust to outliers). L2 is **not** sparser than L1 (L1 promotes sparsity) and is not especially costly to compute. So among the typical options, only “has a different optimum” is true.",
-          "extend": "L2 optimum = mean of targets; L1 optimum = median (hence L1's robustness). L1 → sparser solutions in the regularization sense."
+          "extend": "L2 optimum = mean of targets; L1 optimum = median (hence L1's robustness). L1 → sparser solutions in the regularization sense.",
+          "tags": [
+            "Regularization",
+            "L1/L2",
+            "Loss functions",
+            "Regression"
+          ]
         },
         {
           "type": "ai",
@@ -425,7 +664,47 @@
           ],
           "q": "You train a regression model and a few mislabeled samples with huge errors dominate training. Which loss switch helps, and what is the trade-off?",
           "answer": "Switch from **MSE to MAE (L1)** — it down-weights the influence of large-error outliers (its optimum is the median). Trade-off: MAE has a constant-magnitude gradient and a non-smooth point at 0, so convergence near the optimum can be slower/less smooth than MSE. (Huber loss blends both.)",
-          "extend": "Outlier-heavy → L1 / Huber. Clean, Gaussian-noise data → L2. The choice encodes your assumption about the noise distribution."
+          "extend": "Outlier-heavy → L1 / Huber. Clean, Gaussian-noise data → L2. The choice encodes your assumption about the noise distribution.",
+          "tags": [
+            "L1/L2",
+            "Loss functions",
+            "Regression"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS23 1.6"
+          ],
+          "q": "For a regression task with labels in $[-1,1]$, which final activations $f(x)$ could be used?",
+          "answer": "**Valid (bounded to $[-1,1]$):** $2\\sigma(x)-1$, $\\tanh(10x)$, and $\\min(\\max(-1,x),1)$ (clamp). **Invalid:** $\\max(-1,x)$ is unbounded above, so it can exceed 1.",
+          "extend": "Match the output range to the label range: sigmoid/tanh/clamp bound both sides; a one-sided ReLU-like clamp does not.",
+          "options": [
+            {
+              "text": "$f(x) = 2\\sigma(x) - 1$ (sigmoid).",
+              "correct": true
+            },
+            {
+              "text": "$f(x) = \\tanh(10x)$",
+              "correct": true
+            },
+            {
+              "text": "$f(x) = \\max(-1, x)$",
+              "correct": false
+            },
+            {
+              "text": "$f(x) = \\min(\\max(-1, x), 1)$ (clamp)",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Loss functions",
+            "Regression"
+          ]
         }
       ]
     },
@@ -443,7 +722,13 @@
           ],
           "q": "(a) Fitting 5 billion points each with 100 features — is it feasible to find the optimum without a neural network? (b) How do we turn a linear (affine-only) model into a classifier?",
           "answer": "(a) **No.** Linear regression has a closed-form solution $W=(X^\\top X)^{-1}X^\\top Y$, but it requires loading a $5\\!\\times\\!10^9 \\times 100$ matrix into RAM and inverting it — infeasible. Use **iterative, batched gradient descent** through a network instead.\n(b) Add a **sigmoid** at the end and use a **cross-entropy** loss → logistic regression / classifier.",
-          "extend": "Closed-form OLS is $O(\\text{features}^3)$ to invert and needs the whole dataset in memory — fine for small problems, hopeless at deep-learning scale. Sigmoid + CE = the bridge from regression to classification."
+          "extend": "Closed-form OLS is $O(\\text{features}^3)$ to invert and needs the whole dataset in memory — fine for small problems, hopeless at deep-learning scale. Sigmoid + CE = the bridge from regression to classification.",
+          "tags": [
+            "Sigmoid",
+            "Optimizers",
+            "Loss functions",
+            "Regression"
+          ]
         },
         {
           "type": "open",
@@ -453,7 +738,11 @@
           ],
           "q": "Why might a closed-form linear solution be 'superior' for a linearly-distributed dataset?",
           "answer": "Because it has a **closed-form solution**: $W=(X^\\top X)^{-1}X^\\top Y$ computes the exact optimum directly (no iteration, no learning rate, no convergence issues) — mathematically superior when the data truly is linear and small enough to invert.",
-          "extend": "Closed form wins on small linear problems; iterative GD wins when data is huge or the problem is non-linear (i.e. real deep learning)."
+          "extend": "Closed form wins on small linear problems; iterative GD wins when data is huge or the problem is non-linear (i.e. real deep learning).",
+          "tags": [
+            "Learning rate",
+            "Regression"
+          ]
         },
         {
           "type": "mc",
@@ -481,7 +770,13 @@
             }
           ],
           "answer": "**All four** are correct. Despite the name, logistic regression is a **linear, supervised, binary classifier** trained with (binary) cross-entropy.",
-          "extend": "‘Regression’ in the name refers to the linear score; the sigmoid + CE turn it into a classifier. Decision boundary is linear."
+          "extend": "‘Regression’ in the name refers to the linear score; the sigmoid + CE turn it into a classifier. Decision boundary is linear.",
+          "tags": [
+            "Sigmoid",
+            "Loss functions",
+            "Supervised vs unsupervised",
+            "Regression"
+          ]
         },
         {
           "type": "ai",
@@ -491,7 +786,11 @@
           ],
           "q": "A friend claims 'logistic regression can only draw a straight boundary, so it's useless for the XOR problem.' Is the premise right, and how do you fix the model?",
           "answer": "The premise is **correct** — logistic regression is linear and cannot separate XOR with a single straight boundary. Fix: add **non-linear features** or **hidden layers + activations** (an MLP) so the model can learn a non-linear decision boundary.",
-          "extend": "Linear model ⇒ linear boundary. Depth + non-linear activations are what break that limit."
+          "extend": "Linear model ⇒ linear boundary. Depth + non-linear activations are what break that limit.",
+          "tags": [
+            "Activation functions",
+            "Regression"
+          ]
         }
       ]
     }

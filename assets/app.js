@@ -56,13 +56,8 @@
     const reveal = quiz.querySelector(".reveal");
     const verdict = quiz.querySelector(".verdict");
 
-    const anyChecked = () => inputs.some((i) => i.checked);
-    inputs.forEach((i) =>
-      i.addEventListener("change", () => {
-        if (!quiz.classList.contains("done")) checkBtn.disabled = !anyChecked();
-      })
-    );
-
+    // Note: the check button is always enabled — for some questions the correct
+    // answer is to select NONE of the options, which must be submittable.
     checkBtn.addEventListener("click", () => {
       let allRight = true;
       inputs.forEach((inp) => {
@@ -96,7 +91,6 @@
       verdict.textContent = "";
       quiz.classList.remove("done");
       checkBtn.hidden = false;
-      checkBtn.disabled = true;
       resetBtn.hidden = true;
     });
   });
@@ -115,40 +109,84 @@
   window.addEventListener("load", openHashTarget);
   window.addEventListener("hashchange", openHashTarget);
 
-  // ---- global site-wide search (index page only) ----
+  const INDEX = window.SEARCH_INDEX || [];          // inlined; no fetch needed
+  const TYPE = { mc: "MC", open: "Open", ai: "AI" };
+  const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  // link from this page (index/tags at root, chapters in /chapters/) to a question
+  const onChapters = /\/chapters\//.test(location.pathname);
+  const qHref = (e) => (onChapters ? "" : "chapters/") + e.c + ".html#" + e.a;
+
+  // ---- global site-wide search (index page) ----
   const gbox = document.getElementById("gsearch");
   const gres = document.getElementById("gresults");
   if (gbox && gres) {
-    let index = null, loading = false;
-    const TYPE = { mc: "MC", open: "Open", ai: "AI" };
-    async function ensureIndex() {
-      if (index || loading) return;
-      loading = true;
-      try {
-        const r = await fetch("search-index.json");
-        index = await r.json();
-      } catch (e) { index = []; }
-      loading = false;
-    }
     function runSearch() {
       const term = gbox.value.trim().toLowerCase();
       if (!term) { gres.hidden = true; gres.innerHTML = ""; return; }
       const words = term.split(/\s+/);
-      const hits = (index || []).filter((e) => words.every((w) => e.txt.includes(w))).slice(0, 40);
+      const hits = INDEX.filter((e) => words.every((w) => e.txt.includes(w))).slice(0, 60);
       if (!hits.length) {
-        gres.innerHTML = "<div class='gempty'>No questions match “" + gbox.value + "”.</div>";
+        gres.innerHTML = "<div class='gempty'>No questions match “" + esc(gbox.value) + "”.</div>";
       } else {
-        gres.innerHTML = hits.map((e) =>
-          "<a class='ghit' href='chapters/" + e.c + ".html#" + e.a + "'>" +
-          "<span class='ghit-tag'>" + (TYPE[e.t] || e.t) + "</span>" +
-          "<span class='ghit-q'>" + e.q.replace(/</g, "&lt;") + "</span>" +
-          "<span class='ghit-meta'>" + e.kp + " · " + e.src + "</span></a>"
-        ).join("");
+        gres.innerHTML =
+          "<div class='gcount'>" + hits.length + " match" + (hits.length > 1 ? "es" : "") + "</div>" +
+          hits.map((e) =>
+            "<a class='ghit' href='" + qHref(e) + "'>" +
+            "<span class='ghit-tag'>" + (TYPE[e.t] || e.t) + "</span>" +
+            "<span class='ghit-q'>" + esc(e.q) + "</span>" +
+            "<span class='ghit-meta'>" + esc(e.ct) + " · " + esc(e.kp) + " · " + esc(e.src) + "</span></a>"
+          ).join("");
       }
       gres.hidden = false;
     }
-    gbox.addEventListener("focus", ensureIndex);
-    gbox.addEventListener("input", async () => { await ensureIndex(); runSearch(); });
+    gbox.addEventListener("input", runSearch);
+    const q0 = new URLSearchParams(location.search).get("q");
+    if (q0) { gbox.value = q0; runSearch(); }
+  }
+
+  // ---- standalone tags page (tags.html) ----
+  const tagPage = document.getElementById("tagpage-body");
+  if (tagPage) {
+    const counts = {};
+    INDEX.forEach((e) => (e.tg || []).forEach((t) => (counts[t] = (counts[t] || 0) + 1)));
+    const allTags = Object.keys(counts).sort((a, b) => counts[b] - counts[a] || a.localeCompare(b));
+    const current = new URLSearchParams(location.search).get("t");
+
+    function renderOverview() {
+      document.title = "Concept tags · I2DL Exam Q&A";
+      tagPage.innerHTML =
+        "<h1 class='tp-title'>Concept tags</h1>" +
+        "<p class='tp-sub'>" + allTags.length + " concepts across " + INDEX.length +
+        " questions — click a tag to see every related question, across all chapters.</p>" +
+        "<div class='tagcloud'>" +
+        allTags.map((t) =>
+          "<a class='tagbig' href='tags.html?t=" + encodeURIComponent(t) + "'>" +
+          esc(t) + "<span class='tagbig-n'>" + counts[t] + "</span></a>"
+        ).join("") + "</div>";
+    }
+    function renderTag(tag) {
+      document.title = tag + " · Concept tags · I2DL";
+      const hits = INDEX.filter((e) => (e.tg || []).includes(tag));
+      const byChapter = {};
+      hits.forEach((e) => (byChapter[e.ct] = byChapter[e.ct] || []).push(e));
+      let html =
+        "<a class='tp-back' href='tags.html'>← All tags</a>" +
+        "<h1 class='tp-title'>Tag: <span class='tag'>" + esc(tag) + "</span></h1>" +
+        "<p class='tp-sub'>" + hits.length + " question" + (hits.length > 1 ? "s" : "") +
+        " across " + Object.keys(byChapter).length + " chapter(s).</p>";
+      Object.keys(byChapter).forEach((ct) => {
+        html += "<h2 class='tp-ch'>" + esc(ct) + "</h2><div class='tp-list'>" +
+          byChapter[ct].map((e) =>
+            "<a class='ghit' href='" + qHref(e) + "'>" +
+            "<span class='ghit-tag'>" + (TYPE[e.t] || e.t) + "</span>" +
+            "<span class='ghit-q'>" + esc(e.q) + "</span>" +
+            "<span class='ghit-meta'>" + esc(e.kp) + " · " + esc(e.src) + "</span></a>"
+          ).join("") + "</div>";
+      });
+      tagPage.innerHTML = html;
+    }
+
+    if (current && counts[current]) renderTag(current); else renderOverview();
   }
 
   // ---- back-to-top button (mobile) ----
