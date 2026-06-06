@@ -517,6 +517,190 @@
             "Momentum",
             "Weight initialization"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS20 P1b"
+          ],
+          "q": "Your training loss diverges. What are reasonable things to do?",
+          "answer": "**Decrease the learning rate** (divergence usually means steps too large) and **add dropout** (regularization). **Increasing** the LR would worsen divergence; merely *trying a different optimizer* is not a targeted fix here.",
+          "extend": "Diverging loss ⇒ lower the LR first; regularization can help, a larger LR cannot.",
+          "options": [
+            {
+              "text": "Decrease the learning rate.",
+              "correct": true
+            },
+            {
+              "text": "Add dropout.",
+              "correct": true
+            },
+            {
+              "text": "Increase the learning rate.",
+              "correct": false
+            },
+            {
+              "text": "Try a different optimizer.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 4.1"
+          ],
+          "q": "Explain the idea behind RMSProp. How does it converge faster than plain SGD, and how does it use the gradient?",
+          "answer": "RMSProp is an **adaptive learning-rate** method: it **scales the step per parameter** by an **exponentially-decaying average of the squared gradients** (the second moment). This **dampens oscillations in high-variance directions**, allowing a larger effective LR and faster, more stable convergence (e.g. through saddle points).",
+          "extend": "RMSProp divides the step by √(EMA of squared grads) → per-parameter adaptive LR.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 4.2"
+          ],
+          "q": "What is bias correction in Adam, and what problem does it fix?",
+          "answer": "Adam's moment estimates $m,v$ are **initialized to 0**, so the early running averages are **biased toward zero** (too small). **Bias correction** ($\\hat m=m/(1-\\beta_1^k),\\ \\hat v=v/(1-\\beta_2^k)$) rescales them to **unbiased** estimates so the **first updates are effective**.",
+          "extend": "Zero-init biases the EMAs low; dividing by $1-\\beta^k$ restores their magnitude early on.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum",
+            "Weight initialization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 4.3"
+          ],
+          "q": "Explain what vanishing gradients are in deep convolutional networks and their underlying cause.",
+          "answer": "Vanishing gradients are gradients of **very small magnitude**, so early (shallow) layers get **near-zero updates** and barely learn. Causes: **saturated activations** (e.g. tanh) whose derivative ≈0, and the **chain rule** multiplying many sub-1 factors across layers, shrinking the product toward 0.",
+          "extend": "Repeated multiplication of small derivatives (saturation + depth) shrinks early-layer gradients to ~0.",
+          "tags": [
+            "Tanh",
+            "Vanishing gradient",
+            "Backpropagation",
+            "Optimizers",
+            "Adam"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS22 1.5"
+          ],
+          "q": "What is the benefit of using Momentum in optimization?",
+          "answer": "**True:** *it is more likely to avoid local minima* (and saddle points) when used with SGD — accumulated velocity carries through. **False:** it doesn't 'introduce a single learnable parameter', doesn't equalize the LR across dimensions (that's adaptive methods), and isn't a 'combination of multiple methods' (that's Adam).",
+          "extend": "Momentum's velocity helps escape local minima/saddles; it is not adaptive per-dimension.",
+          "options": [
+            {
+              "text": "It introduces just a single learnable parameter.",
+              "correct": false
+            },
+            {
+              "text": "It effectively scales the LR equally across all dimensions.",
+              "correct": false
+            },
+            {
+              "text": "It combines the benefits of multiple optimization methods.",
+              "correct": false
+            },
+            {
+              "text": "It is more likely to avoid local minima when used with SGD.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 8.1",
+            "SS22 8.2"
+          ],
+          "q": "(8.1) Main definitional difference between GD and SGD? (8.2) Two advantages of SGD over GD.",
+          "answer": "**8.1** **GD** updates once **per epoch** (gradient over the whole training set); **SGD** updates **every iteration/mini-batch**. **8.2** SGD's **noise acts as regularization and helps escape saddle points**, and it takes **more but cheaper steps, converging faster in wall-clock time**.",
+          "extend": "GD = per-epoch exact gradient; SGD = per-batch noisy gradient (faster, escapes saddles).",
+          "tags": [
+            "Regularization",
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 8.3",
+            "SS22 8.4"
+          ],
+          "q": "RMSProp: $s_{k+1}=\\beta s_k+(1-\\beta)[\\nabla L\\circ\\nabla L]$, $\\theta_{k+1}=\\theta_k-\\alpha\\nabla L/\\sqrt{s_{k+1}+\\epsilon}$. (8.3) Which SGD problem does it address? (8.4) How?",
+          "answer": "**8.3** SGD's **slow / noisy, oscillating convergence**. **8.4** RMSProp **dampens oscillations in high-variance directions** by dividing each step by the running RMS of the gradient, which **allows a higher effective learning rate** and smoother progress.",
+          "extend": "RMSProp scales down large-variance directions → less oscillation, larger usable LR.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum",
+            "Learning rate"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 8.5",
+            "SS22 8.6"
+          ],
+          "q": "Adam: (8.5) which optimizers' concepts does it combine? (8.6) Why apply bias correction?",
+          "answer": "**8.5** **Momentum** (first moment $m$) + **RMSProp** (second moment $v$). **8.6** $m_0,v_0$ start at 0, so the early estimates are **biased toward zero**; bias correction restores the **full gradient magnitude**, enabling effective (larger) early steps toward the optimum.",
+          "extend": "Adam = momentum + RMSProp; bias correction de-biases the zero-initialized moments.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum",
+            "Weight initialization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 8.7",
+            "SS22 8.8"
+          ],
+          "q": "(8.7) Write Newton's update for $w_{k+1}$ for $f:\\mathbb{R}^2\\to\\mathbb{R}$. (8.8) Name one advantage of Newton's method.",
+          "answer": "**8.7** $w_{k+1}=w_k-\\dfrac{f'(x,w)}{f''(x,w)}$ (gradient divided by the second derivative / Hessian). **8.8** It **converges much faster (fewer iterations)** and **removes the need to choose a learning rate** (curvature sets the step).",
+          "extend": "Newton steps by gradient/Hessian — curvature-aware, LR-free, few iterations (but Hessian is costly).",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum",
+            "Learning rate"
+          ]
         }
       ]
     },
@@ -801,6 +985,136 @@
             "Overfitting",
             "Optimizers",
             "Learning rate"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS20 P1h"
+          ],
+          "q": "Your training loss does not decrease. What could be wrong?",
+          "answer": "**True:** the *learning rate is too high*, there is *too much regularization*, or there is a *bad initialization* — all can stall learning. **False:** a too-low dropout probability would not stop the training loss from decreasing.",
+          "extend": "Stalled training loss ⇒ LR too high, over-regularized, or bad init.",
+          "options": [
+            {
+              "text": "Learning rate is too high.",
+              "correct": true
+            },
+            {
+              "text": "Too much regularization.",
+              "correct": true
+            },
+            {
+              "text": "Dropout probability not high enough.",
+              "correct": false
+            },
+            {
+              "text": "Bad initialization.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "Overfitting",
+            "Learning rate",
+            "Weight initialization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS20 P5k"
+          ],
+          "q": "Your loss curves show a phase where validation loss rises while training loss keeps falling. Name the issue and an action that doesn't change the number of parameters.",
+          "answer": "**Overfitting.** Action (without changing parameter count): **weight decay / dropout / data augmentation** (or early stopping).",
+          "extend": "Diverging curves = overfitting; regularize or augment rather than resize the net.",
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2",
+            "Overfitting",
+            "Data augmentation"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS24 1.4"
+          ],
+          "q": "Which statement correctly relates loss curves to overfitting/underfitting?",
+          "answer": "**True:** *underfitting is indicated by high training AND high validation loss*. **False:** overfitting is **not** 'both losses high' (it's low train / high val); a low train + high val is **overfitting**, not underfitting; and steadily decreasing train+val is **healthy**, not overfitting.",
+          "extend": "Underfit = both high; overfit = low train, rising val; both falling = good.",
+          "options": [
+            {
+              "text": "Overfitting occurs when both training and validation loss are high.",
+              "correct": false
+            },
+            {
+              "text": "A model is underfitting if training loss is low and validation loss is high.",
+              "correct": false
+            },
+            {
+              "text": "Consistently decreasing train and val loss indicates overfitting.",
+              "correct": false
+            },
+            {
+              "text": "Underfitting is indicated by high training and high validation loss.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Overfitting"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS24 1.6"
+          ],
+          "q": "Your cat-species classifier has low training error but high validation error. Which are promising to try?",
+          "answer": "**Add weight regularization** and **transfer learning from a pretrained large model** — both combat overfitting. **Decreasing the learning rate** or **adding more linear layers** would not address (and more capacity could worsen) the overfitting.",
+          "extend": "Low train / high val = overfitting ⇒ regularize or transfer-learn, don't add capacity.",
+          "options": [
+            {
+              "text": "Add weight regularization.",
+              "correct": true
+            },
+            {
+              "text": "Transfer learning from a pretrained large model.",
+              "correct": true
+            },
+            {
+              "text": "Decrease the learning rate.",
+              "correct": false
+            },
+            {
+              "text": "Add more linear layers.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Regularization",
+            "Overfitting",
+            "Learning rate",
+            "Transfer learning"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 2.6"
+          ],
+          "q": "Give one situation where it makes sense to overfit a model on purpose.",
+          "answer": "To **sanity-check the model/pipeline** by overfitting a **small subset** of data — if it can't reach near-zero loss on a few samples, there's a bug. (Also: deliberately fitting a model tightly to a specific small dataset it will be tested on.)",
+          "extend": "Overfitting a tiny batch is the standard smoke test that training works end-to-end.",
+          "tags": [
+            "Overfitting"
           ]
         }
       ]
@@ -1215,6 +1529,90 @@
             "L1/L2",
             "Overfitting"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 2.5"
+          ],
+          "q": "Why is L2-regularization called 'weight decay'? Derive an expression with weights $W$, learning rate $\\eta$, and L2 coefficient $\\lambda$.",
+          "answer": "L2 adds $\\text{Reg}=\\tfrac12\\lambda\\|W\\|^2$ to the loss. The gradient update becomes $W\\leftarrow W-\\eta(\\nabla_W L+\\lambda W)=(1-\\eta\\lambda)W-\\eta\\nabla_W L$. The factor $(1-\\eta\\lambda)<1$ **shrinks ('decays') the weights toward 0** each step — hence 'weight decay'.",
+          "extend": "L2's gradient adds $\\lambda W$, which multiplies $W$ by $(1-\\eta\\lambda)$ every update → decay.",
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2",
+            "Learning rate"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 2.4",
+            "SS22 2.5"
+          ],
+          "q": "(2.4) Write the gradient-descent update with L2 weight decay (coefficient $\\lambda$, LR $\\alpha$, weights $\\theta$). (2.5) What is the purpose of weight decay?",
+          "answer": "**2.4** $\\theta_{k+1}=(1-\\alpha\\lambda)\\theta_k-\\alpha\\nabla L(\\theta_k)=\\theta_k-\\alpha(\\nabla L(\\theta_k)+\\lambda\\theta_k)$. **2.5** **Regularization** — it shrinks the weights to reduce overfitting and improve generalization.",
+          "extend": "Weight decay multiplies $\\theta$ by $(1-\\alpha\\lambda)$ each step → smaller weights, less overfitting.",
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2",
+            "Overfitting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 2.6"
+          ],
+          "q": "What do the error curves look like if the weight-decay coefficient $\\lambda$ is too high during training?",
+          "answer": "**Underfitting:** both **training and validation loss plateau at a relatively high value** — the penalty is so strong it suppresses the model's capacity to fit the data.",
+          "extend": "Too-strong regularization over-shrinks weights → underfitting (both curves high).",
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2",
+            "Overfitting"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS24 1.5"
+          ],
+          "q": "Which statements about Dropout are true?",
+          "answer": "**True:** *it can be seen as an ensemble of networks* (random sub-networks each step). **False:** it **can** be applied to CNNs; at **evaluation** it keeps all nodes active (scaling is handled in training with inverted dropout); and it **reduces** (not increases) the train/val gap.",
+          "extend": "Dropout = train-time ensemble regularizer; full network at eval; reduces overfitting gap.",
+          "options": [
+            {
+              "text": "It cannot be applied to CNN.",
+              "correct": false
+            },
+            {
+              "text": "During evaluation, it activates all nodes and scales up the output.",
+              "correct": false
+            },
+            {
+              "text": "It can be seen as an ensemble of networks.",
+              "correct": true
+            },
+            {
+              "text": "It increases the gap between validation and training loss.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2",
+            "Overfitting",
+            "CNN"
+          ]
         }
       ]
     },
@@ -1586,6 +1984,56 @@
             "Weight initialization",
             "Normalization"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS20 P1i"
+          ],
+          "q": "Which of the following have trainable parameters?",
+          "answer": "**Batch normalization** (learnable $\\gamma,\\beta$). **Leaky ReLU**, **dropout**, and **max pooling** have **no** trainable parameters.",
+          "extend": "Only BN among these has parameters; activations/dropout/pooling are parameter-free.",
+          "options": [
+            {
+              "text": "Leaky ReLU",
+              "correct": false
+            },
+            {
+              "text": "Batch normalization",
+              "correct": true
+            },
+            {
+              "text": "Dropout",
+              "correct": false
+            },
+            {
+              "text": "Max pooling",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "ReLU",
+            "Activation functions",
+            "Batch normalization",
+            "Dropout",
+            "Pooling"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 7.3"
+          ],
+          "q": "A BatchNorm2d layer operates on input $X_{8\\times3\\times32\\times64}$ (N×C×H×W). How many parameters do the running-mean and running-variance hold?",
+          "answer": "BN tracks one running mean and one running variance **per channel**, so $2\\cdot C=2\\cdot3=\\mathbf{6}$ values (independent of batch/spatial size).",
+          "extend": "Conv BN statistics are per-channel: running mean + var = 2·C.",
+          "tags": [
+            "Batch normalization",
+            "Normalization",
+            "Parameter counting"
+          ]
         }
       ]
     },
@@ -1736,6 +2184,71 @@
             "Tanh",
             "Vanishing gradient",
             "Batch normalization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS20 P2a",
+            "SS20 P2b",
+            "SS20 P2c",
+            "SS20 P2d"
+          ],
+          "q": "Weight init with inputs $i=[2,-4,1]$. (a) Forward sum for $w=[0.05,0.025,-0.03]$ (Var 0.02) and $w=[1,0.5,1.5]$ (Var 1.0). (b) What backprop problems arise from too-small / too-large variance? (c) Which init scheme fixes this and what does it achieve? (d) After switching tanh→ReLU the problem returns — why, and how to adapt the init?",
+          "answer": "**(a)** Var 0.02: $s=2(0.05)+(-4)(0.025)+1(-0.03)=-0.03$. Var 1.0: $s=2(1)+(-4)(0.5)+1(1.5)=1.5$. **(b)** Too **small** variance → activations ≈0 → tiny gradients (vanishing); too **large** → tanh **saturates** → tiny gradients (vanishing). **(c)** **Xavier** init — keeps the **output variance equal to the input variance** across layers. **(d)** ReLU **zeros half** its outputs, halving the variance → multiply Xavier's variance by **2** (He/Kaiming init).",
+          "extend": "Xavier preserves variance for tanh; He/Kaiming adds the ×2 for ReLU's zeroed half.",
+          "tags": [
+            "ReLU",
+            "Tanh",
+            "Vanishing gradient",
+            "Backpropagation",
+            "Weight initialization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 2.9"
+          ],
+          "q": "Why is initializing all weights of a fully-connected layer to the same value problematic?",
+          "answer": "It **fails to break symmetry**: every neuron receives the **same gradient** and therefore updates identically, so all neurons learn the **same function** — the layer can't develop diverse features.",
+          "extend": "Identical weights ⇒ identical gradients ⇒ neurons stay clones; random init breaks symmetry.",
+          "tags": [
+            "Weight initialization",
+            "Fully-connected"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 2.4"
+          ],
+          "q": "How does Xavier initialization set the weights? What mean/variance do the weights and the outputs have?",
+          "answer": "Weights are drawn **Gaussian with zero mean** and **variance $1/n$** where $n$ is the number of input neurons. As a result the **outputs also have zero mean and roughly the same variance as the inputs** — keeping activations well-scaled across layers.",
+          "extend": "Xavier: $\\mathcal N(0,1/n_{in})$ ⇒ output variance ≈ input variance (for tanh/sigmoid).",
+          "tags": [
+            "Sigmoid",
+            "Tanh",
+            "Weight initialization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 5.5"
+          ],
+          "q": "A 10-class classifier uses ReLU activations with Xavier initialization. Why is Xavier not the best choice, and what do you recommend?",
+          "answer": "**Xavier is tuned for tanh/sigmoid**, not ReLU — it doesn't account for ReLU zeroing half the activations, so the variance isn't preserved. Use **Kaiming (He) initialization** instead (variance $2/n_{in}$).",
+          "extend": "ReLU halves the variance ⇒ use He/Kaiming (the ×2 variant of Xavier).",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Weight initialization"
           ]
         }
       ]
@@ -2011,6 +2524,68 @@
           "answer": "Use **k-Nearest-Neighbors** in the embedding space: embed the labeled images and the test image with the frozen ViT, then assign the **majority label of the nearest neighbors** — no parameters are trained.",
           "extend": "Frozen-encoder + kNN on embeddings = a strong training-free baseline.",
           "tags": [
+            "Transfer learning"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS20 P7h"
+          ],
+          "q": "Why do you expect a segmentation network initialized from a pretrained autoencoder to generalize better than a randomly initialized one?",
+          "answer": "The autoencoder was trained on **much more (unlabeled) data**, so its **encoder already extracts useful features** (edges, shapes, coin structure). Reusing those features gives the segmentation network a strong, data-efficient starting point.",
+          "extend": "Pretraining transfers features learned from abundant unlabeled data → better generalization with few labels.",
+          "tags": [
+            "Weight initialization",
+            "Autoencoder",
+            "Transfer learning"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 3.3",
+            "SS21 3.4"
+          ],
+          "q": "(3.3) To classify 30 finer-grained classes instead of 5 without adding layers, what minimal change? (3.4) Given the pretrained 5-class net as a black box, how to get 30 classes?",
+          "answer": "**3.3** Change the **final layer to output 30 channels** (e.g. set the last conv's output channels to 30, or add a size-preserving $1\\times1$ conv with 30 outputs). **3.4** Append a **$1\\times1$ convolution with 30 output channels** on top of the pretrained network's output.",
+          "extend": "Swap/append a 1×1 conv to remap the channel count to the new number of classes.",
+          "tags": [
+            "1×1 convolution",
+            "Convolution",
+            "Transfer learning"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 3.5"
+          ],
+          "q": "You have a large unlabeled dataset of street images. How can you still use it to improve your segmentation network?",
+          "answer": "**Self-supervised pretraining:** train an **autoencoder** on all the unlabeled images (reconstruction), then **reuse the encoder** to initialize the segmentation network, **freeze (some) weights**, and fine-tune the new output layer on the labeled data.",
+          "extend": "Pretrain an AE on unlabeled data, transfer the encoder, fine-tune the head — classic transfer learning.",
+          "tags": [
+            "Weight initialization",
+            "Autoencoder",
+            "Transfer learning",
+            "Supervised vs unsupervised"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 5.5"
+          ],
+          "q": "After pretraining an autoencoder on a large dataset to build a classifier on a small labeled set, what is this technique called, and how should you handle the weights given the small dataset?",
+          "answer": "**Transfer learning.** Reuse the pretrained **encoder** as the backbone and **freeze (part of) its weights**, training only the new classification head — this avoids overfitting the small labeled set and preserves the learned features.",
+          "extend": "Transfer learning: freeze the pretrained encoder, train only the new head on scarce labels.",
+          "tags": [
+            "Overfitting",
+            "Autoencoder",
             "Transfer learning"
           ]
         }

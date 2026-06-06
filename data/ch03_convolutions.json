@@ -325,6 +325,84 @@
             "Convolution",
             "Parameter counting"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 3.1"
+          ],
+          "q": "A segmentation net's fc1 takes a $100\\times4\\times4$ feature map and outputs $40\\times4\\times4$. What is the shape of fc1's weight matrix (ignore bias)?",
+          "answer": "Flatten input $=100\\cdot4\\cdot4=1600$; output $=40\\cdot4\\cdot4=640$. Weight matrix shape **$1600\\times640$** (in × out).",
+          "extend": "FC weight shape = (flattened input) × (flattened output).",
+          "tags": [
+            "Convolution",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 4.1",
+            "SS22 4.2",
+            "SS22 4.3"
+          ],
+          "q": "Digit-sum net: Conv2d(2,8)→MaxPool2d(2)→BN→ReLU → Conv2d(8,16)→MaxPool2d(2)→BN→ReLU → Flatten → Linear(k,n). Input is two stacked $28\\times28$ images. (4.1) Give $(k,s,p)$ keeping spatial size. (4.2) Input and output shapes. (4.3) Value of $k$.",
+          "answer": "**4.1** e.g. $(k{=}3,s{=}1,p{=}1)$ ('same' conv). **4.2** Input $N\\times2\\times28\\times28$; output $N\\times19$ (sums $0..18$ → 19 classes). **4.3** Spatial size: $28\\to28\\to14\\to14\\to7$, depth 16, so $k=16\\cdot7\\cdot7=784$.",
+          "extend": "Same-padding convs preserve size; two pools take $28\\to7$; flatten = channels·H·W.",
+          "tags": [
+            "ReLU",
+            "Pooling",
+            "Convolution",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS24 1.7"
+          ],
+          "q": "Which propositions about a convolutional layer are true?",
+          "answer": "**True:** the *input channels and number of filters can differ*; the *parameter count depends on the kernel's width/height*; and the *output size depends on the stride*. **False:** the parameter count does **not** depend on padding.",
+          "extend": "Conv params = $k^2 C_{in}C_{out}+C_{out}$ (kernel-dependent, padding-independent); output size depends on stride.",
+          "options": [
+            {
+              "text": "The input channels and the number of filters can be different.",
+              "correct": true
+            },
+            {
+              "text": "The number of parameters depends on the width/height of the kernel.",
+              "correct": true
+            },
+            {
+              "text": "The number of parameters depends on padding.",
+              "correct": false
+            },
+            {
+              "text": "The output size depends on the stride.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Convolution",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 2.8"
+          ],
+          "q": "For an input batch $10\\times20\\times30\\times40$ (N×C×H×W), how many parameters are in a single $3\\times3$ convolution filter with stride 2, including bias?",
+          "answer": "A single filter spans all input channels: $3\\times3\\times20+1=\\mathbf{181}$ (the $+1$ is the bias; stride doesn't affect parameter count).",
+          "extend": "Filter params = $k\\cdot k\\cdot C_{in}+1$; stride/padding don't change it.",
+          "tags": [
+            "Convolution",
+            "Parameter counting"
+          ]
         }
       ]
     },
@@ -589,6 +667,83 @@
             "Convolution",
             "CNN"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS20 P1d"
+          ],
+          "q": "For a CNN with a single convolutional layer, which statement is true?",
+          "answer": "**True:** *it is translation-equivariant* (a shifted input gives a correspondingly shifted output). **False:** it is **not** rotation-invariant, **not** scale-invariant, and **not** fully connected (each output sees only a local patch).",
+          "extend": "A conv layer is translation-equivariant, locally connected — not rotation/scale invariant.",
+          "options": [
+            {
+              "text": "It is rotation invariant.",
+              "correct": false
+            },
+            {
+              "text": "It is translation equivariant.",
+              "correct": true
+            },
+            {
+              "text": "All input nodes are connected to all output nodes.",
+              "correct": false
+            },
+            {
+              "text": "It is scale-invariant.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Convolution",
+            "CNN",
+            "Fully-connected"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS20 P4a"
+          ],
+          "q": "What are the effects of these filter kernels? $C_1=\\frac19\\begin{bmatrix}1&1&1\\\\1&1&1\\\\1&1&1\\end{bmatrix}$, $C_2=\\begin{bmatrix}1&-1\\\\1&-1\\end{bmatrix}$.",
+          "answer": "$C_1$ is a **box blur / smoothing** kernel (local average). $C_2$ is a **vertical edge detector** (it responds to horizontal change in intensity).",
+          "extend": "Uniform positive kernel summing to 1 = blur; opposite-sign columns = vertical-edge detector.",
+          "tags": [
+            "Convolution"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 3.6"
+          ],
+          "q": "You want the segmentation network to accept images of arbitrary size $>64$ at run time without retraining. List two approaches.",
+          "answer": "**(1)** Add a **resize/downsample layer** (e.g. bilinear) to map inputs to $64\\times64$ (and upsample the output back). **(2)** Make the network **fully convolutional** by replacing the FC layer with convolutions, so it accepts any input size.",
+          "extend": "Either resize to the trained size, or go fully-convolutional (no fixed-size FC).",
+          "tags": [
+            "Convolution",
+            "Fully-connected",
+            "Upsampling"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 2.3"
+          ],
+          "q": "For MNIST classification, which is more robust to digit translation: a fully-connected net (three hidden layers of 16) or VGGNet? Why?",
+          "answer": "**VGGNet.** It uses **convolutions**, which are **translation-equivariant** (and with pooling, locally invariant), and has greater capacity for complex patterns — so shifted digits still activate the same features, unlike the FC net.",
+          "extend": "Conv weight-sharing → translation robustness; an FC net must relearn each shifted position.",
+          "tags": [
+            "Pooling",
+            "Convolution",
+            "Fully-connected",
+            "Classic architectures"
+          ]
         }
       ]
     },
@@ -754,6 +909,56 @@
             "Receptive field",
             "Pooling",
             "Convolution",
+            "Fully-connected"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS20 P4e"
+          ],
+          "q": "For a single-layer network: (1) what layer choice has a receptive field of 1? (2) what layer has a receptive field of the whole input image?",
+          "answer": "**(1)** A **$1\\times1$ convolution (or identity)** — each output depends on a single input location. **(2)** A **fully-connected layer** (or a conv/pool whose kernel equals the full input size, e.g. $224\\times224$) — every output sees the whole image.",
+          "extend": "RF=1 ⇒ 1×1 conv; RF=full image ⇒ FC layer / full-size kernel.",
+          "tags": [
+            "Receptive field",
+            "1×1 convolution",
+            "Convolution",
+            "Fully-connected"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 3.2"
+          ],
+          "q": "Define 'receptive field' (1p). For conv ($k{=}4,s{=}2,p{=}1$) then maxpool ($k{=}2,s{=}2$): RF after maxpool1 (1p)? RF of an fc1 neuron (1p)?",
+          "answer": "**Receptive field** = the region of the input that an output feature depends on. **After maxpool1: $6\\times6$** (a $2\\times2$ pool window over a stride-2, $4\\times4$-kernel conv spans a $6\\times6$ input region). **fc1 neuron:** the **whole image** ($64\\times64$).",
+          "extend": "Stack the spans: $4\\times4$ conv (s2) + $2\\times2$ pool → $6\\times6$ RF; FC sees everything.",
+          "tags": [
+            "L1/L2",
+            "Receptive field",
+            "Pooling",
+            "Convolution"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 4.6",
+            "SS22 4.7",
+            "SS22 4.8"
+          ],
+          "q": "(4.6) Define the receptive field of a neuron in an intermediate layer. (4.7) RF after maxpool1 (conv $k{=}5,s{=}1$; pool $k{=}2,s{=}2$). (4.8) RF after the Linear layer.",
+          "answer": "**4.6** The region of the **input image** that a single neuron is affected by. **4.7** $r_1=5\\to r_2=5+1\\cdot(2-1)=6$ → **$6\\times6$**. **4.8** The Linear layer sees the **whole input image** ($28\\times28$).",
+          "extend": "RF grows from the conv kernel; an FC layer's RF is the entire input.",
+          "tags": [
+            "L1/L2",
+            "Receptive field",
+            "Pooling",
             "Fully-connected"
           ]
         }
@@ -1045,6 +1250,21 @@
           "q": "Convert the classifier's two FC layers into a fully-convolutional network. State the shapes of the new weight matrices. (Final conv output $16\\times21\\times21$, FC1→2048, FC2→200.)",
           "answer": "Replace each FC with a conv: **FC1 → conv of shape $(2048\\times16\\times21\\times21)$** (a kernel matching the full feature map), and **FC2 → $1\\times1$ conv of shape $(200\\times2048\\times1\\times1)$**.",
           "extend": "FC→conv: first layer's kernel spans the whole feature map; later FCs become 1×1 convs.",
+          "tags": [
+            "1×1 convolution",
+            "Convolution",
+            "Fully-connected"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 5.6"
+          ],
+          "q": "Can a convolutional layer (fixed input/output sizes) be exactly replaced by Flatten → Linear → Reshape? Explain.",
+          "answer": "**Yes.** With fixed sizes, a convolution is a **linear map** with a specific (sparse, weight-shared) structure. A Linear layer can replicate it exactly by setting its weight matrix to match the conv's connectivity and shared weights (zeros where the conv doesn't connect), then reshaping back.",
+          "extend": "A fixed-size conv is a structured linear operator → expressible as a (sparse, weight-tied) FC layer.",
           "tags": [
             "1×1 convolution",
             "Convolution",

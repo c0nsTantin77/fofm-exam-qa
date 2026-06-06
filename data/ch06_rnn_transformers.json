@@ -273,6 +273,64 @@
             "Vanishing gradient",
             "RNN"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS20 P6c"
+          ],
+          "q": "A 1-D ReLU-RNN $h_t=\\text{ReLU}(V h_{t-1}+W x_t)$ with $V=-3,W=3,h_0=0,x_1=2,x_2=3,x_3=1$. Compute $h_2$ and $h_3$.",
+          "answer": "$h_1=\\text{ReLU}(-3\\cdot0+3\\cdot2)=6$; $h_2=\\text{ReLU}(-3\\cdot6+3\\cdot3)=\\text{ReLU}(-9)=0$; $h_3=\\text{ReLU}(-3\\cdot0+3\\cdot1)=3$.",
+          "extend": "The negative recurrent weight + ReLU clipping makes the state jump to 0 then recover from the input.",
+          "tags": [
+            "ReLU",
+            "RNN"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS20 P6d"
+          ],
+          "q": "ReLU-RNN $h_t=\\text{ReLU}(V h_{t-1}+W x_t)$ with $V=-2,W=1,h_0=2,x_1=2,x_2=3,x_3=4$ and forward outputs $h_1=0,h_2=\\tfrac23,h_3=1$. Compute $\\frac{\\partial h_3}{\\partial V},\\frac{\\partial h_3}{\\partial W},\\frac{\\partial h_3}{\\partial x_1}$ (use $\\text{ReLU}'(0)=0$).",
+          "answer": "$\\frac{\\partial h_3}{\\partial V}=h_2+V\\frac{\\partial h_2}{\\partial V}=\\tfrac23+V\\cdot0=\\tfrac23$. $\\frac{\\partial h_3}{\\partial W}=V x_2+x_3=-2(\\tfrac32)+4=1$. $\\frac{\\partial h_3}{\\partial x_1}=0$ — the gradient path is killed by the **dead ReLU** at $h_1=0$.",
+          "extend": "BPTT chains the recurrence; a ReLU that output 0 zeroes every gradient flowing through it (dead path).",
+          "tags": [
+            "ReLU",
+            "Vanishing gradient",
+            "RNN"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 9.2",
+            "SS22 9.3"
+          ],
+          "q": "An RNN's training loss won't drop. (9.2) Explain why this happens. (9.3) Name one solution.",
+          "answer": "**9.2** The **shared recurrent weights are multiplied repeatedly** across time steps; if their eigenvalues are $<1$ the gradient **vanishes**, if $>1$ it **explodes** — so the loss stops improving. **9.3** For vanishing: switch to an **LSTM** (or constrain eigenvalues ≈1); for exploding: **gradient clipping**.",
+          "extend": "Repeated multiplication by the recurrent weight → vanishing/exploding; LSTM or clipping fixes it.",
+          "tags": [
+            "Exploding gradient",
+            "RNN",
+            "LSTM"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 6.2"
+          ],
+          "q": "For an RNN-based translation model: (1) what are the input and output of the RNN block? (2) For full-sentence translation, why is a sequence-to-sequence (encode-all-then-decode) pipeline best?",
+          "answer": "**(1)** Input: the current **word embedding** plus the **previous hidden state**; output: the **current hidden state** (and a per-step prediction). **(2)** Translation needs the **whole input sentence before producing output** (word order/meaning can depend on later words), so an encode-then-decode (seq2seq) structure fits — process all inputs, then generate the output sequence.",
+          "extend": "RNN block: (embedding, prev state) → new state; translation needs full-input encoding before decoding.",
+          "tags": [
+            "RNN"
+          ]
         }
       ]
     },
@@ -419,6 +477,53 @@
             "Backpropagation",
             "RNN",
             "LSTM"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS20 P6e"
+          ],
+          "q": "An LSTM is $g_1,g_2,g_3=\\sigma(\\cdot)$, $\\tilde c_t=\\tanh(\\cdot)$, $c_t=g_2\\circ c_{t-1}+g_3\\circ\\tilde c_t$, $h_t=g_1\\circ c_t$. (1) Assign $g_1,g_2,g_3$ to the forget/input/output gates. (2) What does $c_t$ represent?",
+          "answer": "$g_2$ (multiplies the previous cell state) = **forget gate**; $g_3$ (multiplies the candidate) = **input/update gate**; $g_1$ (multiplies $c_t$ to form $h_t$) = **output gate**. $c_t$ = the **cell state / long-term memory**.",
+          "extend": "Read the gates from the equations: forget scales $c_{t-1}$, input scales $\\tilde c_t$, output scales $c_t$ into $h_t$.",
+          "tags": [
+            "Tanh",
+            "LSTM"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 2.12"
+          ],
+          "q": "Explain how LSTMs often outperform traditional RNNs. What in their architecture enables this?",
+          "answer": "Traditional RNNs struggle to learn **long-term dependencies** because of **vanishing gradients**. The LSTM's **cell state** provides a near-additive path that **improves gradient flow** across many time steps, letting the network retain information over long sequences.",
+          "extend": "The cell-state highway is the LSTM's key fix for the RNN vanishing-gradient/long-memory problem.",
+          "tags": [
+            "Vanishing gradient",
+            "RNN",
+            "LSTM",
+            "ResNet / skip connections"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 6.3"
+          ],
+          "q": "(1) What activations are used for an LSTM's forget gate, input gate, candidate memory, and output gate? (2) Is ReLU a good choice for the forget gate? (3) Why is LSTM better on long sequences?",
+          "answer": "**(1)** **Sigmoid** for the three gates (forget/input/output); **tanh** for the candidate memory. **(2)** **No** — ReLU's output can exceed 1, so it can't act as a $[0,1]$ gate and could make the cell state grow unbounded. **(3)** The **cell state provides a highway** for long-term dependencies (near-additive gradient flow).",
+          "extend": "Gates = sigmoid (valves in [0,1]); candidate = tanh; cell-state highway handles long-range memory.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "LSTM",
+            "ResNet / skip connections"
           ]
         }
       ]
@@ -741,6 +846,72 @@
           "tags": [
             "Transformer",
             "Attention"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 9.4",
+            "SS22 9.5"
+          ],
+          "q": "(9.4) In a translation Transformer fed the full input+output sentence, why must the decoder outputs be masked? (9.5) Can a Transformer take an input of arbitrary length? Explain.",
+          "answer": "**9.4** Because the **entire output sentence is provided**, the decoder must **mask out the tokens after the current position** so it can't 'see' the future word it is supposed to predict (no cheating). **9.5** **No** — the attention layer's $K,Q,V$ projections use **fixed-size matrices**, so the input length is bounded by the fixed configuration.",
+          "extend": "Causal masking hides future tokens; fixed-size attention projections cap the sequence length.",
+          "tags": [
+            "Transformer",
+            "Attention"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS24 1.3"
+          ],
+          "q": "Which layers are used in a Transformer model?",
+          "answer": "**Fully connected layers** (the position-wise feed-forward networks and Q/K/V projections) and **Softmax layers** (inside attention). **Recurrent** and **convolutional** layers are **not** part of a standard Transformer.",
+          "extend": "Transformers = attention (softmax) + feed-forward (FC); no recurrence or convolution.",
+          "options": [
+            {
+              "text": "Recurrent layers",
+              "correct": false
+            },
+            {
+              "text": "Fully connected layers",
+              "correct": true
+            },
+            {
+              "text": "Softmax layers",
+              "correct": true
+            },
+            {
+              "text": "Convolutional layers",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Softmax",
+            "Convolution",
+            "Fully-connected",
+            "RNN",
+            "Transformer"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 6.4"
+          ],
+          "q": "Transformers for translation: (1) how to inform the model of word order? (2) how are attention weights computed (and their characteristics)? (3) how is the attention output computed, and why is it called 'attention'?",
+          "answer": "**(1) Positional encoding** added to the token embeddings. **(2)** Weights = **softmax of the scaled dot products $QK^\\top$**; the closer a query is to a key, the **larger the weight** (weights are non-negative and sum to 1). **(3)** Output = **weighted sum of the Values** using those weights; it's called 'attention' because the output is dominated by the values with **large weights** (the tokens it 'attends to').",
+          "extend": "PE supplies order; softmax(QKᵀ) gives the weights; output = weighted sum of V.",
+          "tags": [
+            "Softmax",
+            "Transformer",
+            "Attention",
+            "Positional encoding"
           ]
         }
       ]

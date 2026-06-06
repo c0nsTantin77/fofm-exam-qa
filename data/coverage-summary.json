@@ -1,25 +1,25 @@
 {
-  "overall_pct": 70,
-  "cited": 375,
+  "overall_pct": 90,
+  "cited": 480,
   "detected": 536,
   "per_exam": [
     {
       "exam": "SS20",
       "det": 54,
-      "cit": 23,
-      "pct": 43
+      "cit": 49,
+      "pct": 91
     },
     {
       "exam": "SS21",
       "det": 39,
-      "cit": 15,
-      "pct": 38
+      "cit": 39,
+      "pct": 100
     },
     {
       "exam": "SS22",
       "det": 65,
-      "cit": 32,
-      "pct": 49
+      "cit": 64,
+      "pct": 98
     },
     {
       "exam": "SS23",
@@ -30,8 +30,8 @@
     {
       "exam": "SS24",
       "det": 45,
-      "cit": 17,
-      "pct": 38
+      "cit": 40,
+      "pct": 89
     },
     {
       "exam": "SS25",

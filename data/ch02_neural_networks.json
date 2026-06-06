@@ -163,6 +163,36 @@
             "Autoencoder",
             "Classic architectures"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 2.8"
+          ],
+          "q": "A FC network has hidden layers of 10 then 5 neurons (both with dropout 0.5), classifies $8\\times8$ grayscale images into 3 classes, all with bias. Total trainable parameters?",
+          "answer": "Weights: $(64\\cdot10)+(10\\cdot5)+(5\\cdot3)=640+50+15=705$. Biases: $10+5+3=18$. **Total $=723$.** (Dropout adds no parameters.)",
+          "extend": "Params = Σ(in·out + out) per layer; dropout is parameter-free.",
+          "tags": [
+            "Dropout",
+            "Fully-connected",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 2.2",
+            "SS22 2.3"
+          ],
+          "q": "FC layer $Y=XW+b$ with $X_{N\\times D},W_{D\\times M}$ and upstream $\\text{dout}=\\frac{\\partial L}{\\partial Y}$. (2.2) Dimensions of $b$ and dout? (2.3) What is $\\frac{\\partial L}{\\partial X}$ and its dimensions?",
+          "answer": "**2.2** $b$ is $1\\times M$ (broadcast over the batch); dout is $N\\times M$. **2.3** $\\frac{\\partial L}{\\partial X}=\\text{dout}\\cdot W^\\top$, of shape $N\\times D$ (matches $X$).",
+          "extend": "Backprop shapes mirror the forward shapes: $\\partial L/\\partial X$ matches $X$, computed as $\\text{dout}\\,W^\\top$.",
+          "tags": [
+            "Backpropagation",
+            "Fully-connected"
+          ]
         }
       ]
     },
@@ -445,6 +475,93 @@
           "extend": "Forward computes + caches; backward consumes the cache and the upstream gradient to return local grads.",
           "tags": [
             "Backpropagation"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS20 P1c"
+          ],
+          "q": "What is the correct order of operations for gradient descent? (a) update weights, (b) compute loss, (c) repeat until convergence, (d) forward pass, (e) initialize weights.",
+          "answer": "**e → d → b → a → c** ('edbac'): initialize, forward pass, compute the loss, update the weights, repeat until convergence.",
+          "extend": "Initialize once, then loop forward→loss→update.",
+          "options": [
+            {
+              "text": "bcdea",
+              "correct": false
+            },
+            {
+              "text": "ebadc",
+              "correct": false
+            },
+            {
+              "text": "eadbc",
+              "correct": false
+            },
+            {
+              "text": "edbac",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Backpropagation",
+            "Optimizers",
+            "Weight initialization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS22 6.1",
+            "SS22 6.2",
+            "SS22 6.3"
+          ],
+          "q": "Net with Leaky ReLU ($\\alpha{=}0.5$): $x_1{=}1,x_2{=}{-}2$; $w_{11}{=}{-}0.5,w_{21}{=}{-}1,b_1{=}0.5$; $w_{12}{=}1,w_{22}{=}0.5,b_2{=}0$; $w_{13}{=}2,w_{23}{=}1.5,b_3{=}{-}1$; output weights $v$, $b_4{=}1,b_5{=}{-}1$; targets $y_1{=}1,y_2{=}1$. (6.1) Compute $\\hat y_1,\\hat y_2$. (6.2) MSE. (6.3) SGD update of $w_{11}$ (lr 0.1).",
+          "answer": "**6.1** $h_1{=}{-}0.5(1){-}1({-}2){+}0.5{=}2,\\ h_2{=}1{-}1{+}0{=}0,\\ h_3{=}2{-}3{-}1{=}{-}2$; LeakyReLU → $h_4{=}2,h_5{=}0,h_6{=}{-}1$. With $v_{11}{=}1,v_{21}{=}{-}0.5,v_{31}{=}{-}1,v_{12}{=}{-}0.5,v_{22}{=}2,v_{32}{=}1$: $\\hat y_1{=}1(2){+}({-}1)({-}1){-}1{=}2,\\ \\hat y_2{=}{-}0.5(2){+}1({-}1){+}2{=}0$. **6.2** $\\text{MSE}=\\tfrac12(2{-}1)^2+\\tfrac12(0{-}1)^2=1$. **6.3** $\\frac{\\partial L}{\\partial w_{11}}=((\\hat y_1{-}y_1)v_{11}+(\\hat y_2{-}y_2)v_{12})\\cdot1\\cdot x_1=((1)(1)+({-}1)({-}0.5))(1)=1.5$; $w_{11}^+=-0.5-0.1(1.5)=-0.65$.",
+          "extend": "Leaky ReLU's slope is 1 for positive pre-activations here; both output branches feed back into $w_{11}$.",
+          "tags": [
+            "ReLU",
+            "Activation functions",
+            "Backpropagation",
+            "Optimizers",
+            "Data leakage"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS24 3.1",
+            "SS24 3.2",
+            "SS24 3.3"
+          ],
+          "q": "Binary classifier, FC $z=XW+b$ with $X=[1,2,0,1]$ (post-ReLU), $W=[1,-2,3,3]^\\top,b=0$, $\\hat y=\\sigma(z),L=\\text{BCE}(y,\\hat y),y=1$. Forward: $z=0,\\hat y=0.5,L=0.693$. (3.1) Compute $\\frac{\\partial L}{\\partial \\hat y},\\frac{\\partial L}{\\partial z},\\frac{\\partial L}{\\partial W},\\frac{\\partial L}{\\partial b}$. (3.2) What to cache? (3.3) Why is $\\frac{\\partial L}{\\partial W}$ always non-positive here?",
+          "answer": "**3.1** $\\frac{\\partial L}{\\partial \\hat y}=-\\tfrac1{\\hat y}=-2$; $\\frac{\\partial L}{\\partial z}=\\frac{\\partial L}{\\partial \\hat y}\\sigma(z)(1-\\sigma(z))=-2(0.25)=-0.5$; $\\frac{\\partial L}{\\partial W}=X^\\top\\frac{\\partial L}{\\partial z}=[-0.5,-1,0,-0.5]^\\top$; $\\frac{\\partial L}{\\partial b}=-0.5$. **3.2** Cache $\\hat y$ and $X$. **3.3** $\\frac{\\partial L}{\\partial W}=\\frac{\\partial L}{\\partial \\hat y}\\cdot\\sigma'\\cdot X^\\top$: $\\sigma'>0$, $X\\ge0$ (post-ReLU), and BCE's $\\frac{\\partial L}{\\partial \\hat y}\\le0$ for $y=1$ ⇒ the product is **always ≤0**.",
+          "extend": "Sign analysis: positive sigmoid derivative × non-negative ReLU input × non-positive BCE gradient ⇒ non-positive.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Backpropagation",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS24 3.4",
+            "SS24 3.5"
+          ],
+          "q": "A ResBlock has layers A,B,C (from {Conv1(k1,s1,p0), ReLU, Conv2(k3,s1)}) and a skip to the adder. (3.4) Assign A,B,C; which intermediate (F2/G1/G2) connects to the adder; and the padding of Conv2. (3.5) Write $\\frac{\\partial L}{\\partial F2}$ and explain the gradient 'highway'.",
+          "answer": "**3.4** A=**Conv1**, B=**ReLU**, C=**Conv2**; the **block input (F2)** is what the skip adds; Conv2 padding **=1** (to keep $k{=}3$ size-preserving). **3.5** $\\frac{\\partial L}{\\partial F2}=\\frac{\\partial L}{\\partial F3}\\big(1+\\frac{\\partial\\text{Conv2}(G2)}{\\partial F2}\\big)$ — the **$+1$** from the skip path guarantees the upstream gradient passes through with full magnitude (the 'highway').",
+          "extend": "Residual skip injects a $+1$ into the gradient → it never fully vanishes through the block.",
+          "tags": [
+            "ReLU",
+            "Backpropagation",
+            "Convolution",
+            "ResNet / skip connections"
           ]
         }
       ]
@@ -1004,6 +1121,127 @@
             "Activation functions",
             "Backpropagation"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS20 P1e"
+          ],
+          "q": "Which activation functions can lead to vanishing gradients?",
+          "answer": "**Tanh** and **Sigmoid** — both **saturate** for large $|x|$, driving their derivative toward 0. **ReLU** and **Leaky ReLU** do not saturate on the positive side, so they avoid this.",
+          "extend": "Saturating activations (sigmoid/tanh) cause vanishing gradients; ReLU-family do not.",
+          "options": [
+            {
+              "text": "Tanh.",
+              "correct": true
+            },
+            {
+              "text": "ReLU.",
+              "correct": false
+            },
+            {
+              "text": "Sigmoid.",
+              "correct": true
+            },
+            {
+              "text": "Leaky ReLU.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS20 P8c"
+          ],
+          "q": "Suggest a method to solve exploding gradients when training fully-connected networks.",
+          "answer": "**Gradient clipping** (cap the gradient norm), and/or **better weight initialization** (e.g. Xavier) or **batch normalization** to keep activations/gradients well-scaled.",
+          "extend": "Exploding gradients ⇒ clip them (primary fix); good init / BN reduce the chance.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Exploding gradient"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS22 1.4"
+          ],
+          "q": "You build a CNN with TanH activations. What could reduce the likelihood of vanishing gradients?",
+          "answer": "**All four help:** **Xavier initialization** (keeps variance balanced), **residual blocks** (gradient highway), **replacing TanH with Leaky ReLU** (non-saturating), and **reducing the number of layers** (fewer chained multiplications).",
+          "extend": "Vanishing-gradient mitigations: good init, residuals, non-saturating activations, fewer layers.",
+          "options": [
+            {
+              "text": "Use Xavier initialization for your conv layers.",
+              "correct": true
+            },
+            {
+              "text": "Organize the layers in residual blocks.",
+              "correct": true
+            },
+            {
+              "text": "Replace TanH with Leaky ReLU (α=0.2).",
+              "correct": true
+            },
+            {
+              "text": "Reduce the number of layers.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS24 1.8"
+          ],
+          "q": "Which functions are NOT suitable as activation functions to add non-linearity?",
+          "answer": "**Unsuitable:** $f(x)=x$ (linear → no non-linearity), $f(x)=\\lfloor x\\rfloor$ (floor: gradient 0 almost everywhere), and $f(x)=\\sqrt x$ (undefined for $x<0$). **Suitable:** $f(x)=|x|$ is non-linear and defined everywhere.",
+          "extend": "Reject linear, zero-gradient (step/floor), or domain-restricted functions.",
+          "options": [
+            {
+              "text": "f(x) = x",
+              "correct": true
+            },
+            {
+              "text": "The floor function f(x) = ⌊x⌋",
+              "correct": true
+            },
+            {
+              "text": "f(x) = |x|",
+              "correct": false
+            },
+            {
+              "text": "f(x) = √x",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions"
+          ]
         }
       ]
     },
@@ -1097,6 +1335,70 @@
           "tags": [
             "Softmax",
             "Loss functions"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS20 P1g"
+          ],
+          "q": "A sigmoid layer...",
+          "answer": "**True:** it *is continuous and differentiable everywhere*. **False:** it can be used in backprop, it has **no learnable parameter**, and it maps to $(0,1)$ — not surjectively onto $(-1,1)$.",
+          "extend": "Sigmoid: smooth, parameter-free, output range $(0,1)$.",
+          "options": [
+            {
+              "text": "...cannot be used during backpropagation.",
+              "correct": false
+            },
+            {
+              "text": "...has a learnable parameter.",
+              "correct": false
+            },
+            {
+              "text": "...maps surjectively to values in (-1, 1).",
+              "correct": false
+            },
+            {
+              "text": "...is continuous and differentiable everywhere.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Softmax",
+            "Sigmoid",
+            "Backpropagation"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 5.1",
+            "SS21 5.2"
+          ],
+          "q": "(5.1) Why use a Softmax at the end of a classification network — what property makes it suitable? (5.2) Its derivative can be written in terms of softmax outputs; why is that advantageous for training?",
+          "answer": "**5.1** Softmax **normalizes the logits into a probability distribution** (positive, summing to 1) over classes — ideal for classification. **5.2** Because $\\frac{\\partial \\hat y}{\\partial z}$ is expressible via the $\\hat y$ already computed in the forward pass, the **backward pass is cheap** (just reuse the cached softmax outputs).",
+          "extend": "Softmax → class probabilities; its self-referential derivative makes backprop fast from the forward cache.",
+          "tags": [
+            "Softmax",
+            "Backpropagation",
+            "Normalization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS21 5.3",
+            "SS21 5.4"
+          ],
+          "q": "For softmax $\\hat y_i=\\frac{e^{z_i}}{\\sum_j e^{z_j}}$: (5.3) show $\\frac{\\partial \\hat y_i}{\\partial z_i}$ in terms of $\\hat y_i$. (5.4) show $\\frac{\\partial \\hat y_i}{\\partial z_j}$ ($i\\ne j$) in terms of $\\hat y_i,\\hat y_j$.",
+          "answer": "**5.3** $\\frac{\\partial \\hat y_i}{\\partial z_i}=\\hat y_i(1-\\hat y_i)$. **5.4** $\\frac{\\partial \\hat y_i}{\\partial z_j}=-\\hat y_i\\hat y_j$. Compactly, $\\frac{\\partial \\hat y_i}{\\partial z_j}=\\hat y_i(\\delta_{ij}-\\hat y_j)$.",
+          "extend": "The softmax Jacobian is $\\hat y_i(\\delta_{ij}-\\hat y_j)$ — diagonal $\\hat y_i(1-\\hat y_i)$, off-diagonal $-\\hat y_i\\hat y_j$.",
+          "tags": [
+            "Softmax",
+            "Jacobian"
           ]
         }
       ]
@@ -1284,6 +1586,83 @@
           "extend": "CE needs probabilities; $\\log$ of a raw (possibly negative) logit is undefined → softmax first.",
           "tags": [
             "Softmax",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS20 P8b"
+          ],
+          "q": "Binary car-vs-person CNN with one output neuron: $\\hat y=\\sigma(\\text{ReLU}(z))$, classify $\\hat y\\ge0.5$ as car. What problem arises?",
+          "answer": "Since $\\text{ReLU}(z)\\ge0$, we always have $\\sigma(\\text{ReLU}(z))\\ge\\sigma(0)=0.5$, so **every input is classified as 'car'** — the classifier collapses to one class. (Drop the ReLU before the sigmoid.)",
+          "extend": "Squashing the logit through ReLU first clamps the sigmoid to $[0.5,1)$ → degenerate one-class output.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "CNN",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 5.5"
+          ],
+          "q": "Using softmax over $C$ classes, what loss do you minimize for multi-class classification? Name it and give its formula for a single sample with one-hot label $y$.",
+          "answer": "**(Categorical) Cross-Entropy**: $L(y,\\hat y)=-\\sum_{j=1}^{C}y_j\\log\\hat y_j$, which for a one-hot label reduces to $-\\log\\hat y_{\\text{true}}$ (the negative log-probability of the correct class). (Not binary CE.)",
+          "extend": "Multi-class ⇒ categorical CE $=-\\log(\\hat y_{\\text{true class}})$.",
+          "tags": [
+            "Softmax",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS21 5.6",
+            "SS21 5.7"
+          ],
+          "q": "2-layer FC net, CE loss, softmax output $\\hat y$, hidden activations $h$, second weight matrix $W^2$. (5.6) Write $\\frac{\\partial L}{\\partial w_{j,k}}$ as a product of three partials. (5.7) Compute $\\frac{\\partial L}{\\partial w^2_{3,1}}$ for true class 3.",
+          "answer": "**5.6** $\\frac{\\partial L}{\\partial w_{j,k}}=\\frac{\\partial L}{\\partial \\hat y}\\cdot\\frac{\\partial \\hat y}{\\partial z}\\cdot\\frac{\\partial z}{\\partial w_{j,k}}$. **5.7** $\\frac{\\partial L}{\\partial \\hat y_3}=-\\frac{1}{\\hat y_3}$; $w_{3,1}$ affects only $z_1$ with $\\frac{\\partial \\hat y_3}{\\partial z_1}=-\\hat y_3\\hat y_1$ and $\\frac{\\partial z_1}{\\partial w_{3,1}}=h_3$. Multiplying: $\\frac{\\partial L}{\\partial w^2_{3,1}}=(-\\tfrac{1}{\\hat y_3})(-\\hat y_3\\hat y_1)(h_3)=\\hat y_1 h_3$.",
+          "extend": "CE+softmax telescopes: the $-1/\\hat y_3$ and $-\\hat y_3\\hat y_1$ cancel to a clean $\\hat y_1 h_3$.",
+          "tags": [
+            "Softmax",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 5.1",
+            "SS24 5.3"
+          ],
+          "q": "A 10-class net uses $\\hat y=\\text{Sigmoid}(z)$ with categorical cross-entropy $-\\sum_i y_i\\log\\hat y_i$ and a regularizer $\\sum_w e^{-w}$. (5.1) What weights does $\\sum_w e^{-w}$ encourage, and what problems result? (5.3) It reaches ~0 loss but ~10% accuracy — why?",
+          "answer": "**5.1** $e^{-w}$ is minimized by **large positive weights** → **exploding gradients, numerical instability, poor performance**. **5.3** With a **sigmoid** (not softmax) output, the network can drive **every $\\hat y_i\\to1$**: categorical CE only rewards the true class's probability and **doesn't penalize false positives**, so loss →0 while accuracy stays at chance (~10%).",
+          "extend": "Sigmoid+CE without competition lets all outputs saturate to 1 → low loss, random accuracy. Use softmax.",
+          "tags": [
+            "Softmax",
+            "Sigmoid",
+            "Vanishing gradient",
+            "Exploding gradient",
+            "Regularization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 5.2"
+          ],
+          "q": "Your friend changes the regularizer to $\\sum_w \\cosh(w)-1$, insisting the '$-1$' is needed so zero weights aren't punished. Does the '$-1$' change the trained weights? Explain.",
+          "answer": "**No.** The $-1$ is a **constant**; its gradient is 0, so it doesn't affect the update or the resulting weights. (It only shifts the loss value, making $\\cosh(0)-1=0$ cosmetically.)",
+          "extend": "Adding a constant to a loss leaves the gradient — and thus the optimum — unchanged.",
+          "tags": [
+            "Regularization",
             "Loss functions"
           ]
         }
@@ -1558,6 +1937,20 @@
           "tags": [
             "Sigmoid",
             "Loss functions",
+            "Regression"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 2.7",
+            "SS22 2.8"
+          ],
+          "q": "Linear regression $W^\\*=\\arg\\min_W\\frac{1}{2n}\\sum_i(y_i-\\hat y_i)^2$. (2.7) Why is a found minimum guaranteed global? (2.8) What advantage does linear regression have over iterative deep learning on a linearly-distributed dataset?",
+          "answer": "**2.7** The least-squares objective is **convex**, so any local minimum is the **global** minimum. **2.8** It has a **closed-form solution** $W=(X^\\top X)^{-1}X^\\top Y$ — exact and direct, no iterative optimization needed.",
+          "extend": "Convex ⇒ unique global optimum; the normal equation solves it in closed form.",
+          "tags": [
             "Regression"
           ]
         }

@@ -219,6 +219,18 @@
           "answer": "**Precision** matters more. With thousands of applicants, **false negatives are tolerable** (missing a few good candidates is fine), but **false positives are costly** (offering jobs to unsuitable people). High precision = a low false-positive rate.",
           "extend": "Choose precision when false positives are expensive; recall when missing positives is expensive.",
           "tags": []
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 5.8",
+            "SS22 5.9"
+          ],
+          "q": "(5.8) What is semantic segmentation of an image? (5.9) For a $C\\times H\\times W$ input, what are the segmentation output dimensions?",
+          "answer": "**5.8** **Per-pixel classification** — assigning a class label to **every pixel**. **5.9** $\\hat C\\times H\\times W$, where $\\hat C$ is the **number of classes** (one channel per class, same spatial size as the input).",
+          "extend": "Segmentation = dense per-pixel labels; output has one channel per class at full resolution.",
+          "tags": []
         }
       ]
     },
@@ -843,6 +855,58 @@
             "Regularization",
             "Dataset splits",
             "Data leakage"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS21 1.4"
+          ],
+          "q": "Which techniques will typically decrease your validation loss?",
+          "answer": "**Add dropout** and **add additional training data** — both improve generalization. **Removing data augmentation** or swapping LeakyReLU→ReLU would not reliably reduce validation loss.",
+          "extend": "Validation loss responds to regularization and more data (generalization), not to removing augmentation.",
+          "options": [
+            {
+              "text": "Add dropout.",
+              "correct": true
+            },
+            {
+              "text": "Add additional training data.",
+              "correct": true
+            },
+            {
+              "text": "Remove data augmentation.",
+              "correct": false
+            },
+            {
+              "text": "Use ReLU instead of LeakyReLU.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "ReLU",
+            "Activation functions",
+            "Dropout",
+            "Regularization",
+            "Data augmentation"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 4.4"
+          ],
+          "q": "You train from scratch on 1000 images, then evaluate on train and validation. What result do you expect, and name two ways (besides transfer learning) to improve it.",
+          "answer": "Expect **high training accuracy but low validation accuracy** (overfitting on the small dataset). Improvements: **label/collect more data**, **data augmentation**, or other **regularization** (dropout, weight decay).",
+          "extend": "Small-data training overfits; combat it with more data, augmentation, or regularization.",
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2",
+            "Overfitting",
+            "Data augmentation"
           ]
         }
       ]
@@ -1477,6 +1541,19 @@
           "q": "A dataset has 400 images of label 0 and 100 of label 1. (1) What problem do you foresee? (2) Two techniques to address it without collecting more data.",
           "answer": "(1) **Class imbalance** → the network **biases toward label 0**; overall accuracy may look high but **label-1 performance is poor**. (2) **Oversample the minority** (or undersample the majority), and **use class weighting in the loss**.",
           "extend": "Imbalance biases toward the majority; rebalance via resampling or loss weighting.",
+          "tags": [
+            "Class imbalance"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 2.5"
+          ],
+          "q": "Binary classification with the positive class underrepresented (8 negatives per positive). Describe a training technique to alleviate the imbalance. Would you apply it at test time? Why?",
+          "answer": "**Oversample the positive class** (or undersample the negative) so classes are balanced during **training** — alternatively, **weight the per-class losses**. **Don't** apply resampling at **test** time: it would distort the evaluation metrics (e.g. accuracy) and misrepresent real performance. (Loss-weighting doesn't change the data, so it's training-only by nature.)",
+          "extend": "Rebalance during training (resample / loss weights); evaluate on the true distribution.",
           "tags": [
             "Class imbalance"
           ]

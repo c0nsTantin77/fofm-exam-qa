@@ -182,6 +182,90 @@
             "CNN",
             "Classic architectures"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS20 P1a"
+          ],
+          "q": "Which statements about successful ImageNet-classification architectures are correct?",
+          "answer": "**True:** *AlexNet uses filters of different kernel sizes*, and *InceptionV3 uses filters of different kernel sizes* (parallel branches). **False:** ResNet18 has **fewer** parameters than VGG16 (not 11M more), and VGG16 uses FC layers too (not only conv).",
+          "extend": "AlexNet/Inception mix kernel sizes; VGG is conv+FC and parameter-heavy; ResNet18 is lighter than VGG16.",
+          "options": [
+            {
+              "text": "ResNet18 has 11 million parameters more than VGG16.",
+              "correct": false
+            },
+            {
+              "text": "AlexNet uses filters of different kernel sizes.",
+              "correct": true
+            },
+            {
+              "text": "InceptionV3 uses filters of different kernel sizes.",
+              "correct": true
+            },
+            {
+              "text": "VGG16 only uses convolutional layers.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Convolution",
+            "CNN",
+            "Fully-connected",
+            "ResNet / skip connections",
+            "Classic architectures"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS24 1.1"
+          ],
+          "q": "Which statements about CNNs are true?",
+          "answer": "**True:** *deep layers typically capture high-level features*, and *pooling layers reduce the spatial dimension of feature maps*. **False:** early layers capture **low-level** features (not high-level), and layers do **not** all have the same receptive-field size (it grows with depth).",
+          "extend": "Depth ↑ ⇒ higher-level features + larger RF; pooling shrinks spatial size.",
+          "options": [
+            {
+              "text": "Early layers typically capture high-level features.",
+              "correct": false
+            },
+            {
+              "text": "All layers in a CNN have the same receptive field size.",
+              "correct": false
+            },
+            {
+              "text": "Deep layers typically capture high-level features.",
+              "correct": true
+            },
+            {
+              "text": "Pooling layers reduce the spatial dimension of feature maps.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Receptive field",
+            "Pooling",
+            "CNN",
+            "Classic architectures"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 2.4"
+          ],
+          "q": "AlexNet uses an $11\\times11$ filter in its first layer. Name one disadvantage of such a large filter.",
+          "answer": "It is **expensive** in both parameters and computation, and it captures **coarse/global** features rather than fine local detail — stacking smaller kernels is usually preferred.",
+          "extend": "Large kernels cost many params/FLOPs and miss fine local structure.",
+          "tags": [
+            "Convolution",
+            "CNN",
+            "Classic architectures"
+          ]
         }
       ]
     },
@@ -329,6 +413,34 @@
             "Exploding gradient",
             "Backpropagation",
             "Overfitting",
+            "ResNet / skip connections"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS20 P4g"
+          ],
+          "q": "For a residual block $H(x)=x+R(x)$ with $\\frac{\\partial R(x)}{\\partial x}=r$, compute $\\frac{\\partial H(x)}{\\partial x}$.",
+          "answer": "$\\frac{\\partial H}{\\partial x}=\\frac{\\partial (x+R(x))}{\\partial x}=1+r$. The **$+1$** is the identity/skip path that lets the gradient flow through even when $r\\to0$ (a gradient highway).",
+          "extend": "Residual derivative is $1+r$ — the constant 1 prevents the gradient from vanishing.",
+          "tags": [
+            "ResNet / skip connections"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 4.4"
+          ],
+          "q": "How do residual connections help against vanishing gradients? Show it via the gradient $\\frac{\\partial z}{\\partial w_0}$ for a residual block $z=x+R(x)$.",
+          "answer": "A residual block computes $z=x+R(x)$, so $\\frac{\\partial z}{\\partial x}=1+\\frac{\\partial R}{\\partial x}$. Backpropagating to an early weight, $\\frac{\\partial z}{\\partial w_0}=(1+\\frac{\\partial R}{\\partial x})\\cdot\\frac{\\partial x}{\\partial w_0}$ — the **constant 1** guarantees a gradient path even when $\\frac{\\partial R}{\\partial x}\\to0$, so gradients don't vanish (a 'highway').",
+          "extend": "The additive identity injects a $+1$ into the chain rule → undiminished gradient flow.",
+          "tags": [
+            "Vanishing gradient",
+            "Backpropagation",
             "ResNet / skip connections"
           ]
         }
@@ -613,6 +725,50 @@
             "Loss functions",
             "Transfer learning"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS20 P7a"
+          ],
+          "q": "Is an autoencoder an example of unsupervised or supervised learning?",
+          "answer": "**Unsupervised** — it trains to reconstruct its own input (the target is the input itself), so **no labels** are required.",
+          "extend": "AE = self-reconstruction, label-free ⇒ unsupervised.",
+          "tags": [
+            "Autoencoder",
+            "Supervised vs unsupervised"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS20 P7d"
+          ],
+          "q": "Can you generate a new image by randomly sampling a vector from a plain autoencoder's latent space?",
+          "answer": "**No.** The encoder only maps the input distribution into part of the latent space (not surjectively), so a random latent vector is **unlikely to decode to a valid image**. You'd need a **VAE** that forces the latent to follow a known (Gaussian) distribution you can sample.",
+          "extend": "Plain AE latent has 'holes'; VAE regularizes it to be samplable.",
+          "tags": [
+            "Regularization",
+            "Autoencoder",
+            "VAE"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 4.5"
+          ],
+          "q": "For transfer learning you want to train your own backbone instead of downloading one. How can you do it with 1M unlabeled images?",
+          "answer": "Train an **autoencoder** (or another **self-supervised** method) on the **1M unlabeled images** to learn good features, then reuse its **encoder** as the pretrained backbone for your classifier.",
+          "extend": "Self-supervised pretraining (autoencoder) turns unlabeled data into a reusable feature backbone.",
+          "tags": [
+            "Autoencoder",
+            "Transfer learning",
+            "Supervised vs unsupervised"
+          ]
         }
       ]
     },
@@ -786,6 +942,40 @@
             "U-Net",
             "ResNet / skip connections"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS20 P7e",
+            "SS20 P7f"
+          ],
+          "q": "You have a trained reconstruction autoencoder. (e) How would you change its architecture to perform semantic segmentation (coin vs background)? (f) What loss function would you use and how?",
+          "answer": "**(e)** Replace the **last/decoder output layer** so it outputs **1 or 2 channels** (one per class) at full image resolution. **(f)** **(Binary) cross-entropy** applied **per pixel** (channel-wise) over the two classes (Dice loss also works).",
+          "extend": "Segmentation head = per-pixel classifier; train with per-pixel cross-entropy.",
+          "tags": [
+            "Convolution",
+            "Autoencoder",
+            "U-Net",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 7.2"
+          ],
+          "q": "You have a pretrained CNN autoencoder and build a U-Net for segmentation by reusing its encoder. What modifications do you make to the decoder?",
+          "answer": "**Add skip connections** from encoder layers to the matching decoder layers (the defining U-Net feature), and **change the final output channels** to the number of segmentation classes.",
+          "extend": "U-Net = autoencoder decoder + encoder→decoder skips + class-count output head.",
+          "tags": [
+            "Convolution",
+            "CNN",
+            "Autoencoder",
+            "U-Net",
+            "ResNet / skip connections"
+          ]
         }
       ]
     },
@@ -882,6 +1072,36 @@
           "q": "Why is a VAE better than a plain AE for generating new, similar product images? What architecture change and loss are needed?",
           "answer": "A **VAE enforces a probability distribution** (Gaussian) on the latent space, so you can **sample** new latents and decode realistic new images (a plain AE's latent has gaps). **Change:** the encoder outputs a **mean and variance** (not a fixed vector). **Loss:** **reconstruction + KL-divergence**.",
           "extend": "VAE's regularized, samplable latent enables generation; encoder→(μ,σ), loss = recon + KL.",
+          "tags": [
+            "Regularization",
+            "Autoencoder",
+            "VAE"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 2.10"
+          ],
+          "q": "Explain the difference between an autoencoder and a variational autoencoder.",
+          "answer": "A **VAE imposes a constraint on the latent distribution** — it forces the bottleneck to follow a known prior (e.g. Gaussian, via a KL-divergence loss) — whereas a plain **autoencoder imposes no structure** on the latent space. This makes a VAE's latent **samplable** for generation.",
+          "extend": "VAE constrains the latent to a known distribution (KL) so you can sample it; AE does not.",
+          "tags": [
+            "Autoencoder",
+            "VAE"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS22 5.6",
+            "SS22 5.7"
+          ],
+          "q": "You trained an autoencoder on MNIST. (5.6) Why does decoding a randomly sampled latent vector not produce a digit? (5.7) How can you train it so random latents decode to MNIST digits?",
+          "answer": "**5.6** Training only maps the **input distribution** into the latent space; this mapping need **not be surjective**, so random latent vectors fall in 'empty' regions the decoder never learned. **5.7** Use a **Variational Autoencoder** — enforce a loss (KL) so the latent follows a known distribution (Gaussian) you can sample.",
+          "extend": "Plain AE latent isn't fully covered; VAE regularizes it to a samplable prior.",
           "tags": [
             "Regularization",
             "Autoencoder",
@@ -1011,6 +1231,51 @@
           "tags": [
             "Autoencoder",
             "GAN"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS21 2.11"
+          ],
+          "q": "In a GAN, what is the input to the generator (1p)? What are the two inputs to the discriminator (1p)?",
+          "answer": "**Generator input:** a **random noise vector** (latent sample). **Discriminator inputs:** **generated/fake images** and **real images** — it learns to tell them apart.",
+          "extend": "G: noise → image; D: sees real + fake and classifies real/fake.",
+          "tags": [
+            "GAN"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS24 1.9"
+          ],
+          "q": "What is true about GANs for image generation?",
+          "answer": "**True:** the *Generator decodes a latent vector into an image*; a *lower generator loss generally means a higher discriminator loss* (adversarial); and *training needs no manual real/fake labeling* (labels come for free from which images are generated). **False:** the Discriminator is **trained jointly**, not used frozen as supervision.",
+          "extend": "G decodes latent→image; G and D losses trade off; real/fake labels are automatic.",
+          "options": [
+            {
+              "text": "When training G, we use a frozen pretrained Discriminator as supervision.",
+              "correct": false
+            },
+            {
+              "text": "The Generator decodes a latent vector into an image.",
+              "correct": true
+            },
+            {
+              "text": "A reduced generator loss generally means an increased discriminator loss.",
+              "correct": true
+            },
+            {
+              "text": "Training a GAN does not require manual real/fake labeling.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "GAN",
+            "Transfer learning"
           ]
         }
       ]
