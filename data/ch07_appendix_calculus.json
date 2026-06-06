@@ -49,6 +49,38 @@
           "tags": [
             "Jacobian"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS26 P1f"
+          ],
+          "q": "When computing gradients of a multi-layer network, which observations hold?",
+          "answer": "**True:** the gradient for a weight **depends on both the loss and the activation preceding that weight**; **backprop must store intermediate activations** from the forward pass; and **Hessian (2nd-derivative) computations are usually avoided** as too expensive. **False:** the per-parameter gradient does depend on the batch.",
+          "extend": "Backprop caches forward activations; weight grad = upstream × input activation; Hessians avoided at scale.",
+          "options": [
+            {
+              "text": "The gradient of each parameter is independent of the batch size used.",
+              "correct": false
+            },
+            {
+              "text": "The gradient for a weight depends on both the loss and the activation preceding that weight.",
+              "correct": true
+            },
+            {
+              "text": "Backpropagation requires storing intermediate activations from the forward pass.",
+              "correct": true
+            },
+            {
+              "text": "Hessian calculations are usually avoided because they are computationally expensive.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Backpropagation",
+            "Jacobian"
+          ]
         }
       ]
     },
@@ -206,6 +238,22 @@
             "Backpropagation",
             "Data leakage"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS26 P4a",
+            "WS26 P4b",
+            "WS26 P4c"
+          ],
+          "q": "2-layer MLP (single sample): $a=W_1x+b_1,\\ h=\\text{ReLU}(a),\\ z=W_2h+b_2,\\ p=\\text{softmax}(z)$, loss $L=-\\ln p_y$ with $y=2$. Given $p=[\\tfrac14,\\tfrac12,\\tfrac14]^\\top,\\ a=[\\tfrac12,-1]^\\top,\\ \\frac{\\partial L}{\\partial h}=[\\tfrac12,-\\tfrac14]^\\top$: (a) loss $L$; (b) $\\frac{\\partial L}{\\partial z}$; (c) $\\frac{\\partial L}{\\partial a}$ and which hidden unit gets zero gradient and why.",
+          "answer": "**(a)** $L=-\\ln p_2=-\\ln\\tfrac12=\\ln 2$. **(b)** softmax+CE gives $\\frac{\\partial L}{\\partial z}=p-\\mathbb{1}_y=[\\tfrac14,\\tfrac12,\\tfrac14]-[0,1,0]=[\\tfrac14,-\\tfrac12,\\tfrac14]^\\top$. **(c)** $\\frac{\\partial L}{\\partial a}=\\frac{\\partial L}{\\partial h}\\odot\\mathbb{1}[a>0]=[\\tfrac12,-\\tfrac14]\\odot[1,0]=[\\tfrac12,0]^\\top$; **hidden unit 2 gets zero gradient** because its pre-activation $a_2=-1<0$ was deactivated by ReLU (derivative 0 there).",
+          "extend": "softmax+CE backward is $p-y$; ReLU backward masks gradients where the pre-activation was negative.",
+          "tags": [
+            "Softmax",
+            "ReLU"
+          ]
         }
       ]
     },
@@ -272,6 +320,57 @@
             "Vanishing gradient",
             "Backpropagation",
             "Normalization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS21 7.4"
+          ],
+          "q": "Two identical trainings differ only in that one normalizes the loss by $1/N$. Does this change the optimal weights? After 10 SGD steps, are the weights the same? Explain.",
+          "answer": "The **optimum is unchanged** — scaling the loss by a constant doesn't move its minimizer. But after 10 steps the **weights differ**, because scaling the loss scales every **gradient by $1/N$**, which is equivalent to using a **different (smaller) effective learning rate** — so the two trajectories diverge.",
+          "extend": "Constant loss scaling ≡ rescaling the LR: same minimum, different path/speed under gradient descent.",
+          "tags": [
+            "Backpropagation",
+            "Optimizers",
+            "Learning rate",
+            "Normalization"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS23 1.9"
+          ],
+          "q": "Which statements about backpropagation are true?",
+          "answer": "**True:** the gradient through **tanh is always ≤ the upstream gradient in magnitude** ($\\tanh'\\le1$), and **sigmoid/tanh/Leaky-ReLU don't flip the gradient's sign** (their derivatives are positive). **False:** vanishing gradients make **earlier** layers learn slower (not deeper); and for $\\partial L/\\partial w=-6$, *decreasing* $w$ *increases* the loss.",
+          "extend": "tanh shrinks gradients (≤1), positive-derivative activations preserve sign; vanishing hits shallow layers.",
+          "options": [
+            {
+              "text": "The gradient through tanh is always ≤ the upstream gradient in magnitude.",
+              "correct": true
+            },
+            {
+              "text": "Sigmoid/tanh/Leaky-ReLU won't change the sign of the gradient.",
+              "correct": true
+            },
+            {
+              "text": "Vanishing gradient causes deeper layers to learn more slowly than earlier layers.",
+              "correct": false
+            },
+            {
+              "text": "If dL/dw = -6, decreasing this weight slightly would decrease the loss.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
           ]
         }
       ]

@@ -183,6 +183,96 @@
             "LSTM",
             "ResNet / skip connections"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 2.5"
+          ],
+          "q": "Name one advantage and one disadvantage of Recurrent Neural Networks in general.",
+          "answer": "**Advantage (any):** handles **sequential data of arbitrary length**, can model any output / reuse past output information, lightweight (shared weights). **Disadvantage (any):** **vanishing/exploding gradients**, no long-term memory, hard to **parallelize**, long training time.",
+          "extend": "RNN trades flexible variable-length sequence modeling for unstable gradients and poor parallelism.",
+          "tags": [
+            "Exploding gradient",
+            "RNN"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 7.1"
+          ],
+          "q": "A vanilla RNN cell is $h_t=\\tanh(V h_{t-1}+W x_t)$ with $x_t\\in\\mathbb{R}^4,h_t\\in\\mathbb{R}^{12}$. How many parameters are in the cell (neglect bias)?",
+          "answer": "$W$ is $12\\times4$ and $V$ is $12\\times12$, so $4\\cdot12+12\\cdot12=48+144=\\mathbf{192}$ parameters (add $+12$ if a bias is included).",
+          "extend": "RNN cell params $= h(x+h)$ (+bias); the $h\\times h$ recurrent matrix dominates.",
+          "tags": [
+            "Tanh",
+            "RNN",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 7.2"
+          ],
+          "q": "For $h_t=\\tanh(V h_{t-1}+W x_t)$, is it true that if $x_t$ is the zero vector then $h_t=h_{t-1}$?",
+          "answer": "**False (in general).** With $x_t=0$, $h_t=\\tanh(V h_{t-1})$, which is **not** equal to $h_{t-1}$ unless $h_{t-1}$ happens to be a fixed point of $\\tanh(V\\cdot)$ (e.g. $h_{t-1}=0$). The hidden state still transforms through $V$ and the non-linearity.",
+          "extend": "Zero input ≠ identity update: $V$ and $\\tanh$ still act on the previous hidden state.",
+          "tags": [
+            "Tanh",
+            "Activation functions",
+            "RNN"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 7.3"
+          ],
+          "q": "A 1-D ReLU-RNN is $h_t=\\text{ReLU}(V h_{t-1}+W x_t)$ with $V=1,W=2,h_0=-3,x_1=1,x_2=2,x_3=0$. Compute $h_1,h_2,h_3$.",
+          "answer": "$h_1=\\text{ReLU}(1\\cdot({-}3)+2\\cdot1)=\\text{ReLU}({-}1)=0$; $h_2=\\text{ReLU}(0+2\\cdot2)=4$; $h_3=\\text{ReLU}(4+0)=4$.",
+          "extend": "ReLU clips the negative first step to 0, then the state accumulates the inputs.",
+          "tags": [
+            "ReLU",
+            "RNN"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS26 P1h"
+          ],
+          "q": "Which statements about RNNs are correct?",
+          "answer": "**True:** RNNs *process sequences sequentially, one time step at a time*, and *share parameters across time steps*. **False:** RNNs **cannot** be fully parallelized over the sequence length, and they are **not** well-suited to very long-range dependencies (vanishing gradients).",
+          "extend": "RNN = sequential + weight-shared across time; poor at long-range, not parallelizable over length.",
+          "options": [
+            {
+              "text": "RNNs can be fully parallelized over the sequence length during training.",
+              "correct": false
+            },
+            {
+              "text": "RNNs process sequences sequentially, one time step at a time.",
+              "correct": true
+            },
+            {
+              "text": "RNNs are well-suited for modeling very long-range dependencies.",
+              "correct": false
+            },
+            {
+              "text": "RNNs share parameters across time steps.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Vanishing gradient",
+            "RNN"
+          ]
         }
       ]
     },
@@ -313,6 +403,22 @@
             "Sigmoid",
             "LSTM",
             "ResNet / skip connections"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS23 2.4"
+          ],
+          "q": "Describe gradient clipping (2p) and explain why it particularly benefits RNN training (1p).",
+          "answer": "**Gradient clipping** caps the magnitude (norm or value) of gradients during backprop to a threshold, preventing them from becoming **excessively large**. RNNs are especially prone to **exploding gradients** because the same recurrent weight is applied across many time steps, so clipping keeps their training **stable**.",
+          "extend": "Clipping bounds the gradient norm — the standard fix for RNN exploding gradients (not vanishing).",
+          "tags": [
+            "Exploding gradient",
+            "Backpropagation",
+            "RNN",
+            "LSTM"
           ]
         }
       ]
@@ -579,6 +685,63 @@
             "Transformer",
             "Attention"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS26 P7a"
+          ],
+          "q": "Transition from RNNs to Transformers: (1) why can a Transformer train much faster than an RNN on the same hardware? (2) Compare the 'path length' (sequential ops for info to travel between two distant tokens) of an RNN vs a Transformer.",
+          "answer": "**(1) Parallelization:** RNNs process tokens **sequentially**; Transformers have **no recurrence** and process **all tokens simultaneously**. **(2) Path length:** RNN path length is **$O(n)$** (linear in sequence length); Transformer path length is **constant $O(1)$** (any two tokens attend directly).",
+          "extend": "Attention = parallel + constant path length; recurrence = sequential + linear path length.",
+          "tags": [
+            "RNN",
+            "Transformer",
+            "Attention"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P7b"
+          ],
+          "q": "How are Q, K, V generated in self-attention vs cross-attention blocks (ignore multi-head)?",
+          "answer": "**Self-attention:** Q, K, V come from **three separate linear layers applied to the same input**. **Cross-attention:** Q and K are linear projections of one input ($a$, e.g. the decoder/encoder output) while **V is a projection of the other input** ($b$) — letting one sequence query another.",
+          "extend": "Self-attn: one source for Q,K,V. Cross-attn: queries from one sequence, keys/values from another.",
+          "tags": [
+            "Transformer",
+            "Attention"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P7c"
+          ],
+          "q": "Why do Transformers use multiple attention heads rather than a single larger head?",
+          "answer": "Multiple heads attend to **different representation subspaces / relationships** in parallel, increasing expressiveness — each head can capture a distinct type of dependency that a single head would average away.",
+          "extend": "Multi-head = several parallel attention 'views' → richer relational modeling than one big head.",
+          "tags": [
+            "Transformer",
+            "Attention"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P7d"
+          ],
+          "q": "In a Transformer, what are the purposes of self- vs cross-attention, and which blocks use masking and why?",
+          "answer": "**Self-attention:** gathers information **within** a sequence (encoder over input, decoder over generated output). **Cross-attention:** lets the **decoder query the encoder's input** sequence. **Masking** is used in the **decoder self-attention** to **prevent attending to future tokens** (no 'cheating' / look-ahead during training).",
+          "extend": "Self-attn = intra-sequence, cross-attn = decoder→encoder; causal mask keeps decoding autoregressive.",
+          "tags": [
+            "Transformer",
+            "Attention"
+          ]
         }
       ]
     },
@@ -674,6 +837,22 @@
           ],
           "q": "Why is positional encoding used in Transformers, and what problem arises without it?",
           "answer": "It **adds information about token position** in the sequence. **Without it**, attention treats the input as an **unordered set** (no inherent notion of order), so the model can't use word order — yet order changes meaning ('dog bites man' ≠ 'man bites dog').",
+          "extend": "No recurrence/convolution ⇒ no built-in order ⇒ positional encoding supplies it.",
+          "tags": [
+            "Convolution",
+            "Transformer",
+            "Attention",
+            "Positional encoding"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS23 2.2"
+          ],
+          "q": "Why is positional encoding used in the transformer architecture for sequential data (1p)? What problem arises without it (2p)?",
+          "answer": "It **adds information about each token's position** in the sequence. **Without it**, self-attention treats the input as an **unordered set** — there is no inherent notion of order — yet **order changes meaning** ('dog bites man' ≠ 'man bites dog'), so the model couldn't distinguish reorderings.",
           "extend": "No recurrence/convolution ⇒ no built-in order ⇒ positional encoding supplies it.",
           "tags": [
             "Convolution",

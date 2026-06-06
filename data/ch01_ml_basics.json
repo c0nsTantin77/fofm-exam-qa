@@ -152,6 +152,73 @@
             "Clustering / PCA",
             "Regression"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS23 2.1"
+          ],
+          "q": "Two binary classifiers: A gets 50% accuracy, B gets 5%. With no further training, which is more useful and why?",
+          "answer": "**B.** A 50% binary classifier is **no better than random**. A 5% classifier is **consistently wrong**, so simply **flipping its outputs** yields ~95% accuracy — it has actually learned a useful signal.",
+          "extend": "Far-below-50% on a binary task = useful (just invert); exactly 50% = no information.",
+          "tags": []
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS23 7.3"
+          ],
+          "q": "A 100-class classifier gets 95%/90% train/val accuracy but <32% on its worst class (train and val). Assuming correct labels, give a reason and a fix.",
+          "answer": "**Class imbalance** (too few examples of that class) or that class coming from a **different sub-domain**. **Fix:** rebalance — **augment / oversample the minority class**, **stratified sampling**, or **loss weighting**.",
+          "extend": "Per-class failure with correct labels ⇒ imbalance/under-representation; rebalance the data or loss.",
+          "tags": [
+            "Dataset splits",
+            "Class imbalance"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS23 1.6"
+          ],
+          "q": "Which statements about Semantic Segmentation are true?",
+          "answer": "**True:** *its precision can be influenced by lighting conditions and image quality*. **False:** it is **supervised** (needs pixel labels), it is **pixel-level** (not broad whole-image categories), and a fixed architecture **cannot** handle an arbitrary number of classes without change (the output layer depends on #classes).",
+          "extend": "Semantic segmentation = supervised, pixel-wise classification; output channels tied to #classes.",
+          "options": [
+            {
+              "text": "Semantic segmentation is unsupervised and needs no labels.",
+              "correct": false
+            },
+            {
+              "text": "It classifies whole images into broad categories without pixel precision.",
+              "correct": false
+            },
+            {
+              "text": "One architecture handles any number of classes without change.",
+              "correct": false
+            },
+            {
+              "text": "Precision can be influenced by lighting conditions and image quality.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Supervised vs unsupervised"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Mock II.2"
+          ],
+          "q": "You auto-screen thousands of job applications, sending offers or rejections. Which matters more for the model: precision or recall? Explain. (Precision = TP/predicted-positive, Recall = TP/actual-positive.)",
+          "answer": "**Precision** matters more. With thousands of applicants, **false negatives are tolerable** (missing a few good candidates is fine), but **false positives are costly** (offering jobs to unsuitable people). High precision = a low false-positive rate.",
+          "extend": "Choose precision when false positives are expensive; recall when missing positives is expensive.",
+          "tags": []
         }
       ]
     },
@@ -301,6 +368,56 @@
             "Supervised vs unsupervised",
             "Clustering / PCA"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS22 1.9"
+          ],
+          "q": "Which methods can be used in unsupervised learning?",
+          "answer": "**Autoencoder, PCA, and K-means** are unsupervised (no labels). **Linear regression** is supervised (needs target values).",
+          "extend": "Unsupervised = learn structure without labels: AE, PCA, K-means. Regression needs targets.",
+          "options": [
+            {
+              "text": "Autoencoder.",
+              "correct": true
+            },
+            {
+              "text": "PCA.",
+              "correct": true
+            },
+            {
+              "text": "K-means.",
+              "correct": true
+            },
+            {
+              "text": "Linear Regression.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Autoencoder",
+            "Supervised vs unsupervised",
+            "Clustering / PCA",
+            "Regression"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS21 2.6"
+          ],
+          "q": "Can one encounter overfitting in an unsupervised learning setting? Give a yes/no with reasoning or an example.",
+          "answer": "**Yes.** Examples: **K-means with $k=N$** (each point its own cluster), an **autoencoder with too large a bottleneck** (learns the identity / memorizes), or **PCA keeping too many components**. The model fits noise/specifics instead of structure.",
+          "extend": "Overfitting isn't label-specific: any over-flexible unsupervised model can memorize rather than generalize.",
+          "tags": [
+            "Overfitting",
+            "Autoencoder",
+            "Supervised vs unsupervised",
+            "Clustering / PCA"
+          ]
         }
       ]
     },
@@ -432,6 +549,46 @@
             "Dataset splits",
             "i.i.d. / distribution"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 8.1"
+          ],
+          "q": "Explain the purpose of the train, validation, and test splits and how each is used. What percentages are common?",
+          "answer": "**Train** (>50%, e.g. 60–80%): fits the **model parameters** (compute gradients, optimize loss). **Validation:** **hyperparameter tuning** and checking generalization on unseen data (model selection, early stopping). **Test:** the **final, one-time evaluation** of overall performance. Common split: 60/20/20, 70/15/15, or 80/10/10.",
+          "extend": "Train fits weights, val tunes hyperparameters / selects models, test reports the final unbiased score once.",
+          "tags": [
+            "Regularization",
+            "Dataset splits"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS21 2.1"
+          ],
+          "q": "In k-fold cross-validation, a larger $k$ increases confidence in the validation score. What is a practical disadvantage and why?",
+          "answer": "**Higher training cost / time.** With larger $k$ you train and validate the model **$k$ separate times** (on nearly the full dataset each time), so compute grows roughly linearly with $k$.",
+          "extend": "More folds → more confidence but $k$× the training runs; it's a compute–reliability trade-off.",
+          "tags": [
+            "Dataset splits"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P3a"
+          ],
+          "q": "For handwritten-digit recognition, describe how you would split your dataset so the model is trained, tuned, and evaluated.",
+          "answer": "Use **three disjoint splits**: a **training** set (the majority, >50%), a **validation** set (for hyperparameter tuning / model selection), and a **test** set (final evaluation). E.g. 70/15/15 or 80/10/10.",
+          "extend": "Three splits: train fits, val tunes, test reports — training portion >50%.",
+          "tags": [
+            "Dataset splits"
+          ]
         }
       ]
     },
@@ -535,6 +692,49 @@
             "Transfer learning",
             "i.i.d. / distribution"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 8.4"
+          ],
+          "q": "Your classifier trained on Amazon product photos works well there, but misclassifies objects you photograph yourself. Give one reason.",
+          "answer": "**Domain gap** — your own photos come from a **different data distribution** (lighting, backgrounds, angles, camera) than the Amazon training images, so the learned features don't transfer.",
+          "extend": "Train/deploy distribution mismatch (domain shift) is the classic cause of good-train / bad-real performance.",
+          "tags": [
+            "i.i.d. / distribution"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS21 7.3"
+          ],
+          "q": "A model with good train/val curves performs poorly when deployed in the real world. Possible reason and fix?",
+          "answer": "**Reason:** the **test/real data comes from a different distribution** than train/val (domain gap). **Fix:** make the training data more representative — **augmentation**, **add data** from the deployment domain, or otherwise align the distributions.",
+          "extend": "Good train/val but bad deployment ⇒ domain shift; close the gap with more/representative data.",
+          "tags": [
+            "Data augmentation",
+            "Dataset splits",
+            "i.i.d. / distribution"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 7.1",
+            "SS23 7.2"
+          ],
+          "q": "A depth-prediction dataset stores all daytime scenes first, then nighttime; consecutive frames are 20 ms apart. (7.1) A batch contains only consecutive 'sun-000x' frames — state and explain one problem. (7.2) Why shuffle before splitting into train/val/test?",
+          "answer": "**7.1** The batch is **homogeneous** (all sunny, near-duplicate frames), so it **doesn't represent the dataset** → **biased gradient updates** toward daytime and poor night-time generalization. **7.2** Shuffling makes each **split representative of the overall distribution**, avoiding day/night domain mismatch between train and val/test.",
+          "extend": "Sorted/consecutive data → unrepresentative batches and splits; shuffle to mix the distribution.",
+          "tags": [
+            "Dataset splits",
+            "i.i.d. / distribution"
+          ]
         }
       ]
     },
@@ -610,6 +810,37 @@
           "extend": "Val < train is a red flag for leakage or an unrepresentative/easy validation split, or for heavy train-only augmentation.",
           "tags": [
             "Data augmentation",
+            "Dataset splits",
+            "Data leakage"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS21 2.3"
+          ],
+          "q": "Explain the difference between the validation set and the test set — the role of each and how they are used differently.",
+          "answer": "The **validation set** is used **during** development to test generalization while **tuning hyperparameters** / selecting models. The **test set** is **untouched during training** and used **only once at the end** to measure generalization on truly unseen data.",
+          "extend": "Validation = repeated, tunes choices; test = touched once, reports the final unbiased number.",
+          "tags": [
+            "Dataset splits",
+            "Data leakage"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS23 2.5"
+          ],
+          "q": "During training you notice the validation loss is smaller than the training loss. Name two possible explanations.",
+          "answer": "Any two: the **validation set is easier / simpler**; **training loss is averaged over the whole epoch** while validation is measured at the end (after the model improved); **dropout/regularization** is active in training but not validation; or a **bug / data leakage**.",
+          "extend": "Val < train usually means train-time regularization, epoch-averaging, or an easy/leaky val split.",
+          "tags": [
+            "Activation functions",
+            "Dropout",
+            "Regularization",
             "Dataset splits",
             "Data leakage"
           ]
@@ -847,6 +1078,99 @@
             "Overfitting",
             "Data augmentation"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 2.8"
+          ],
+          "q": "Define data augmentation (0.5p), name two techniques for image classification (0.5p each), and explain how it can be problematic in supervised training (1p).",
+          "answer": "**Definition:** artificially increase the training data by adding **transformations** of existing samples. **Techniques:** crop, flip (rotation, color jitter…). **Problem:** a transform can make the **ground-truth label wrong** — e.g. after cropping, the object/label no longer matches the image (label–data mismatch).",
+          "extend": "Augment to grow data, but label-altering transforms (aggressive crop, vertical flip) corrupt supervision.",
+          "tags": [
+            "Data augmentation",
+            "Supervised vs unsupervised"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS21 1.1"
+          ],
+          "q": "For MNIST handwritten-digit classification, which data augmentations are suitable?",
+          "answer": "**Suitable:** add Gaussian noise, rotate by $\\pm10°$, change contrast — these keep the digit recognizable and label-preserving. **Unsuitable:** **vertical flip** (it changes/destroys the digit, e.g. turning a 6 upside down).",
+          "extend": "Augment within the data's natural variation; vertical-flipping digits creates out-of-distribution, mislabeled samples.",
+          "options": [
+            {
+              "text": "Add Gaussian noise to the images.",
+              "correct": true
+            },
+            {
+              "text": "Vertically flip the images.",
+              "correct": false
+            },
+            {
+              "text": "Rotate the images by 10 degrees.",
+              "correct": true
+            },
+            {
+              "text": "Change the contrast of the images.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Data augmentation"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P2a"
+          ],
+          "q": "What is data augmentation (what does it do and its purpose)? List two techniques for RGB images.",
+          "answer": "Data augmentation **artificially increases the dataset size** by applying label-preserving **transformations** to existing samples; it **improves generalization and helps prevent overfitting**. Techniques: rotation, cropping, flipping, color jittering, adding noise.",
+          "extend": "More in-distribution variety ⇒ invariance and less overfitting, no new data collection needed.",
+          "tags": [
+            "Overfitting",
+            "Data augmentation"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS23 1.8"
+          ],
+          "q": "Which statements about data augmentation in a supervised setup are true?",
+          "answer": "**True:** it *generates additional labeled data for training* and *helps reduce overfitting by introducing variations*. **False:** it is **not** image-only (works for audio, text…), and it is applied to **training**, not the test set.",
+          "extend": "Augmentation expands the labeled train set with label-preserving variations; never applied to test.",
+          "options": [
+            {
+              "text": "Data augmentation generates additional labeled data for training.",
+              "correct": true
+            },
+            {
+              "text": "Data augmentation can help reduce overfitting by introducing variations.",
+              "correct": true
+            },
+            {
+              "text": "Data augmentation is only applicable to image data.",
+              "correct": false
+            },
+            {
+              "text": "Data augmentation should only be applied to the testing set.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Overfitting",
+            "Data augmentation",
+            "Dataset splits",
+            "Supervised vs unsupervised"
+          ]
         }
       ]
     },
@@ -933,6 +1257,22 @@
             "Normalization",
             "Data leakage"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 7.4"
+          ],
+          "q": "When loading data you apply both data augmentation and input normalization. To which splits (train/val/test) does each apply, and why?",
+          "answer": "**Data augmentation:** only the **training** split — it adds diversity to reduce overfitting; val/test must stay on **original, unmodified** data for fair evaluation. **Normalization:** **all splits** — the model expects inputs in a consistent range/distribution at both training and inference.",
+          "extend": "Augment train only; normalize everything (it's a deterministic preprocessing the model relies on).",
+          "tags": [
+            "Overfitting",
+            "Data augmentation",
+            "Normalization",
+            "Dataset splits"
+          ]
         }
       ]
     },
@@ -993,6 +1333,74 @@
           "answer": "Any two: **use a GPU/accelerator** for computation; **load the images into RAM** before training (feasible for a small dataset); **pre-download all labels** in advance to avoid per-iteration network latency.",
           "extend": "Remove per-iteration I/O bottlenecks: cache data in RAM, prefetch labels, and use parallel workers — the DataLoader's job.",
           "tags": [
+            "Dataloader"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P6e"
+          ],
+          "q": "In PyTorch: (1) the primary responsibility of the Dataset class, and (2) three functionalities of the DataLoader.",
+          "answer": "**Dataset:** defines how to **access a single sample** (and its label) by index. **DataLoader:** handles **batching**, **shuffling**, and **parallel loading** (multiprocessing workers) — also collation and memory pinning.",
+          "extend": "Dataset = per-sample access; DataLoader = batch/shuffle/parallelize the stream.",
+          "tags": [
+            "Dataloader"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 2.6"
+          ],
+          "q": "Give two advantages of training with a batch of inputs rather than a single input at a time.",
+          "answer": "**Better hardware utilization** — processing many inputs in parallel exploits GPUs for faster training; and **improved/more stable optimization** — averaging the gradient over a batch gives a **lower-variance estimate**, leading to smoother convergence (also better memory/I/O efficiency).",
+          "extend": "Batching = parallel hardware use + lower-variance gradient ⇒ faster, steadier training.",
+          "tags": [
+            "Dataloader"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 4.7"
+          ],
+          "q": "Your 50,000-sample training set fits entirely in (V-)RAM and you can do math on all of it at once. How can you leverage this to optimize training?",
+          "answer": "Use the **whole dataset at once** — i.e. **full-batch Gradient Descent** (a single exact gradient per step), or even a **second-order / (Gauss-)Newton** method to exploit curvature and **converge in far fewer iterations**, since memory is no longer a constraint.",
+          "extend": "All data in RAM ⇒ full-batch GD or second-order methods become feasible (no mini-batch noise).",
+          "tags": [
+            "Optimizers",
+            "Dataloader"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 7.5"
+          ],
+          "q": "In PyTorch, state the input/output of `Dataset.__getitem__` in a supervised setting, and explain the role of the DataLoader.",
+          "answer": "`__getitem__` takes an **index/key** and returns the **sample and its label** (a tuple/dict of input + ground truth). The **DataLoader** wraps the Dataset to provide **batching** (also shuffling and parallel loading) for efficient training.",
+          "extend": "Dataset.__getitem__ = one (input,label) by index; DataLoader = batch/shuffle/parallelize.",
+          "tags": [
+            "Dataloader",
+            "Supervised vs unsupervised"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 7.6"
+          ],
+          "q": "Adding random horizontal flip as augmentation makes both train and val loss stay high. What's a likely reason (depth-prediction task)?",
+          "answer": "You probably **flipped the input image but not the ground-truth depth map** (or the flip is invalid for the target) — the input no longer matches its label, so the model can't learn. The flip must be applied **consistently to the target**.",
+          "extend": "Geometric augmentations must transform the label too; otherwise input–target pairs become inconsistent.",
+          "tags": [
+            "Data augmentation",
             "Dataloader"
           ]
         }
@@ -1058,6 +1466,19 @@
             "Class imbalance",
             "Loss functions",
             "Transfer learning"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P6d"
+          ],
+          "q": "A dataset has 400 images of label 0 and 100 of label 1. (1) What problem do you foresee? (2) Two techniques to address it without collecting more data.",
+          "answer": "(1) **Class imbalance** → the network **biases toward label 0**; overall accuracy may look high but **label-1 performance is poor**. (2) **Oversample the minority** (or undersample the majority), and **use class weighting in the loss**.",
+          "extend": "Imbalance biases toward the majority; rebalance via resampling or loss weighting.",
+          "tags": [
+            "Class imbalance"
           ]
         }
       ]

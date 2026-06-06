@@ -214,6 +214,117 @@
             "Convolution",
             "Parameter counting"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS22 1.3"
+          ],
+          "q": "Which propositions about a Conv layer are true?",
+          "answer": "**True:** *the output depth equals the number of filters*. **False:** the parameter count does **not** depend on padding nor on the input's width/height (only on $k$, $C_{in}$, $C_{out}$); and the conv filter's channel count **must match** the input's channels (they cannot differ).",
+          "extend": "Output channels = #filters; params independent of spatial size/padding; filter depth = input depth.",
+          "options": [
+            {
+              "text": "The total number of parameters depends on padding.",
+              "correct": false
+            },
+            {
+              "text": "The total number of parameters depends on the width and height of the input.",
+              "correct": false
+            },
+            {
+              "text": "The output depth is the same as the number of filters.",
+              "correct": true
+            },
+            {
+              "text": "The channels of the input image and filters can be different.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Convolution",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 2.4"
+          ],
+          "q": "A conv layer has kernel size 3, 3 filters, stride 1, padding 1. Give the weight shape (order: Kernels, Channels, H, W) and write the weights explicitly so the layer is the identity for an RGB image.",
+          "answer": "Shape $W=(3,3,3,3)$. For the **identity**, each output channel copies its matching input channel through the kernel center: $W[0,0,1,1]=W[1,1,1,1]=W[2,2,1,1]=1$, all other entries $0$.",
+          "extend": "Identity conv = center-tap on the matching channel, zero elsewhere (a per-channel pass-through).",
+          "tags": [
+            "Convolution",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS23 1.8"
+          ],
+          "q": "For a conv layer (kernel $k$, padding 1, stride 1, $m$ filters) on input $C\\times N\\times N$, which affect the output shape?",
+          "answer": "**$N$, $k$, and $m$** affect the output shape (spatial size from $N,k$; output channels $=m$). The input channel count **$C$ does not** change the output shape (only per-filter depth).",
+          "extend": "Output shape = (m, H_out, W_out); $C$ sets filter depth, not the output dimensions.",
+          "options": [
+            {
+              "text": "N",
+              "correct": true
+            },
+            {
+              "text": "k",
+              "correct": true
+            },
+            {
+              "text": "m",
+              "correct": true
+            },
+            {
+              "text": "C",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Convolution",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 6.1",
+            "SS23 6.3"
+          ],
+          "q": "Input $3\\times375\\times375$, structure [Conv–ReLU–MaxPool]×4 (conv $k{=}3,s{=}1,p{=}0$, channels 16,32,64,16; pools $2\\times2,s{=}2$). (6.1) Parameters of the first conv (with bias)? (6.3) Output size after the 4th pooling layer (show steps).",
+          "answer": "**6.1** $(3\\cdot3)\\cdot3\\cdot16+16=432+16=\\mathbf{448}$. **6.3** Each block: conv $\\frac{n-3}{1}+1$, then pool $\\lfloor\\frac{\\cdot-2}{2}\\rfloor+1$ (floor): $375\\to186\\to92\\to45\\to21$, depth 16 → **$16\\times21\\times21$**.",
+          "extend": "Conv params $=k^2C_{in}C_{out}+C_{out}$; track spatial size with floor division through each conv+pool.",
+          "tags": [
+            "ReLU",
+            "Pooling",
+            "Convolution",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS23 6.2"
+          ],
+          "q": "For the same net, what is the receptive field of a neuron after the 3rd convolutional layer (Conv1→Pool1→Conv2→Pool2→Conv3, conv $k{=}3$, pool $2\\times2,s{=}2$)?",
+          "answer": "Step the RF forward: Conv1 $3$ → Pool1 $3+1(2{-}1)=4$ → Conv2 $4+(1\\cdot2)(3{-}1)=8$ → Pool2 $8+(1\\cdot2\\cdot1)(2{-}1)=10$ → Conv3 $10+(1\\cdot2\\cdot1\\cdot2)(3{-}1)=\\mathbf{18}$.",
+          "extend": "RF accumulates kernel growth scaled by the product of preceding strides (pools have stride 2).",
+          "tags": [
+            "L1/L2",
+            "Receptive field",
+            "Convolution",
+            "Parameter counting"
+          ]
         }
       ]
     },
@@ -394,6 +505,90 @@
             "CNN",
             "Fully-connected"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 2.9"
+          ],
+          "q": "For MNIST classification, which is more robust to translation of the digits: a 3-layer perceptron or LeNet? Why?",
+          "answer": "**LeNet.** It uses **convolutional layers**, which are **translation-equivariant** (and with pooling, locally translation-invariant), so a shifted digit still activates the same features — unlike the fully-connected perceptron.",
+          "extend": "Conv weight-sharing ⇒ translation robustness; an MLP must relearn each shifted position.",
+          "tags": [
+            "Pooling",
+            "Convolution",
+            "Fully-connected",
+            "Classic architectures"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS22 1.7"
+          ],
+          "q": "Among FC, CNN and RNN, in which architecture(s) does weight sharing occur across an input?",
+          "answer": "**CNN** (the same filter slides across all spatial positions) and **RNN** (the same weights are reused at every time step). A **fully-connected** layer has a separate weight per connection — no sharing.",
+          "extend": "Weight sharing = the same parameters reused across positions/time: CNNs (space) and RNNs (time).",
+          "options": [
+            {
+              "text": "FC",
+              "correct": false
+            },
+            {
+              "text": "CNN",
+              "correct": true
+            },
+            {
+              "text": "RNN",
+              "correct": true
+            },
+            {
+              "text": "None",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Convolution",
+            "CNN",
+            "Fully-connected",
+            "RNN"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS21 1.3"
+          ],
+          "q": "For a fully-convolutional 2D CNN, if we double the spatial dimensions of the input images...",
+          "answer": "**True:** *the number of network parameters stays the same* (conv weights are independent of input size). **False:** params don't double; the receptive field of a pixel doesn't decrease; and dropout's $p$ is not corrected to $\\sqrt p$ at test time.",
+          "extend": "Conv params are tied to kernels/channels, not input resolution — fully-conv nets accept any size.",
+          "options": [
+            {
+              "text": "...the number of network parameters doubles.",
+              "correct": false
+            },
+            {
+              "text": "...the number of network parameters stays the same.",
+              "correct": true
+            },
+            {
+              "text": "...the receptive field of a pixel can decrease.",
+              "correct": false
+            },
+            {
+              "text": "...the dropout coefficient p must be corrected to sqrt(p) at test time.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Dropout",
+            "Receptive field",
+            "Convolution",
+            "CNN"
+          ]
         }
       ]
     },
@@ -493,6 +688,71 @@
           "extend": "RF grows from the kernel size (first conv) to the entire image (a fully-connected neuron sees everything).",
           "tags": [
             "Receptive field",
+            "Convolution",
+            "Fully-connected"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS22 2.3"
+          ],
+          "q": "A CNN has three layers: $5\\times5$ Conv (stride 2) → $3\\times3$ Conv (stride 2) → $3\\times3$ Conv (stride 2). What is the receptive field of an output pixel (give it as $M\\times M$)?",
+          "answer": "**$17\\times17$.** Working back: $r=1\\to5\\to5+2(3{-}1)=9\\to9+(2\\cdot2)(3{-}1)=17$. (Or forward: $3\\cdot2+3-2=7$, $7\\cdot2+5-2=17$.)",
+          "extend": "Strides multiply the jump: each deeper layer's kernel growth is scaled by the product of preceding strides.",
+          "tags": [
+            "Receptive field",
+            "Convolution",
+            "CNN"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS26 P5a",
+            "WS26 P5c"
+          ],
+          "q": "A 1D conv net: Input $1\\times1000$ → Conv1D($k{=}5,s{=}1,p{=}2$,8 filt) → MaxPool1D($k{=}2,s{=}2$) → Conv1D($k{=}3,s{=}1,p{=}1$,8 filt). (a) Receptive field of a Layer-3 output entry. (c) How to exactly double that RF without changing parameter count?",
+          "answer": "**(a)** Back through layers: L3 sees 3 → MaxPool spans $2(3{-}1)+2=6$ → L1 spans $1(6{-}1)+5=\\mathbf{10}$. **(c)** **Increase the stride of Layer 1 to 3** (then $(6{-}1)\\cdot3+5=20$) — this doubles the RF using the same weights (dilated convolution is a partial alternative).",
+          "extend": "Stride in an early layer multiplies the downstream RF without adding parameters.",
+          "tags": [
+            "L1/L2",
+            "Receptive field",
+            "Pooling",
+            "Convolution",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P5b"
+          ],
+          "q": "Compute the total trainable parameters of the 1D model above with a final FC(→4) (input length 1000, Conv layers preserve length, one pool halves it).",
+          "answer": "**L1:** $(5\\cdot1+1)\\cdot8=48$. **L3:** $(3\\cdot8+1)\\cdot8=200$. **FC:** length $1000/2=500$, features $500\\cdot8=4000$, weights $4000\\cdot4+4=16004$. **Total $=48+200+16004=\\mathbf{16252}$.**",
+          "extend": "Conv1D params $=(kC_{in}+1)C_{out}$; the flattened FC dominates the count.",
+          "tags": [
+            "Receptive field",
+            "Convolution",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS23 4.1"
+          ],
+          "q": "Explain 'receptive field' (1p). For LeNet (conv1 → maxpool1 → … → FC), what are the receptive fields after conv1 (kernel 5, no padding) and maxpool1, and of a neuron in FC layer f1?",
+          "answer": "**Receptive field** = the region of the **input** that an output feature depends on. After **conv1** (5×5): $5\\times5$. After **maxpool1** (2×2): $6\\times6$. A neuron in the **fully-connected layer f1** sees the **whole image** ($32\\times32$).",
+          "extend": "RF grows kernel-by-kernel from conv1 to the full image at the first FC layer.",
+          "tags": [
+            "L1/L2",
+            "Receptive field",
+            "Pooling",
             "Convolution",
             "Fully-connected"
           ]
@@ -616,6 +876,41 @@
             "Pooling",
             "Parameter counting"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS26 P1g"
+          ],
+          "q": "Which statements correctly describe pooling layers?",
+          "answer": "**True:** a convolutional layer **can model average pooling** (a fixed averaging kernel), and **pooling increases the receptive field** of deeper layers. **False:** average pooling does **not** introduce non-linearity, and a conv layer **cannot** model max pooling (max is non-linear).",
+          "extend": "Avg-pool ≈ a fixed conv (linear); max-pool is non-linear and not expressible as a conv; pooling grows the RF.",
+          "options": [
+            {
+              "text": "A convolutional layer can correctly model an Average-Pooling layer.",
+              "correct": true
+            },
+            {
+              "text": "Average-Pooling introduces non-linearity to the network.",
+              "correct": false
+            },
+            {
+              "text": "A convolutional layer can correctly model a Max-Pooling layer.",
+              "correct": false
+            },
+            {
+              "text": "Pooling layers increase the receptive field of deeper layers.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Activation functions",
+            "Backpropagation",
+            "Receptive field",
+            "Pooling",
+            "Convolution"
+          ]
         }
       ]
     },
@@ -723,6 +1018,38 @@
             "Convolution",
             "Parameter counting"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 2.1"
+          ],
+          "q": "Give one application scenario for a $1\\times1$ convolution.",
+          "answer": "Any of: **change / shrink the number of channels** (keeping spatial size and scale), **add a non-linearity**, **stack more layers cheaply** (vs $3\\times3/5\\times5$), **reduce computational cost**, or replace FC layers — e.g. the **Inception / GoogLeNet** bottleneck layers.",
+          "extend": "1×1 conv = cheap per-pixel channel reshaping + extra non-linearity (the Inception trick).",
+          "tags": [
+            "Activation functions",
+            "1×1 convolution",
+            "Convolution",
+            "Fully-connected",
+            "Classic architectures"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 6.4"
+          ],
+          "q": "Convert the classifier's two FC layers into a fully-convolutional network. State the shapes of the new weight matrices. (Final conv output $16\\times21\\times21$, FC1→2048, FC2→200.)",
+          "answer": "Replace each FC with a conv: **FC1 → conv of shape $(2048\\times16\\times21\\times21)$** (a kernel matching the full feature map), and **FC2 → $1\\times1$ conv of shape $(200\\times2048\\times1\\times1)$**.",
+          "extend": "FC→conv: first layer's kernel spans the whole feature map; later FCs become 1×1 convs.",
+          "tags": [
+            "1×1 convolution",
+            "Convolution",
+            "Fully-connected"
+          ]
         }
       ]
     },
@@ -777,6 +1104,33 @@
             "Weight initialization",
             "Convolution",
             "Data augmentation"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS23 5.1",
+            "WS23 5.2"
+          ],
+          "q": "A $3\\times3$ kernel $\\begin{bmatrix}0&-1&0\\\\-1&5&-1\\\\0&-1&0\\end{bmatrix}$ is convolved over an image. (5.1) Compute the forward pass for a given patch. (5.2) What effect does this kernel have?",
+          "answer": "**5.2** It is a **sharpening** filter: the center weight 5 boosts the pixel while the negative neighbors subtract the local average (an unsharp-mask / high-pass effect). **5.1** Each output = $5\\cdot(\\text{center})-(\\text{4-neighbour sum})$ — e.g. the given input/kernel yields $[[13,-5],[-2,6]]$.",
+          "extend": "Center-positive, neighbor-negative kernels with weights summing to 1 sharpen; summing to 0 detect edges.",
+          "tags": [
+            "Convolution"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 2.4"
+          ],
+          "q": "A $3\\times3$ filter turns a grayscale image into an output that highlights horizontal edges. Write a valid filter and name the operation.",
+          "answer": "It is a **horizontal edge detector** (Sobel-like). A valid kernel: $\\begin{bmatrix}-1&-2&-1\\\\0&0&0\\\\1&2&1\\end{bmatrix}$ (or $\\begin{bmatrix}-1&-1&-1\\\\0&0&0\\\\1&1&1\\end{bmatrix}$, or their vertical flip) — it computes a **vertical gradient**, responding to horizontal edges.",
+          "extend": "Rows of opposite sign with a zero middle row = vertical gradient ⇒ detects horizontal edges.",
+          "tags": [
+            "Convolution"
           ]
         }
       ]

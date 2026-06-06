@@ -103,6 +103,66 @@
             "Activation functions",
             "Fully-connected"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS21 2.5"
+          ],
+          "q": "Can two consecutive dropout layers with keep/drop probabilities $q$ and $p$ be replaced by one dropout operation? Explain.",
+          "answer": "**Yes.** Neurons are zeroed **independently** in each layer, so a neuron survives only if it survives both. The combined effect is a single dropout — e.g. with drop-probabilities $p,q$ the effective drop probability is $p+q-pq$ (survival $=(1-p)(1-q)$).",
+          "extend": "Independent masks compose into one Bernoulli mask; probabilities combine multiplicatively on the survival side.",
+          "tags": [
+            "Dropout",
+            "Fully-connected"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS23 2.6"
+          ],
+          "q": "Show that two linear layers $(W_1,b_1)$ then $(W_2,b_2)$ with no non-linearity between them equal a single linear layer (1p). Give the combined weight and bias (2p).",
+          "answer": "$f_2(f_1(x))=W_2(W_1x+b_1)+b_2=\\underbrace{W_2W_1}_{\\text{weight}}x+\\underbrace{W_2b_1+b_2}_{\\text{bias}}$. So the combined layer has **weight $W_2W_1$** and **bias $W_2b_1+b_2$** — a single affine map.",
+          "extend": "Composing affine maps without a non-linearity collapses to one affine map ⇒ depth needs activations.",
+          "tags": [
+            "Activation functions",
+            "Fully-connected"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS23 8.1",
+            "WS23 8.2",
+            "WS23 8.3"
+          ],
+          "q": "Point clouds are stored as $(B,N,3)$. (8.1) Why is a fully-connected layer better than a conv here? (8.2) How do you reshape the input so the first FC layer extracts global info per cloud? (8.3) For $B{=}8,N{=}100$ predicting a rotation+translation, give the input and output layer sizes.",
+          "answer": "**8.1** Point clouds are **unordered sets** — convolutions assume a fixed local neighborhood/grid, which is irrelevant; an **FC layer sees all points (global) and is permutation-agnostic to structure**. **8.2** **Flatten** the per-cloud points: $(B,N,3)\\to(B,N\\cdot3)$. **8.3** Input $=N\\cdot3=300$; output $=9+3=12$ (a $3\\times3$ rotation matrix plus a 3-vector translation).",
+          "extend": "Unordered → no grid → FC over flattened points; output a rotation (9) + translation (3).",
+          "tags": [
+            "Convolution",
+            "Fully-connected"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 4.1"
+          ],
+          "q": "Predicting which of two boxers wins from two feature vectors. (a) How to construct the input? Which fits best — Autoencoder, FC network, or VGG16? Why?",
+          "answer": "Combine the two boxer vectors with a **non-symmetric** operation (concatenate, or take their difference) so $f(x_1,x_2)\\ne f(x_2,x_1)$ — **addition is symmetric** and would lose who-is-who. Use a **fully-connected network**: VGG16 is for images (needs spatial/global structure), and an autoencoder is for reconstruction, not classification.",
+          "extend": "Tabular two-entity comparison ⇒ concatenate (order-preserving) into an FC classifier, not a CNN/AE.",
+          "tags": [
+            "CNN",
+            "Fully-connected",
+            "Autoencoder",
+            "Classic architectures"
+          ]
         }
       ]
     },
@@ -214,6 +274,177 @@
           "tags": [
             "Backpropagation",
             "Optimizers"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS22 1.6"
+          ],
+          "q": "What is the correct order of operations for optimization with gradient descent? (a) update weights, (b) compute loss = difference predicted vs target, (c) repeat until convergence, (d) forward pass, (e) initialize weights.",
+          "answer": "**e → d → b → a → c** ('edbac'): initialize weights, forward pass, compute the loss, update the weights, then iteratively repeat until convergence.",
+          "extend": "Init once, then loop: forward → loss → backward/update → repeat.",
+          "options": [
+            {
+              "text": "ebadc",
+              "correct": false
+            },
+            {
+              "text": "bcdea",
+              "correct": false
+            },
+            {
+              "text": "edbac",
+              "correct": true
+            },
+            {
+              "text": "eadbc",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Backpropagation",
+            "Optimizers",
+            "Weight initialization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS22 3.1",
+            "WS22 3.2",
+            "WS22 3.3",
+            "Mock III.1"
+          ],
+          "q": "Two-input FC net with ReLU: $i_1{=}2,i_2{=}{-}1$; $w_{11}{=}1,w_{21}{=}0.5,b_1{=}0.5$; $w_{12}{=}{-}0.5,w_{22}{=}{-}1,b_2{=}{-}0.5$; $w_{31}{=}0.5,w_{41}{=}{-}0.5,b_3{=}{-}1$; $w_{32}{=}{-}1,w_{42}{=}1,b_4{=}0.5$; targets $t_1{=}1,t_2{=}0.5$. (3.1) Compute $o_1,o_2$. (3.2) MSE loss. (3.3) Update $w_{21}$ with SGD, lr $0.1$.",
+          "answer": "**3.1** $h_1{=}2{-}0.5{+}0.5{=}2,\\ h_2{=}{-}1{+}1{-}0.5{=}{-}0.5$; ReLU → $h_3{=}2,h_4{=}0$. $o_1{=}2(0.5){+}0{-}1{=}0,\\ o_2{=}2({-}1){+}0{+}0.5{=}{-}1.5$. **3.2** $\\text{MSE}=\\tfrac12(t_1{-}o_1)^2+\\tfrac12(t_2{-}o_2)^2=\\tfrac12(1)+\\tfrac12(4)=2.5$. **3.3** $\\frac{\\partial L}{\\partial w_{21}}=(o_1{-}t_1)w_{31}i_2+(o_2{-}t_2)w_{32}i_2=({-}1)(0.5)({-}1)+({-}2)({-}1)({-}1)=0.5{-}2={-}1.5$; $w_{21}^+=0.5-0.1({-}1.5)=\\mathbf{0.65}$.",
+          "extend": "ReLU zeros $h_4$, killing the $w_4$ paths; chain the two output branches back into $w_{21}$ via $h_3,h_1$.",
+          "tags": [
+            "ReLU",
+            "Backpropagation",
+            "Optimizers",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS21 6.1",
+            "WS21 6.2"
+          ],
+          "q": "(6.1) Compute the derivative of the sigmoid $\\sigma(x)=\\frac{1}{1+e^{-x}}$. (6.2) Re-express it in terms of $y=\\sigma(x)$.",
+          "answer": "**6.1** $\\sigma'(x)=\\dfrac{e^{-x}}{(1+e^{-x})^2}$. **6.2** Since $1-y=\\dfrac{e^{-x}}{1+e^{-x}}$, this equals $y(1-y)$ — i.e. $\\dfrac{dy}{dx}=y(1-y)$.",
+          "extend": "$\\sigma'=\\sigma(1-\\sigma)$ — a key identity that makes sigmoid backprop cheap (reuse the forward output).",
+          "tags": [
+            "Sigmoid",
+            "Backpropagation"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS21 6.3",
+            "WS21 6.4"
+          ],
+          "q": "Affine layer $z=XW+b$ with $X=\\begin{bmatrix}1&1\\\\0&-1\\end{bmatrix}$, $W=\\begin{bmatrix}1\\\\2\\end{bmatrix}$, $b=2$, and $y=\\sigma(z)=\\begin{bmatrix}1\\\\0.5\\end{bmatrix}$ (rounded). (6.3) Compute $\\frac{\\partial y}{\\partial z}$. (6.4) With $\\text{dout}=\\frac{\\partial y}{\\partial z}$, compute $\\frac{\\partial y}{\\partial W}$ and $\\frac{\\partial y}{\\partial b}$.",
+          "answer": "**6.3** $\\frac{\\partial y}{\\partial z}=y\\odot(1-y)=\\begin{bmatrix}1\\\\0.5\\end{bmatrix}\\odot\\begin{bmatrix}0\\\\0.5\\end{bmatrix}=\\begin{bmatrix}0\\\\0.25\\end{bmatrix}$ (element-wise, not matrix mult). **6.4** $\\frac{\\partial y}{\\partial W}=X^\\top\\,\\text{dout}=\\begin{bmatrix}1&0\\\\1&-1\\end{bmatrix}\\begin{bmatrix}0\\\\0.25\\end{bmatrix}=\\begin{bmatrix}0\\\\-0.25\\end{bmatrix}$; $\\frac{\\partial y}{\\partial b}=\\text{sum}(\\text{dout},\\text{axis}=0)=0.25$.",
+          "extend": "Sigmoid backward is element-wise $y(1-y)$; affine backward: $X^\\top\\text{dout}$ for $W$, column-sum for $b$.",
+          "tags": [
+            "Sigmoid",
+            "Backpropagation",
+            "Fully-connected"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS23 3.1",
+            "WS23 3.2",
+            "WS23 3.3",
+            "WS23 3.4"
+          ],
+          "q": "1D net Conv1D($k{=}3,s{=}1,p{=}0$, weights $c$)→MaxPool1D($k{=}2,s{=}1$)→FC→L2 loss. (3.1) For 7-dim input, output dims of Conv, Pool, and FC input $n$? (3.2) With $x=[2,3,1,2,-1]$, conv weights $[0.5,1.5,0.5]$, FC $w=[-1,3]$, $y^\\*=2$: forward pass $z,m,y,L$. (3.3) Express the conv as a matrix-vector product. (3.4) $\\frac{dL}{dy}$.",
+          "answer": "**3.1** Conv: $\\frac{7-3}{1}+1=5$; Pool: $\\frac{5-2}{1}+1=4$; FC input $n=4$. **3.2** (5-dim input) $z=[1{+}4.5{+}0.5,\\ 1.5{+}1.5{+}1,\\ 0.5{+}3{-}0.5]=[6,4,3]$; $m=[\\max(6,4),\\max(4,3)]=[6,4]$; $y=-1\\cdot6+3\\cdot4=6$; $L=(6-2)^2=16$. **3.3** $z=\\begin{bmatrix}c_1&c_2&c_3&0&0\\\\0&c_1&c_2&c_3&0\\\\0&0&c_1&c_2&c_3\\end{bmatrix}x$ (a banded Toeplitz matrix). **3.4** $\\frac{dL}{dy}=2(y-y^\\*)=2(6-2)=8$.",
+          "extend": "Conv output $=\\frac{N-k}{s}+1$; a conv is a Toeplitz matrix multiply; L2 grad is $2(y-y^\\*)$.",
+          "tags": [
+            "Backpropagation",
+            "L1/L2",
+            "Pooling",
+            "Convolution",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS23 3.5",
+            "WS23 3.6",
+            "WS23 3.7"
+          ],
+          "q": "Same 1D net (max-pool argmaxes $m_1{=}\\max(z_1,z_2){=}z_1$, $m_2{=}\\max(z_2,z_3){=}z_2$; FC $w=[-1,3]$, $x=[2,3,1,2,-1]$). (3.5) Given $\\frac{dL}{dy}=2$, find $\\frac{dL}{dm}$. (3.6) Given $\\frac{dL}{dm}=[2,1]$, find $\\frac{dL}{dz}$. (3.7) Given $\\frac{dL}{dz}=[1,2,3]$, find $\\frac{dL}{dc_2}$.",
+          "answer": "**3.5** $\\frac{dL}{dm_i}=\\frac{dL}{dy}w_i$: $[2({-}1),\\,2(3)]=[-2,6]$. **3.6** Max-pool routes each gradient to its argmax: $\\frac{dL}{dz_1}=2,\\ \\frac{dL}{dz_2}=1\\,(\\text{from }m_2),\\ \\frac{dL}{dz_3}=0$ → $[2,1,0]$. **3.7** $c_2$ multiplies $x_2,x_3,x_4$ across the three conv positions: $\\frac{dL}{dc_2}=1\\cdot x_2+2\\cdot x_3+3\\cdot x_4=1(3)+2(1)+3(2)=11$.",
+          "extend": "Max-pool backward sends the gradient only to the winning input; a conv weight's grad sums over all positions it touched.",
+          "tags": [
+            "Backpropagation",
+            "Pooling"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS23 3.1",
+            "SS23 3.2",
+            "SS23 3.3",
+            "SS23 3.4"
+          ],
+          "q": "Network $\\hat y=\\text{ReLU}(Wx+b)$, scalars, dataset $x\\in\\{2,3,4\\},y\\in\\{0.5,0.75,1.0\\}$, loss $L=(y-\\hat y)^2$. (3.1) Dimensionality of $W$ and total parameters? (3.2) Can loss 0 be achieved — give parameters or explain. (3.3) With $W_0{=}1,b_0{=}1$, forward pass for $x{=}4$. (3.4) Its loss.",
+          "answer": "**3.1** $W$ is a **scalar** ($1\\times1$); **2 trainable parameters** ($W$ and $b$). **3.2** **Yes:** $W=0.25,\\ b=0$ gives $\\hat y=0.25x$, matching all three targets exactly → loss 0. **3.3** $\\hat y=\\text{ReLU}(1\\cdot4+1)=5$. **3.4** $L=(5-1)^2=16$.",
+          "extend": "A linear $y=0.25x$ fits this data exactly; the bad init ($W{=}1,b{=}1$) starts far off.",
+          "tags": [
+            "ReLU",
+            "Backpropagation",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS23 3.5",
+            "SS23 3.6",
+            "SS23 3.7",
+            "SS23 3.8",
+            "SS23 3.9"
+          ],
+          "q": "Continuing ($\\hat y{=}\\text{ReLU}(Wx+b)$, $W_0{=}1,b_0{=}1$, lr $0.5$; sample $x{=}4,y{=}1$ gave $\\hat y{=}5,L{=}16$). (3.5) $\\frac{\\partial L}{\\partial W},\\frac{\\partial L}{\\partial b}$. (3.6) SGD update $W_1,b_1$. (3.7) Next sample $x{=}2$: prediction and loss. (3.8) After 3 more iters (order 2,3,4): $W_4$? (3.9) Minimal fix to improve training.",
+          "answer": "**3.5** $\\frac{\\partial L}{\\partial\\hat y}=2(\\hat y-y)=8$; ReLU active so $\\frac{\\partial L}{\\partial W}=8x=32,\\ \\frac{\\partial L}{\\partial b}=8$. **3.6** $W_1=1-0.5(32)=-15,\\ b_1=1-0.5(8)=-3$. **3.7** $\\hat y=\\text{ReLU}(-15\\cdot2-3)=0$; $L=(0.5-0)^2=0.25$. **3.8** $\\hat y=0$ for every sample now (negative pre-activations) → **dead ReLU**, gradients are 0, so $W_4=W_1=-15$. **3.9** Replace ReLU with **Leaky ReLU** (or similar) so dead neurons keep a non-zero gradient.",
+          "extend": "A too-large step pushed the ReLU permanently negative (dead) → no more learning; Leaky ReLU revives it.",
+          "tags": [
+            "ReLU",
+            "Activation functions",
+            "Vanishing gradient",
+            "Backpropagation",
+            "Optimizers"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Mock II.6"
+          ],
+          "q": "When implementing a NN layer from scratch with `forward` and `backward` functions, what does each do — arguments, cached values, and returns?",
+          "answer": "**Forward:** takes the **previous layer's output**, performs the layer's operation, **returns the result**, and **caches** values needed for the gradient (e.g. inputs / intermediate activations). **Backward:** takes the **upstream gradient** (dout) and **returns the partial derivatives** w.r.t. the inputs and parameters.",
+          "extend": "Forward computes + caches; backward consumes the cache and the upstream gradient to return local grads.",
+          "tags": [
+            "Backpropagation"
           ]
         }
       ]
@@ -549,6 +780,230 @@
             "Activation functions",
             "Vanishing gradient"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS22 1.2"
+          ],
+          "q": "Which statements on activation functions are true?",
+          "answer": "**True:** *Tanh can lead to vanishing gradients* (it saturates), and *Parametric ReLU can handle negative input values* (learnable negative slope). **False:** outputs need not be in $[0,1]$; *Sigmoid outputs are not zero-centered* (Tanh is).",
+          "extend": "Tanh saturates (vanishing); PReLU has a negative-side slope; sigmoid is not zero-centered.",
+          "options": [
+            {
+              "text": "The output values should be in the range 0 to 1.",
+              "correct": false
+            },
+            {
+              "text": "Tanh can lead to vanishing gradients.",
+              "correct": true
+            },
+            {
+              "text": "Sigmoid outputs are zero-centered.",
+              "correct": false
+            },
+            {
+              "text": "Parametric ReLU can handle negative input values.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS22 6.1",
+            "WS22 6.2",
+            "WS22 6.3"
+          ],
+          "q": "Training a 10-layer CNN with a Sigmoid non-linearity: (6.1) how does its gradient behave for very large inputs, (6.2) why is that a problem, and (6.3) what non-linearity is used instead and why?",
+          "answer": "**6.1** For large inputs the sigmoid **saturates** — the curve flattens, so its **gradient → 0**. **6.2** Tiny gradients **slow training / give no meaningful updates** and prevent earlier layers from learning (vanishing gradients). **6.3** Use **ReLU (or Leaky/Parametric ReLU)**: it **does not saturate for large positive inputs**, giving large, consistent, stable gradients.",
+          "extend": "Saturating sigmoid → vanishing gradients → ReLU's non-saturating positive branch fixes it.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS21 2.2"
+          ],
+          "q": "The function $f(x)=\\ln(1+e^x)$ most closely approximates which of Tanh / ReLU / Sigmoid? Justify, and give a benefit of $f$ over it.",
+          "answer": "It approximates **ReLU** (softplus is a smooth version, also unbounded above). **Benefit:** softplus is **smooth/differentiable everywhere** (ReLU is non-differentiable at 0) and has **no dead region** for negative inputs (no dead-ReLU problem).",
+          "extend": "Softplus = smooth ReLU: differentiable at 0 and gradient never exactly 0 on the negative side.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS21 2.7"
+          ],
+          "q": "For each function, state one common problem when used as the activation in a deep network: (a) Sigmoid, (b) ReLU, (c) Identity.",
+          "answer": "**Sigmoid:** saturates → vanishing gradients (and is not zero-centered). **ReLU:** the **dead-ReLU** problem (units stuck at 0; also not zero-centered). **Identity:** introduces **no non-linearity** (stacked layers collapse to one linear map).",
+          "extend": "Sigmoid→saturation, ReLU→dead units, Identity→no non-linearity.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS26 P1b"
+          ],
+          "q": "Which function(s) is/are generally unsuitable as activation functions in deep networks?",
+          "answer": "**Unsuitable:** $\\log(\\text{ReLU}(x+1))$ (undefined where $\\text{ReLU}(x{+}1)=0$), $\\text{ReLU}(x)-\\text{ReLU}(-x)=x$ (**linear** → no non-linearity), and a **constant function** (zero gradient, no information). **Suitable:** $\\log(\\text{ReLU}(x)+1)$ (well-defined, non-linear).",
+          "extend": "Reject activations that are undefined, purely linear, or constant.",
+          "options": [
+            {
+              "text": "log(ReLU(x + 1))",
+              "correct": true
+            },
+            {
+              "text": "log(ReLU(x) + 1)",
+              "correct": false
+            },
+            {
+              "text": "ReLU(x) - ReLU(-x)",
+              "correct": true
+            },
+            {
+              "text": "A constant function.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P2d"
+          ],
+          "q": "Give one reason for using activation functions. What happens if no non-linear activation is used?",
+          "answer": "Activations **introduce non-linearity**, increasing the model's representational capacity. Without them, **multiple linear layers collapse into a single linear transformation** — the deep network can only represent a linear function.",
+          "extend": "No non-linearity ⇒ composition of linear maps is linear ⇒ depth buys nothing.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS23 2.3"
+          ],
+          "q": "Are these appropriate activation functions in a backprop network? (a) $y=\\cos(x)$, (b) $y=0.5\\,\\text{sgn}(x)$.",
+          "answer": "**(a) $\\cos(x)$:** acceptable as a non-linearity, but unusual — it's **non-monotonic/periodic**, so many inputs map to the same output and its gradient oscillates in sign. **(b) $0.5\\,\\text{sgn}(x)$: No** — it's piecewise-constant, so its **gradient is zero almost everywhere**, giving no signal for backpropagation.",
+          "extend": "A step/sign function has zero gradient a.e. → cannot train by gradient descent.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Backpropagation"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS23 1.5"
+          ],
+          "q": "Which statements about loss function and activation in a neural network are true?",
+          "answer": "**True:** *activations introduce non-linearity, enabling the network to learn complex patterns*. **False:** activations don't handle class imbalance; the loss measures error (not accuracy) to guide weights via backprop; and activations are not used in *all but the output* layer in the way stated.",
+          "extend": "Activation = non-linearity; the loss guides weight updates through backprop (it isn't an accuracy meter).",
+          "options": [
+            {
+              "text": "The activation function handles class imbalances in the dataset.",
+              "correct": false
+            },
+            {
+              "text": "Activations introduce non-linearity, enabling learning of complex patterns.",
+              "correct": true
+            },
+            {
+              "text": "The primary purpose of a loss function is to calculate model accuracy.",
+              "correct": false
+            },
+            {
+              "text": "The loss is applied to the output layer, the activation to all other layers.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Backpropagation"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS23 4.5",
+            "SS23 4.6"
+          ],
+          "q": "(4.5) Explain the vanishing-gradient problem and name two activations that suffer from it. (4.6) What is the main difference between vanishing gradients and the 'Dead ReLU'?",
+          "answer": "**4.5** Gradients **lose magnitude as they propagate from the loss back to shallow layers** (repeated multiplication by small derivatives), so deep layers train while shallow ones barely learn. Suffering activations: **Sigmoid and Tanh**. **4.6** Vanishing gradient is a **global/depth** effect that **slows** learning across layers; **Dead ReLU** is a **per-neuron** effect where a unit's pre-activation is always negative, so its gradient is **exactly 0** and it stops learning entirely (limiting capacity).",
+          "extend": "Vanishing = gradual depth-wise shrinkage (slows learning); Dead ReLU = individual neurons permanently off.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Vanishing gradient"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 2.7"
+          ],
+          "q": "Find the derivative of $\\tanh(x)$ and express it using $\\tanh(x)$ itself, given $\\tanh(x)=2\\sigma(2x)-1$.",
+          "answer": "$\\frac{d}{dx}\\tanh(x)=1-\\tanh^2(x)$. (Via the chain rule on $2\\sigma(2x)-1$: $4\\sigma(2x)(1-\\sigma(2x))$, which simplifies to $1-\\tanh^2(x)$.)",
+          "extend": "$\\tanh'=1-\\tanh^2$ — like sigmoid, the derivative reuses the forward output (cheap backprop).",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Activation functions",
+            "Backpropagation"
+          ]
         }
       ]
     },
@@ -594,6 +1049,51 @@
           "q": "For a 3-class problem with softmax probabilities $y_k$ and cross-entropy loss $L=-\\ln(y_3)$ (true label 3), compute $\\frac{\\partial L}{\\partial z_k}$. What would you cache in the forward pass?",
           "answer": "$\\frac{\\partial L}{\\partial z_k}=y_k-\\mathbb{1}[k=3]$: i.e. $y_3-1$ for the true class and $y_k$ for the others. **Cache** the ground-truth label and the softmax outputs $y_k$ to accelerate the backward pass.",
           "extend": "The clean softmax+CE gradient is $\\hat y - y$ (prediction minus one-hot) — one of the most important results to memorize.",
+          "tags": [
+            "Softmax",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS26 P1i"
+          ],
+          "q": "For softmax with temperature $\\sigma(z)_i=\\frac{e^{c z_i}}{\\sum_j e^{c z_j}}$, as $c\\to\\infty$ (unique max) the output converges to...?",
+          "answer": "**A one-hot vector at the argmax** of $z$. A large temperature $c$ sharpens the distribution until all mass sits on the largest logit. (As $c\\to0$ it would instead approach a uniform distribution.)",
+          "extend": "High temperature → hard argmax (one-hot); low temperature → uniform. Temperature controls sharpness.",
+          "options": [
+            {
+              "text": "A one-hot vector representing the argmax of the input.",
+              "correct": true
+            },
+            {
+              "text": "A uniform distribution over all classes.",
+              "correct": false
+            },
+            {
+              "text": "The input vector z itself (identity mapping).",
+              "correct": false
+            },
+            {
+              "text": "A standard normal distribution.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Softmax"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS23 4.2"
+          ],
+          "q": "Three softmax classifiers output probabilities for a digit-8 image. Which predicts correctly, which yields the largest CE loss, and what is that loss? (Model C gives class 8 a probability of 0.35, its argmax.)",
+          "answer": "Cross-entropy depends only on the probability assigned to the **true class** (8). The model with the **lowest** true-class probability has the **largest loss** — here **Model C** (0.35), giving $L=-\\ln(0.35)$. A model predicts correctly if its **argmax** is class 8.",
+          "extend": "CE loss $=-\\ln(p_\\text{true})$: lower true-class probability ⇒ higher loss, regardless of the other entries.",
           "tags": [
             "Softmax",
             "Loss functions"
@@ -730,6 +1230,62 @@
             "Sigmoid",
             "Loss functions"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 2.2"
+          ],
+          "q": "Explain the differences between binary and multiclass classification in terms of the output-layer activation and the loss function.",
+          "answer": "**Binary:** output activation **Sigmoid**, loss **Binary Cross-Entropy (BCE)**. **Multiclass:** output activation **Softmax**, loss **(categorical) Cross-Entropy (CE)**. (BCE is a special case of CE.)",
+          "extend": "Sigmoid+BCE for one probability; Softmax+CE for a distribution over $C$ classes.",
+          "tags": [
+            "Softmax",
+            "Sigmoid",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P3b"
+          ],
+          "q": "For 10-class digit recognition with minibatch size $B$: state the output shape, how predicted labels are obtained, and a suitable loss.",
+          "answer": "Output shape **$(B,10)$**. Predicted label = **argmax over the class dimension** (index of the max logit/probability). Suitable loss: **(softmax) cross-entropy**.",
+          "extend": "Classifier head outputs $(B,C)$ logits → argmax for the label, cross-entropy for training.",
+          "tags": [
+            "Softmax",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 2.1"
+          ],
+          "q": "Multiclass CE over [dog,cat,monkey]. For $\\hat y_1=[0.4,0.3,0.3]$ and $\\hat y_2=[0.4,0.5,0.1]$ with GT 'dog' $=[1,0,0]$: predicted classes, and how do $CE(\\hat y_1,y)$ and $CE(\\hat y_2,y)$ compare?",
+          "answer": "$\\arg\\max\\hat y_1=$ **dog**; $\\arg\\max\\hat y_2=$ **cat**. The **losses are equal**: cross-entropy $=-\\ln(\\hat y_{\\text{dog}})$ depends **only on the probability assigned to the ground-truth class** (0.4 in both), regardless of how the rest is distributed.",
+          "extend": "CE only sees the true-class probability; the split among other classes doesn't change the loss.",
+          "tags": [
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 2.2"
+          ],
+          "q": "You drop the softmax before cross-entropy and feed logits $\\hat y=[-1.0,-1.3,-1.3]$ with $y=[1,0,0]$. Why must a softmax-like activation precede CE, and what breaks here?",
+          "answer": "Softmax maps logits to a **probability distribution in $(0,1)$** (positive, summing to 1), which CE's $\\log$ requires. Without it, CE computes $-\\log(\\text{logit})$ on a **negative** value — $\\log(-1.0)$ is **undefined** (numerical error).",
+          "extend": "CE needs probabilities; $\\log$ of a raw (possibly negative) logit is undefined → softmax first.",
+          "tags": [
+            "Softmax",
+            "Loss functions"
+          ]
         }
       ]
     },
@@ -851,6 +1407,40 @@
             "Loss functions",
             "Regression"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS23 1.6"
+          ],
+          "q": "For a regression task with labels in $[-1,1]$, which final activations could be used?",
+          "answer": "**Valid (bounded to $[-1,1]$):** $2\\sigma(x)-1$, $\\tanh(10x)$, and $\\min(\\max(-1,x),1)$ (clamp). **Invalid:** $\\max(-1,x)$ is unbounded above.",
+          "extend": "Match the output range to the label range — both sides must be bounded.",
+          "options": [
+            {
+              "text": "f(x) = 2σ(x) - 1 (sigmoid).",
+              "correct": true
+            },
+            {
+              "text": "f(x) = tanh(10x)",
+              "correct": true
+            },
+            {
+              "text": "f(x) = max(-1, x)",
+              "correct": false
+            },
+            {
+              "text": "f(x) = min(max(-1, x), 1)",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Sigmoid",
+            "Tanh",
+            "Loss functions",
+            "Regression"
+          ]
         }
       ]
     },
@@ -935,6 +1525,39 @@
           "extend": "Linear model ⇒ linear boundary. Depth + non-linear activations are what break that limit.",
           "tags": [
             "Activation functions",
+            "Regression"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS22 1.4"
+          ],
+          "q": "Logistic regression: which statements are true?",
+          "answer": "**True:** it allows **binary classification**, uses a **variant of the cross-entropy loss** (BCE), and **can be seen as a 1-layer neural network**. **False:** its output space is $[0,1]$ (a probability), not $[-1,1]$.",
+          "extend": "Logistic regression = sigmoid + BCE = a 1-neuron net; output is a probability in $[0,1]$.",
+          "options": [
+            {
+              "text": "Allows performing binary classification.",
+              "correct": true
+            },
+            {
+              "text": "Uses a variant of the cross-entropy loss.",
+              "correct": true
+            },
+            {
+              "text": "Can be seen as a 1-layer neural network.",
+              "correct": true
+            },
+            {
+              "text": "The output space is between -1 and 1.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Sigmoid",
+            "Loss functions",
             "Regression"
           ]
         }

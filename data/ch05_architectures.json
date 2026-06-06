@@ -147,6 +147,41 @@
             "Convolution",
             "CNN"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS21 4.1",
+            "WS21 4.4",
+            "WS21 4.5"
+          ],
+          "q": "A CNN does Conv2d(3,8)→Pool→BN→ReLU → Conv2d(8,16)→Pool→BN→ReLU → Conv2d(16,32)→Pool→BN→ReLU → Flatten → Linear(x,4). All conv: $k{=}3,p{=}1,s{=}1$; pools halve spatial size. (4.1) trainable params of the final Linear in terms of $x$; (4.4) params of the first conv Conv2d(3,8); (4.5) total params of all BatchNorm layers.",
+          "answer": "**4.1** Linear is $4\\times x$ weights $+4$ bias $=\\mathbf{4(x+1)}$. **4.4** $3\\cdot3\\cdot3\\cdot8+8=216+8=\\mathbf{224}$. **4.5** BN has 2 params per channel: $2(8+16+32)=\\mathbf{112}$.",
+          "extend": "Conv params $=k^2 C_{in}C_{out}+C_{out}$; BN adds $2\\times$channels; an FC layer adds out$\\times$(in+1).",
+          "tags": [
+            "ReLU",
+            "Batch normalization",
+            "CNN",
+            "Fully-connected",
+            "Classic architectures"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS21 4.2"
+          ],
+          "q": "For the above network with $80\\times80$ RGB input, what is the flattened size $x$ into the Linear layer? Explain.",
+          "answer": "Each conv keeps spatial size ('same' padding) and each of the **3 max-pools halves** it: $80\\to40\\to20\\to10$. Final depth is $32$, so $x=10\\times10\\times32=\\mathbf{3200}$.",
+          "extend": "Track spatial size through pools (×½ each) and multiply by the last conv's channel count.",
+          "tags": [
+            "Pooling",
+            "Convolution",
+            "CNN",
+            "Classic architectures"
+          ]
         }
       ]
     },
@@ -279,6 +314,23 @@
             "Activation functions",
             "ResNet / skip connections"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS23 4.5",
+            "WS23 4.6"
+          ],
+          "q": "(4.5) Name two problems when training very deep networks. (4.6) How do skip connections help, shown via a weight update for $w_0$ in $z=y+G(y)$ with $y=w_1(w_0x)$, $G(y)$ two more layers?",
+          "answer": "**4.5** Vanishing/exploding gradients (too many layers, chain rule), high compute / out-of-memory, and overfitting (high capacity). **4.6** Skip connections add an **identity path**: $\\frac{dz}{dy}=\\frac{d(y+G(y))}{dy}=1+\\frac{dG}{dy}$, so $\\frac{dz}{dw_0}=(1+\\frac{dG}{dy})\\,w_1x$. The **$+1$** guarantees the **full upstream gradient flows through** even if $\\frac{dG}{dy}\\to0$ — a gradient highway.",
+          "extend": "The additive identity gives $\\partial z/\\partial y=1+\\partial G/\\partial y$ → gradients never fully vanish.",
+          "tags": [
+            "Exploding gradient",
+            "Backpropagation",
+            "Overfitting",
+            "ResNet / skip connections"
+          ]
         }
       ]
     },
@@ -314,6 +366,22 @@
           "extend": "Multi-scale in one layer = let the data choose the scale. The 1×1 bottlenecks keep this multi-branch design computationally feasible.",
           "tags": [
             "Receptive field",
+            "1×1 convolution",
+            "Convolution",
+            "Classic architectures"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS23 2.8"
+          ],
+          "q": "Explain the Inception layer and list its internal elements.",
+          "answer": "**Idea:** apply **multiple kernel sizes in parallel** so the layer captures features at different scales. **Elements:** convolutions of different kernel sizes ($1\\times1$, $3\\times3$, $5\\times5$), a **max-pooling** branch, and a **concatenation** of all branch outputs (with $1\\times1$ convs as bottlenecks to cut cost).",
+          "extend": "Inception = parallel multi-scale convs + pooling, concatenated; 1×1 convs keep it cheap.",
+          "tags": [
+            "Pooling",
             "1×1 convolution",
             "Convolution",
             "Classic architectures"
@@ -485,6 +553,66 @@
             "Fully-connected",
             "Autoencoder"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 5.1"
+          ],
+          "q": "How do the encoder, code, and decoder of an autoencoder each function?",
+          "answer": "**Encoder:** performs **dimensionality reduction**, mapping the input to a compact representation. **Code:** the **compressed, low-dimensional latent** representation (bottleneck). **Decoder:** **reconstructs** the original-dimension input from the latent code (a lossy reconstruction).",
+          "extend": "Encoder↓ → code (bottleneck) → decoder↑; the code is the learned compression.",
+          "tags": [
+            "Autoencoder",
+            "Clustering / PCA"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 5.2"
+          ],
+          "q": "You have a small labeled dataset for semantic segmentation plus a large unlabeled image dataset. How can an autoencoder help?",
+          "answer": "**Pretrain** an autoencoder to **reconstruct** the inputs on the **whole (unlabeled) dataset**, so its encoder learns useful features. Then take the **trained encoder** and fine-tune it with the **labeled data** to train the segmentation model.",
+          "extend": "Self-supervised pretraining: learn features from unlabeled data, then transfer the encoder to the labeled task.",
+          "tags": [
+            "Autoencoder",
+            "Transfer learning",
+            "Supervised vs unsupervised"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 5.2"
+          ],
+          "q": "Your trained autoencoder produces blurry reconstructions. Name and explain two possible reasons.",
+          "answer": "**MSE/L2 loss:** its optimum is the **average** of plausible outputs, which **blurs** high-frequency detail. **Latent dimension too small:** the bottleneck has **insufficient capacity** to represent the data, losing information → blur.",
+          "extend": "Blurry AE output ⇒ averaging loss (MSE) and/or an over-tight bottleneck.",
+          "tags": [
+            "L1/L2",
+            "Autoencoder",
+            "Loss functions"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 5.3"
+          ],
+          "q": "You have a trained autoencoder on many product images and few prototype images. Build a 'prototype vs not' classifier; give the loss and number of output neurons.",
+          "answer": "**Transfer learning:** reuse the **pretrained encoder** as a feature extractor, **replace the decoder with a classifier head**, and fine-tune on the small prototype set. For binary classification: **BCE loss with 1 output neuron** (or cross-entropy with 2).",
+          "extend": "Pretrained encoder + small classifier head = data-efficient transfer; binary head = sigmoid+BCE.",
+          "tags": [
+            "Sigmoid",
+            "Autoencoder",
+            "Loss functions",
+            "Transfer learning"
+          ]
         }
       ]
     },
@@ -592,6 +720,72 @@
             "U-Net",
             "Upsampling"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 5.3"
+          ],
+          "q": "If you use a U-Net for semantic segmentation, what is a skip connection in U-Net?",
+          "answer": "A **direct concatenation** from an **encoder** layer to the **decoder** layer at the same resolution. It passes **fine-grained spatial features** to the decoder and acts as a **gradient highway** (helps avoid vanishing gradients), improving localization.",
+          "extend": "U-Net skips concatenate encoder→decoder features (not residual adds), restoring spatial detail lost at the bottleneck.",
+          "tags": [
+            "Vanishing gradient",
+            "Convolution",
+            "U-Net",
+            "ResNet / skip connections"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P5d"
+          ],
+          "q": "An autoencoder decoder uses Transposed Convolution. (1) A simple alternative? (2) Why might transposed conv outperform it? (3) What artifact appears if kernel size isn't divisible by the stride?",
+          "answer": "(1) **Upsampling / interpolation** (nearest-neighbor or bilinear resize, then conv). (2) Transposed conv has **learnable parameters**, so it can learn the data-specific upsampling structure. (3) **Checkerboard artifacts** from uneven kernel overlap.",
+          "extend": "Learned upsampling beats fixed interpolation but risks checkerboard artifacts when stride ∤ kernel.",
+          "tags": [
+            "Convolution",
+            "Autoencoder",
+            "U-Net",
+            "Upsampling",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P5e"
+          ],
+          "q": "What is the main structural difference of U-Net vs a conventional CNN autoencoder, and why does it improve reconstruction?",
+          "answer": "**Skip connections** linking encoder layers directly to the matching decoder layers (passing pre-bottleneck features). They let **high-frequency spatial detail flow directly to the output** (better localization/detail) and provide a **gradient shortcut** for training deeper layers.",
+          "extend": "U-Net's encoder→decoder skips restore fine detail lost at the bottleneck and ease optimization.",
+          "tags": [
+            "Convolution",
+            "CNN",
+            "Autoencoder",
+            "U-Net",
+            "ResNet / skip connections"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 5.1"
+          ],
+          "q": "You distribute only the decoder; clients send you the latent vector. Is a vanilla fully-conv autoencoder or a fully-conv U-Net better, and why?",
+          "answer": "**Vanilla autoencoder.** A **U-Net has skip connections from encoder to decoder**, so the decoder needs the encoder's intermediate features — but clients only have the **decoder and the latent vector**, not those features. A plain AE decodes from the latent alone.",
+          "extend": "U-Net skips require encoder activations at decode time → unusable when only the decoder + code are shared.",
+          "tags": [
+            "Convolution",
+            "Autoencoder",
+            "U-Net",
+            "ResNet / skip connections"
+          ]
         }
       ]
     },
@@ -657,6 +851,37 @@
           "q": "What are the main differences between a standard autoencoder and a variational autoencoder?",
           "answer": "A **standard AE** imposes **no structure on the latent space** — it only compresses and reconstructs the input (reconstruction loss only). A **VAE imposes a prior on the latent space** (learns a probability distribution), **samples from the latent distribution**, and adds a **KL-divergence term** to the loss → enabling generation of new samples.",
           "extend": "VAE = AE + a regularized, samplable latent (KL to a prior). Plain AE's latent has 'holes', so it can't generate.",
+          "tags": [
+            "Regularization",
+            "Autoencoder",
+            "VAE"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 5.4"
+          ],
+          "q": "What are the differences between an autoencoder and a variational autoencoder in terms of goal and loss?",
+          "answer": "**Goal:** AE learns an efficient embedding to **reconstruct** the input; VAE learns a **latent distribution** so it can **generate new data** from the same distribution. **Loss:** AE uses a **reconstruction loss** (MSE/L1); VAE uses **reconstruction + KL-divergence** (forcing the latent toward a Gaussian).",
+          "extend": "VAE = AE + a probabilistic, samplable latent regularized by KL; plain AE only reconstructs.",
+          "tags": [
+            "Regularization",
+            "Autoencoder",
+            "VAE",
+            "i.i.d. / distribution"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 5.4"
+          ],
+          "q": "Why is a VAE better than a plain AE for generating new, similar product images? What architecture change and loss are needed?",
+          "answer": "A **VAE enforces a probability distribution** (Gaussian) on the latent space, so you can **sample** new latents and decode realistic new images (a plain AE's latent has gaps). **Change:** the encoder outputs a **mean and variance** (not a fixed vector). **Loss:** **reconstruction + KL-divergence**.",
+          "extend": "VAE's regularized, samplable latent enables generation; encoder→(μ,σ), loss = recon + KL.",
           "tags": [
             "Regularization",
             "Autoencoder",
@@ -771,6 +996,20 @@
             }
           ],
           "tags": [
+            "GAN"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 5.5"
+          ],
+          "q": "How do an autoencoder and a GAN differ in network architecture (0.5p each)? What is the goal of the discriminator loss in a GAN (1p)?",
+          "answer": "**Architecture:** an **AE has an encoder** (+decoder, trained cooperatively); a **GAN has a discriminator** (+generator, trained adversarially). **Discriminator loss goal:** to **correctly classify real vs fake** images — pushing the generator to make outputs that look real.",
+          "extend": "AE: encoder–decoder, cooperative; GAN: generator–discriminator, adversarial.",
+          "tags": [
+            "Autoencoder",
             "GAN"
           ]
         }

@@ -310,6 +310,213 @@
             "Adam",
             "Momentum"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 4.1"
+          ],
+          "q": "Explain the concept behind momentum in SGD.",
+          "answer": "Momentum **accumulates a (weighted) running average of past gradients** (a velocity) and steps along it. This **accelerates** progress in consistent directions and helps the optimizer **roll through saddle points / flat regions** where the raw gradient is small.",
+          "extend": "Momentum = EMA of gradients ⇒ inertia through saddles and faster, smoother descent.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 4.2"
+          ],
+          "q": "Which optimizer introduced in the lecture uses the second but not the first order moment?",
+          "answer": "**RMSProp** — it keeps an exponentially-decaying average of **squared** gradients (second moment) to scale per-parameter steps, but does **not** accumulate a first-moment (momentum) term.",
+          "extend": "RMSProp = 2nd moment only; Adam = 1st + 2nd moments.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 4.4"
+          ],
+          "q": "Why is Newton's method not commonly used to train deep models (1p)? What is an advantage of using it (1p)?",
+          "answer": "**Not used:** it needs the **Hessian** (second derivatives) and its inverse — **computationally too expensive** for models with many parameters. **Advantage:** it **converges in fewer iterations** and **needs no learning rate** (curvature sets the step).",
+          "extend": "Second-order = curvature-aware, LR-free, few steps — but the Hessian is infeasible at scale.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum",
+            "Learning rate"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS21 5.1",
+            "WS21 5.2"
+          ],
+          "q": "(5.1) Name two limitations of SGD that momentum can solve and how. (5.2) In $\\nu_{k+1}=\\beta\\nu_k-\\alpha\\nabla_\\theta L$, what do $\\alpha$ and $\\beta$ represent?",
+          "answer": "**5.1** Momentum fixes: **slow learning / small steps** (it builds velocity in consistent directions → faster) and **getting stuck in local minima / saddle points / noise** (accumulated velocity carries through, and the EMA reduces noise). **5.2** $\\alpha$ = **learning rate**; $\\beta$ = **momentum / velocity-accumulation (friction) coefficient**.",
+          "extend": "Momentum = EMA of gradients with rate $\\beta$, scaled step $\\alpha$ → speed + saddle escape + denoising.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum",
+            "Learning rate"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS21 5.3"
+          ],
+          "q": "How does Nesterov momentum differ from standard momentum?",
+          "answer": "Nesterov takes a **look-ahead step**: it first jumps in the direction of the **accumulated momentum**, then computes the gradient **at that look-ahead position**. This lets the gradient **correct overshooting of the momentum within the same step**, giving more responsive updates.",
+          "extend": "Standard: gradient at current point, then add momentum. Nesterov: peek ahead via momentum, then correct.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS21 5.4"
+          ],
+          "q": "Is RMSProp a first- or second-order method (1p)? What is the main difference between RMSProp and SGD+Momentum?",
+          "answer": "**First order** (it only uses gradients, no Hessian). **Difference:** RMSProp uses the **second moment** — an exponentially-decaying average of **squared** gradients (variance) — to dampen oscillation and scale per-parameter steps; **SGD+Momentum** accumulates the **first moment** (a running average of the gradients).",
+          "extend": "Both first-order; RMSProp scales by gradient variance, momentum averages gradient direction.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS26 P1a"
+          ],
+          "q": "Which statement(s) about batch size and SGD is/are true?",
+          "answer": "**True:** *increasing the batch size reduces the noise in SGD* (more samples → lower-variance gradient), and *batch size can have a regularization-like effect* (small batches add noise). **False:** SGD needs *more* update steps than GD (not fewer); and a larger batch does not *always* improve performance.",
+          "extend": "Bigger batch = less gradient noise; small-batch noise can act like regularization.",
+          "options": [
+            {
+              "text": "Increasing the batch size reduces the noise in SGD.",
+              "correct": true
+            },
+            {
+              "text": "Compared to GD, SGD typically requires fewer update steps.",
+              "correct": false
+            },
+            {
+              "text": "A larger batch size always leads to better performance.",
+              "correct": false
+            },
+            {
+              "text": "The batch size can have an effect similar to regularization.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Regularization",
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P3c"
+          ],
+          "q": "Momentum SGD: $m_{t+1}=\\beta m_t-\\alpha\\frac{\\partial L}{\\partial\\theta_t},\\ \\theta_{t+1}=\\theta_t+m_{t+1}$. (1) Name $\\alpha,\\beta$. (2) Name two problems of plain SGD and how momentum helps.",
+          "answer": "**$\\alpha$** = learning rate; **$\\beta$** = momentum / accumulation coefficient. Momentum helps with: **oscillations** (averaging gradients cancels noise, smoothing the path), **slow convergence** (builds velocity through flat areas), and **saddle points** (inertia rolls through zero-gradient regions).",
+          "extend": "Momentum's velocity term denoises, accelerates, and carries the optimizer through saddles.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum",
+            "Learning rate"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS23 1.2"
+          ],
+          "q": "Which statements about deep-learning optimizers are true?",
+          "answer": "**True:** *RMSProp requires less memory than Adam* (one moment vs two), and *Adam uses the 1st and 2nd moments* of gradients. **False:** RMSProp is not 'SGD+momentum with LR divided by an EMA of gradients', and it does not estimate the Hessian.",
+          "extend": "RMSProp = 2nd moment only (lighter); Adam = 1st + 2nd moments (heavier).",
+          "options": [
+            {
+              "text": "RMSProp is equivalent to SGD with momentum and LR divided by an EMA of gradients.",
+              "correct": false
+            },
+            {
+              "text": "RMSProp employs a local estimation of the Hessian.",
+              "correct": false
+            },
+            {
+              "text": "RMSProp requires less memory than Adam.",
+              "correct": true
+            },
+            {
+              "text": "Adam optimizer uses 1st and 2nd moment of gradients.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS23 2.7"
+          ],
+          "q": "Explain the $\\beta_1$ and $\\beta_2$ hyperparameters in the Adam optimizer.",
+          "answer": "$\\beta_1$ = decay-rate coefficient of the **moving average of the first moment** (the mean of recent gradients). $\\beta_2$ = decay-rate coefficient of the **moving average of the second moment** (the variance / squared gradients).",
+          "extend": "Higher $\\beta$ ⇒ longer memory; $\\beta_1$ governs momentum, $\\beta_2$ governs the adaptive scaling.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 2.3"
+          ],
+          "q": "Explain the purpose and benefit of the 'bias correction' step in Adam, given $m_{k+1}=\\beta_1 m_k+(1-\\beta_1)\\nabla L$ and $v_{k+1}=\\beta_2 v_k+(1-\\beta_2)(\\nabla L\\odot\\nabla L)$.",
+          "answer": "$m,v$ are **initialized to 0**, so early estimates are **biased toward zero** (too small). **Bias correction** ($\\hat m=m/(1-\\beta_1^k),\\ \\hat v=v/(1-\\beta_2^k)$) rescales them to **unbiased** estimates, giving **effective early updates** and accelerating early training.",
+          "extend": "Zero-init biases the moving averages low; dividing by $1-\\beta^k$ de-biases them for the first steps.",
+          "tags": [
+            "Optimizers",
+            "Adam",
+            "Momentum",
+            "Weight initialization"
+          ]
         }
       ]
     },
@@ -486,6 +693,114 @@
             "Overfitting",
             "Optimizers",
             "CNN"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS22 1.1"
+          ],
+          "q": "Your cat-species classifier gets a low training error but a high test error. Which are promising things to try?",
+          "answer": "**Get more training data** and **add weight regularization** — both reduce the **generalization gap** (this is overfitting). A *bigger* network or a *different initialization* would not address overfitting (a bigger net can make it worse).",
+          "extend": "Low train / high test = overfitting ⇒ more data or regularization, not more capacity.",
+          "options": [
+            {
+              "text": "Use a bigger neural network.",
+              "correct": false
+            },
+            {
+              "text": "Get more training data.",
+              "correct": true
+            },
+            {
+              "text": "Try a different initialization during training.",
+              "correct": false
+            },
+            {
+              "text": "Add weight regularization.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Regularization",
+            "Overfitting",
+            "Weight initialization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS22 8.2"
+          ],
+          "q": "Explain overfitting and underfitting (1p each) and describe how the loss curves look in each case.",
+          "answer": "**Underfitting:** low model capacity / training too slow → **both** train and val loss stay **high** with a small gap (both could keep descending). **Overfitting:** the model memorizes the data and generalizes poorly → train loss keeps **decreasing** while val loss **decreases then rises** after a critical point.",
+          "extend": "Underfit = high error both curves; overfit = diverging curves (train↓, val↑).",
+          "tags": [
+            "Overfitting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS21 7.1",
+            "WS21 7.2"
+          ],
+          "q": "Two students train image classifiers. (7.1) Erika's curves show train loss falling while val loss rises — interpret and how to improve. (7.2) Max's curves show both losses high/flat — interpret and how to improve.",
+          "answer": "**7.1 Overfitting** → apply **regularization** (dropout, L1/L2/weight decay, data augmentation), **early stopping**, or **reduce capacity**. **7.2 Underfitting** (or poor optimization) → **increase model capacity**, or fix optimization: **decrease/decay the learning rate**, use Adam/BN.",
+          "extend": "Train↓ val↑ = overfit (regularize); both high = underfit (more capacity / better optimization).",
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2",
+            "Overfitting",
+            "Adam"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P2e"
+          ],
+          "q": "Identify the technique in this pseudocode and explain the counter/patience logic: it tracks `best_validation_loss`, resets `counter=0` on improvement, else `counter+=1`, and breaks when `counter>=patience`.",
+          "answer": "It implements **early stopping**. It monitors the **validation loss**, remembering the best value; each epoch **without improvement increments a counter**, and once the loss hasn't improved for `patience` consecutive epochs the loop **breaks** — stopping training before it overfits.",
+          "extend": "Patience = grace epochs of no val-improvement before stopping; resets whenever val loss hits a new best.",
+          "tags": [
+            "Regularization",
+            "Overfitting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P3e"
+          ],
+          "q": "Training accuracy is high but validation accuracy is much lower. (1) Name the phenomenon. (2) If you reduce the model size, what happens to the train–val gap and why?",
+          "answer": "(1) **Overfitting** (poor generalization). (2) The **gap shrinks**: a smaller model has **lower capacity**, so it can **memorize the training data less**, reducing the difference between training and validation accuracy.",
+          "extend": "Overfit gap ∝ capacity; shrinking the model is a (capacity-reducing) regularizer.",
+          "tags": [
+            "Regularization",
+            "Overfitting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Mock II.4"
+          ],
+          "q": "Plain SGD with L2 was run with four learning rates [3e-4, 4e-1, 2e-5, 8e-3] giving loss curves; one diverges, one barely moves, one is noisy/high, one descends smoothly. How do you match LR to curve behaviour?",
+          "answer": "The **largest LR (4e-1)** makes the loss **diverge/oscillate** (way too high). **2e-5** is **too low** → the loss barely decreases. **8e-3** is **too high** → unstable/high loss. **3e-4** is the **good** LR → smooth, steady descent.",
+          "extend": "Read curves by stability: diverging = LR too high, flat = too low, smooth descent = well-tuned.",
+          "tags": [
+            "L1/L2",
+            "Overfitting",
+            "Optimizers",
+            "Learning rate"
           ]
         }
       ]
@@ -681,6 +996,225 @@
             "Overfitting",
             "Data augmentation"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS22 1.5"
+          ],
+          "q": "Regularization: which statements are true?",
+          "answer": "**True:** it is *any technique that aims to reduce the **generalization gap***, and *weight decay (L2) spreads the decision power among as many neurons as possible*. **False:** it does not aim to *increase training accuracy*; and *ReLU is not a regularization technique* (so the dropout/ReLU/early-stopping claim is false).",
+          "extend": "Regularization shrinks the train–val gap (often at some training-accuracy cost); ReLU is an activation, not regularization.",
+          "options": [
+            {
+              "text": "Any technique that reduces validation error and increases training accuracy.",
+              "correct": false
+            },
+            {
+              "text": "Any technique that aims to reduce the generalization gap.",
+              "correct": true
+            },
+            {
+              "text": "Dropout, ReLU activations, and early stopping can all be considered regularization.",
+              "correct": false
+            },
+            {
+              "text": "Weight decay (L2) spreads the decision power among as many neurons as possible.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "ReLU",
+            "Dropout",
+            "Regularization",
+            "L1/L2",
+            "Overfitting"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS22 1.8"
+          ],
+          "q": "What is true about Dropout?",
+          "answer": "**True:** it *can be seen as an ensemble of networks* (random sub-networks) and is an *efficient way to regularize*. **False:** it does not make the network train faster, and it has no special trouble with tanh activations.",
+          "extend": "Dropout = cheap ensemble regularizer; it slows (not speeds) convergence and is activation-agnostic.",
+          "options": [
+            {
+              "text": "...makes your network train faster.",
+              "correct": false
+            },
+            {
+              "text": "...can be seen as an ensemble of networks.",
+              "correct": true
+            },
+            {
+              "text": "...is an efficient way for regularization.",
+              "correct": true
+            },
+            {
+              "text": "...has trouble with tanh activations.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Tanh",
+            "Dropout",
+            "Regularization",
+            "L1/L2"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 6.4"
+          ],
+          "q": "Your segmentation network is too large for the task. Name two approaches to counteract overfitting **without** changing the convolutional layers.",
+          "answer": "Any two: **weight regularization / weight decay**, **data augmentation**, or **dropout**. (Adding more data also helps.) Changing BN, learning rate, skip connections, or pooling is not an answer here.",
+          "extend": "Too-large model ⇒ overfits ⇒ regularize (weight decay / dropout) or augment, leaving the conv stack intact.",
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2",
+            "Overfitting",
+            "Learning rate"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS26 P1c",
+            "WS26 P1d"
+          ],
+          "q": "Regularization & dropout: which statements are true?",
+          "answer": "**Regularization** is used to **improve generalization to unseen data** (not to speed convergence, learn more complex patterns, or reduce both errors). **Dropout** is **a regularization strategy**; it is **inactive at inference**, $p_{drop}=0.5$ does **not** mean half-capacity at inference, and it **reduces** (not increases) neuron co-adaptation.",
+          "extend": "Regularization targets the generalization gap; dropout is train-only and decreases co-adaptation.",
+          "options": [
+            {
+              "text": "Regularization speeds up convergence during training.",
+              "correct": false
+            },
+            {
+              "text": "Regularization improves generalization to unseen data.",
+              "correct": true
+            },
+            {
+              "text": "Dropout is considered a regularization strategy.",
+              "correct": true
+            },
+            {
+              "text": "Dropout remains active during the inference phase.",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2",
+            "Overfitting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P2b"
+          ],
+          "q": "Explain why dropout is considered an ensemble method (training vs inference).",
+          "answer": "During **training**, randomly disabling neurons trains a different **sub-network** each step — effectively training a huge ensemble of sub-networks sharing weights. At **inference**, the **full network** (with appropriate scaling) **approximates the average** of all these sub-networks' predictions.",
+          "extend": "Dropout = implicit weight-shared ensemble; test-time full net ≈ averaging the ensemble.",
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P2c"
+          ],
+          "q": "Which penalty-based regularization encourages a network to focus on a small number of important features? Explain.",
+          "answer": "**L1 regularization** — it penalizes the absolute weight values, **encouraging sparsity** (driving many weights to exactly 0), so the model effectively **selects a small set of important features**.",
+          "extend": "L1 → sparse weights (feature selection); L2 → small, spread-out weights.",
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS23 7.1",
+            "WS23 7.4"
+          ],
+          "q": "(7.1) Name a regularization method that encourages sparse weights and write its formula for $W_{m\\times n}$. (7.4) How can sparsity in weight matrices be leveraged for lossy model compression, and what are the practical advantages?",
+          "answer": "**7.1 L1 regularization (Lasso):** $\\|W\\|_1=\\sum_{i=1}^{m}\\sum_{j=1}^{n}|w_{ij}|$. **7.4** **Set weights below a threshold to zero** and store the result as **sparse matrices** → **less storage** and **more efficient compute** (skip the zeros).",
+          "extend": "L1 drives weights to exactly 0 → prune + store sparsely → smaller, faster models.",
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS23 1.9"
+          ],
+          "q": "Which statements about dropout regularization are true?",
+          "answer": "**True:** it *prevents overfitting by randomly zeroing a fraction of neurons during training*, and it *promotes learning more generic features* (less memorization). **False:** it is not 'adding noise to the input', and it is **not** CNN-only.",
+          "extend": "Dropout randomly masks neurons in training → discourages memorization/co-adaptation across all net types.",
+          "options": [
+            {
+              "text": "Dropout adds noise to the input data during training.",
+              "correct": false
+            },
+            {
+              "text": "Dropout randomly sets a fraction of neurons to zero during training.",
+              "correct": true
+            },
+            {
+              "text": "Dropout is only applicable to CNNs.",
+              "correct": false
+            },
+            {
+              "text": "Dropout helps prevent memorizing specific samples, promoting generic features.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2",
+            "Overfitting",
+            "CNN"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 4.2",
+            "SS23 4.3"
+          ],
+          "q": "(4.2) Define L2 regularization and why it is used. (4.3) After training with L2 ($\\lambda=1$), the weight histogram shows all weights close to 0 — why?",
+          "answer": "**4.2** $\\text{reg}=\\lambda\\sum_i\\theta_i^2$ — it penalizes large weights, **spreading the decision power** across many small weights to **reduce overfitting / improve generalization**. **4.3** The **regularization coefficient $\\lambda$ is too high**, so the penalty dominates and **shrinks all weights toward 0** (hence the name 'weight decay').",
+          "extend": "L2 shrinks weights; too-large $\\lambda$ over-shrinks everything toward zero (under-uses capacity).",
+          "tags": [
+            "Dropout",
+            "Regularization",
+            "L1/L2",
+            "Overfitting"
+          ]
         }
       ]
     },
@@ -870,6 +1404,188 @@
             "Convolution",
             "Normalization"
           ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS21 1.5"
+          ],
+          "q": "Given input $x$, which identities are always true? (For dropout, assume the same neurons are chosen.)",
+          "answer": "**True:** $\\text{Dropout}(\\text{ReLU}(x))\\equiv\\text{ReLU}(\\text{Dropout}(x))$ and $\\text{MaxPool}(\\text{ReLU}(x))\\equiv\\text{ReLU}(\\text{MaxPool}(x))$ — ReLU is monotonic and commutes with masking/max. **False:** BN does not commute with ReLU, and Sigmoid/ReLU don't commute.",
+          "extend": "ReLU (monotone, elementwise) commutes with max-pool and with a fixed dropout mask, but not with BN or sigmoid.",
+          "options": [
+            {
+              "text": "BatchNorm(ReLU(x)) ≡ ReLU(BatchNorm(x))",
+              "correct": false
+            },
+            {
+              "text": "Dropout(ReLU(x)) ≡ ReLU(Dropout(x))",
+              "correct": true
+            },
+            {
+              "text": "MaxPool(ReLU(x)) ≡ ReLU(MaxPool(x))",
+              "correct": true
+            },
+            {
+              "text": "ReLU(Sigmoid(x)) ≡ Sigmoid(ReLU(x))",
+              "correct": false
+            }
+          ],
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Batch normalization",
+            "Dropout",
+            "Pooling"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS21 1.8"
+          ],
+          "q": "What is true about batch normalization (train and test set from the same distribution)?",
+          "answer": "**True:** BN *makes gradients more stable so we can train deeper networks*, and BN *has learnable parameters* ($\\gamma,\\beta$). **False:** BN can be used with dropout; and at **test** time it uses **running (training) statistics**, not test-batch statistics.",
+          "extend": "BN: learnable $\\gamma,\\beta$; train uses batch stats, test uses running averages.",
+          "options": [
+            {
+              "text": "Batch normalization cannot be used together with dropout.",
+              "correct": false
+            },
+            {
+              "text": "Batch normalization makes the gradients more stable, so we can train deeper networks.",
+              "correct": true
+            },
+            {
+              "text": "At test time, BN uses mean/variance computed on test-set samples.",
+              "correct": false
+            },
+            {
+              "text": "Batch normalization has learnable parameters.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Batch normalization",
+            "Dropout",
+            "Normalization",
+            "Dataset splits",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS21 4.3"
+          ],
+          "q": "Explain the main difference in how a BatchNorm layer is used in a convolutional vs a fully-connected network.",
+          "answer": "In a **conv** network BN normalizes **per channel** — statistics are pooled over the batch **and the spatial dimensions**, giving one $(\\gamma,\\beta)$ per channel. In an **FC** network BN normalizes **per feature** (statistics over the batch only).",
+          "extend": "Conv BN = per-channel (batch+spatial); FC BN = per-feature (batch only).",
+          "tags": [
+            "Batch normalization",
+            "Convolution",
+            "Fully-connected",
+            "Normalization"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "WS26 P1e"
+          ],
+          "q": "Which statements about batch normalization are true?",
+          "answer": "**True:** it *reduces internal covariate shift* and *can be applied per channel in CNNs*. **False:** it works **worse** (not better) for small mini-batches, and it **has** learnable parameters ($\\gamma,\\beta$).",
+          "extend": "BN: per-channel in CNNs, learnable $\\gamma,\\beta$, needs a reasonably large batch.",
+          "options": [
+            {
+              "text": "Reduces internal covariate shift.",
+              "correct": true
+            },
+            {
+              "text": "Works better for smaller mini-batch sizes.",
+              "correct": false
+            },
+            {
+              "text": "Has no learnable parameters.",
+              "correct": false
+            },
+            {
+              "text": "Can be applied per channel in CNNs.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Batch normalization",
+            "CNN",
+            "Normalization",
+            "Parameter counting"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P3g",
+            "WS26 P3h"
+          ],
+          "q": "BN with $\\hat x=\\frac{x-E[x]}{\\sqrt{\\text{Var}[x]+\\epsilon}},\\ y=\\gamma\\hat x+\\beta$. (g) Why is a very small mini-batch bad for BN? (h) How are mean/variance obtained at inference and why?",
+          "answer": "**(g)** With a small batch the mean/variance are **noisy and unrepresentative** of the full data, so normalization is unreliable. **(h)** At inference we use a **running (moving) average** of the mean/variance collected during training — this keeps the output **deterministic**, independent of which other samples share the batch.",
+          "extend": "Small batch ⇒ noisy stats; test-time running averages make BN deterministic and batch-independent.",
+          "tags": [
+            "Batch normalization",
+            "Normalization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P3i"
+          ],
+          "q": "What $\\gamma,\\beta$ would BN need to learn to recover the original unnormalized input ($y=x$)?",
+          "answer": "$\\gamma=\\sqrt{\\text{Var}[x]+\\epsilon}$ and $\\beta=E[x]$ — these exactly invert the normalization, so $y=\\gamma\\hat x+\\beta=x$.",
+          "extend": "BN can represent the identity; the affine $\\gamma,\\beta$ let it undo normalization if that's optimal.",
+          "tags": [
+            "Batch normalization",
+            "Normalization"
+          ]
+        },
+        {
+          "type": "mc",
+          "freq": 1,
+          "sources": [
+            "SS23 1.4"
+          ],
+          "q": "Which statements about Batch Normalization are true?",
+          "answer": "**True:** BN *accelerates the training process in most cases* and *reduces the impact of poor weight initialization*. **False:** it does not speed up a single batch's raw processing time, and it is **not** skipped at test time (it uses running statistics).",
+          "extend": "BN speeds convergence and tolerates bad init; at test time it runs with stored statistics.",
+          "options": [
+            {
+              "text": "Batch Normalization speeds up the processing time of a single batch.",
+              "correct": false
+            },
+            {
+              "text": "Batch Normalization accelerates the training process in most cases.",
+              "correct": true
+            },
+            {
+              "text": "Batch Normalization layers are always skipped at test time.",
+              "correct": false
+            },
+            {
+              "text": "Batch Normalization reduces the impact of poor weight initialization.",
+              "correct": true
+            }
+          ],
+          "tags": [
+            "Batch normalization",
+            "Weight initialization",
+            "Normalization"
+          ]
         }
       ]
     },
@@ -988,6 +1704,39 @@
             "Batch normalization",
             "Weight initialization"
           ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 2.6"
+          ],
+          "q": "Briefly explain weight initialization. Name one bad method and why it's bad, plus two common strategies.",
+          "answer": "**Concept:** initialize weight matrices with **random non-zero** values. **Bad:** **zero-initialization** — it doesn't **break symmetry**, so all neurons get identical gradients and learn the same thing. **Common strategies:** **He/Kaiming** (for ReLU) and **Xavier** (for tanh/sigmoid).",
+          "extend": "Init must break symmetry; He↔ReLU (fan-in), Xavier↔tanh/sigmoid (fan-in+out).",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Weight initialization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS23 4.4"
+          ],
+          "q": "A network uses Kaiming init with ReLU. You replace all ReLUs with Sigmoids and change nothing else. What problem appears and how do you fix it?",
+          "answer": "**Kaiming init is designed for ReLU**; with Sigmoid it no longer preserves the activation variance across layers (and sigmoids in middle layers cause **vanishing gradients**). **Fix:** use **Xavier initialization** (suited to sigmoid/tanh) — or switch back to ReLU / add BatchNorm.",
+          "extend": "Init must match the activation: He/Kaiming↔ReLU, Xavier↔sigmoid/tanh.",
+          "tags": [
+            "Sigmoid",
+            "ReLU",
+            "Tanh",
+            "Vanishing gradient",
+            "Batch normalization"
+          ]
         }
       ]
     },
@@ -1076,6 +1825,64 @@
           "extend": "Larger LR ⇒ faster but rougher convergence; smaller LR ⇒ slower but smoother. Map curve speed/stability to LR magnitude.",
           "tags": [
             "Optimizers",
+            "Learning rate"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 4.3"
+          ],
+          "q": "Name a disadvantage of a small mini-batch size and a disadvantage of a large mini-batch size.",
+          "answer": "**Small batch:** **noisy / high-variance** gradient updates → slower, less stable training (more steps). **Large batch:** **requires more memory** (heavy GPU usage) and can get stuck near saddle points / sharp minima.",
+          "extend": "Batch size trades gradient noise (small) against memory and generalization (large).",
+          "tags": [
+            "Learning rate"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS22 6.5",
+            "WS22 8.3"
+          ],
+          "q": "For vanilla SGD you grid-search three learning rates with converged training-accuracy curves and order them $\\tau_1>\\tau_3>\\tau_2$. Separately, a training-loss plot shows a sudden drop — name the technique that produced it.",
+          "answer": "**Ordering:** the largest stable LR ($\\tau_1$) climbs fastest, the smallest ($\\tau_2$) slowest, giving $\\tau_1>\\tau_3>\\tau_2$. **Sudden loss drop:** **learning-rate scheduling / step decay** (reducing the LR mid-training).",
+          "extend": "Faster, higher curve ⇒ larger LR; a step-down in the loss curve ⇒ an LR-decay schedule.",
+          "tags": [
+            "Optimizers",
+            "Learning rate"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS21 5.5",
+            "WS21 5.6",
+            "WS21 5.7"
+          ],
+          "q": "For the convex objective $\\min_{x}x^2$: (5.5) the optimum? (5.6) with $x_0=5$, lr $=1$, how many GD steps to converge (no momentum)? (5.7) starting from a random $x_0$, how could you speed up GD (no momentum)?",
+          "answer": "**5.5** $x^\\*=0$. **5.6** It **never converges** — the gradient is $2x$, so the update $x\\leftarrow x-1\\cdot2x=-x$ just **oscillates** $5\\to-5\\to5\\dots$ (the LR is too large). **5.7** **Reduce / decay the learning rate** (adaptive LR, line search, or gradient clipping).",
+          "extend": "$\\nabla=2x$ with lr 1 flips the sign each step (overshoot); a smaller/decaying LR converges.",
+          "tags": [
+            "Exploding gradient",
+            "Momentum",
+            "Learning rate"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P3d"
+          ],
+          "q": "Name one problem from a learning rate that is too high, and one from a learning rate that is too low.",
+          "answer": "**Too high:** the loss may **diverge (blow up) or oscillate** around the minimum without converging. **Too low:** convergence is **extremely slow**, or the model gets **trapped in a poor local minimum**.",
+          "extend": "LR too high → overshoot/diverge; too low → crawl / stuck. Tune or schedule between the extremes.",
+          "tags": [
             "Learning rate"
           ]
         }
@@ -1175,6 +1982,34 @@
           "q": "For transferring to a 'human present?' road-camera classifier, you have pretrained models on (a) ImageNet, (b) Bird200k, (c) road-scene signs. Which is least suitable, and how would you use the chosen encoder?",
           "answer": "**Least suitable: (b) the bird classifier** — a **domain mismatch** between bird images and road images. Using the chosen encoder: **resize inputs** if needed, **add new layers** on top of the embeddings for your output, and **freeze the encoder weights** during training.",
           "extend": "Pick a backbone whose pretraining domain is close to the target; freeze it and train only a small new head when data is scarce.",
+          "tags": [
+            "Transfer learning"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P6a",
+            "WS26 P6c"
+          ],
+          "q": "Transfer learning with a pretrained ViT (embedding $d=768$) to classify two dog breeds, small dataset, limited GPU. (a) Two techniques to reduce GPU memory. (c) What change to the final layer, and which parameters to train vs freeze and why?",
+          "answer": "**(a)** Any two: freeze layers, reduce batch size, mixed-precision training, gradient checkpointing. **(c)** Replace the final classification head with a **new layer of output dim 2** (or 1 for binary). **Freeze the ViT backbone** and **train only the new head** — the small dataset would overfit if the whole backbone were tuned, and the pretrained features are already strong (and full fine-tuning is costly).",
+          "extend": "Small data + big pretrained model ⇒ swap the head, freeze the backbone, train only the head.",
+          "tags": [
+            "Overfitting",
+            "Transfer learning"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P6b"
+          ],
+          "q": "Using a pretrained ViT's embeddings and a small labeled set, describe a parameter-free way to predict a new test image's label.",
+          "answer": "Use **k-Nearest-Neighbors** in the embedding space: embed the labeled images and the test image with the frozen ViT, then assign the **majority label of the nearest neighbors** — no parameters are trained.",
+          "extend": "Frozen-encoder + kNN on embeddings = a strong training-free baseline.",
           "tags": [
             "Transfer learning"
           ]
