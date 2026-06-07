@@ -591,7 +591,7 @@
       if (!el) return;
       const others = Math.max(0, n - 1);
       el.textContent = others > 0
-        ? "🟢 " + others + (others === 1 ? " other person" : " others") + " studying with you right now"
+        ? "🟢 You are not alone! " + others + (others === 1 ? " other person is" : " others are") + " studying right now"
         : "🟢 You're the only one studying right now — keep going!";
       el.classList.add("show");
     }
