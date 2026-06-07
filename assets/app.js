@@ -560,9 +560,12 @@
       async init(cfg) {
         try {
           await load(FB + "firebase-app-compat.js");
-          await Promise.all([load(FB + "firebase-auth-compat.js"), load(FB + "firebase-firestore-compat.js")]);
+          const extra = [load(FB + "firebase-auth-compat.js"), load(FB + "firebase-firestore-compat.js")];
+          if (cfg.databaseURL) extra.push(load(FB + "firebase-database-compat.js"));
+          await Promise.all(extra);
           firebase.initializeApp(cfg);
           db = firebase.firestore();
+          if (cfg.databaseURL) Presence.start();
           firebase.auth().onAuthStateChanged(async (user) => {
             if (user) { uid = user.uid; ready = true; await pullMergePush(); renderAuth(user); }
             else { uid = null; ready = false; renderAuth(null); }
@@ -575,6 +578,40 @@
     return API;
   })();
   window.CloudSync = CloudSync;
+
+  // ===================================================================
+  // Presence — live "people online now" banner via Realtime Database.
+  // Each open tab pushes a child under /presence and removes it on
+  // disconnect (Firebase server-side onDisconnect), so the count tracks
+  // real concurrent visitors without any backend.
+  // ===================================================================
+  const Presence = (function () {
+    function render(n) {
+      const el = document.getElementById("presence-bar");
+      if (!el) return;
+      const others = Math.max(0, n - 1);
+      el.textContent = others > 0
+        ? "🟢 目前有 " + others + " 人跟你一起在线刷题"
+        : "🟢 目前就你一个人在线刷题，加油！";
+      el.classList.add("show");
+    }
+    function start() {
+      try {
+        const dbRT = firebase.database();
+        const listRef = dbRT.ref("presence");
+        const connRef = dbRT.ref(".info/connected");
+        let myRef = null;
+        connRef.on("value", (snap) => {
+          if (snap.val() !== true) return;
+          myRef = listRef.push();
+          myRef.onDisconnect().remove();
+          myRef.set({ t: firebase.database.ServerValue.TIMESTAMP });
+        });
+        listRef.on("value", (snap) => render(snap.numChildren()));
+      } catch (e) { console.warn("Presence init failed", e); }
+    }
+    return { start };
+  })();
 
   if (CFG.firebase && CFG.firebase.apiKey) {
     const a = document.getElementById("authctl");
@@ -590,6 +627,13 @@
     fbLink.textContent = "Feedback form not configured yet";
     fbLink.removeAttribute("href");
   }
+
+  // ---- mobile: start with the contents panel collapsed so questions are
+  //      immediately reachable; desktop keeps the always-on sidebar TOC ----
+  (function () {
+    const tw = document.querySelector(".toc-wrap");
+    if (tw && window.matchMedia("(max-width:860px)").matches) tw.removeAttribute("open");
+  })();
 
   // ---- TOC scroll-spy: highlight the topic section currently in view ----
   (function () {

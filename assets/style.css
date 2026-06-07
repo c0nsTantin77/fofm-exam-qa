@@ -441,6 +441,7 @@ details.q.has-note .note-btn{background:#fffaf0;border-color:#ffe2a8;color:#b886
   .toc-wrap>summary::after{content:"▾";transition:transform .2s}
   .toc-wrap[open]>summary::after{transform:rotate(180deg)}
   .toc-wrap>.toc{padding:0 14px 10px}
+  .toc-wrap:not([open])>.toc{display:none}       /* mobile: actually collapse when closed (overrides the desktop always-show) */
   .toc-title{display:none}                       /* summary already serves as the heading */
   .toc a{font-size:.96rem;padding:10px 6px}       /* taller rows = easier taps */
   .legend{display:none}                          /* legend duplicated in footer; hide to save space */
@@ -476,3 +477,11 @@ details.q.has-note .note-btn{background:#fffaf0;border-color:#ffe2a8;color:#b886
 @media(max-width:380px){
   .cards{grid-template-columns:1fr}
 }
+
+/* ---- live "people online now" banner -------------------------------- */
+#presence-bar{
+  display:none;text-align:center;font-size:.86rem;font-weight:600;
+  color:#0b6b2e;background:linear-gradient(90deg,#e6f7ec,#d3f0dd);
+  border-bottom:1px solid #b7e3c6;padding:5px 12px;letter-spacing:.01em;
+}
+#presence-bar.show{display:block}
