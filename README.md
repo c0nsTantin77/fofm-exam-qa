@@ -19,6 +19,7 @@ Popular Architectures (65) · RNNs & Transformers (57) · Appendix: Matrix Calcu
 - KaTeX formulas, collapsible answers, mobile-optimized.
 
 ## Recent updates
+- **2026-06-07** — Chapter-page readability: **numbered topics** (4.2) **& questions** (4.2.1), an **always-on left contents panel** that highlights your current section as you scroll, and tidier multi-part **answer/summary line breaks**.
 - **2026-06-07** — Mined SS20/SS21/SS22/SS24: +87 questions (now **512**); **all 12 exams covered, overall 90%** (SS21 100%, SS22 98%, SS20 91%).
 - **2026-06-07** — Mined WS22/WS21/WS26/WS23/SS23/Mock: +144 questions; overall exam coverage **41%→70%** (WS22 95%, SS23 93%, WS26 89%).
 - **2026-06-06** — Full WS24 (Winter 2024) endterm mined: +41 questions, WS24 coverage 4%→98%, overall 31%→41%.
