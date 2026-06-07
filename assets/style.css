@@ -153,6 +153,22 @@ details.q.flash{animation:flash 1.6s ease}
 #search:focus{outline:2px solid var(--tum);border-color:var(--tum)}
 #expandAll{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 12px;font-size:.84rem;cursor:pointer;font-weight:600;color:var(--tum)}
 #expandAll:hover{background:#f0f6ff}
+/* ---- "you are here" pill + floating contents popover ---- */
+.nowat-wrap{position:relative;min-width:0;display:flex}
+.nowat{display:inline-flex;align-items:center;gap:8px;max-width:min(56vw,340px);
+  border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;
+  font:inherit;font-size:.9rem;font-weight:600;color:var(--ink);cursor:pointer;
+  transition:border-color .12s,background .12s}
+.nowat:hover{border-color:var(--tum);background:#f0f6ff}
+.nowat-here{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nowat-n{color:var(--tum);font-weight:800;margin-right:6px;font-variant-numeric:tabular-nums}
+.nowat-caret{color:var(--muted);font-size:.78rem;flex:none;transition:transform .2s}
+.nowat[aria-expanded="true"] .nowat-caret{transform:rotate(180deg)}
+.toc-pop{position:absolute;top:calc(100% + 8px);left:0;z-index:60;width:min(360px,calc(100vw - 20px));
+  max-height:min(70vh,520px);overflow-y:auto;overflow-x:hidden;background:#fff;border:1px solid var(--line);
+  border-radius:12px;box-shadow:0 14px 36px rgba(16,24,40,.20);padding:8px}
+.toc-pop[hidden]{display:none}
+.toc-pop .toc-label{overflow-wrap:anywhere}   /* let long titles wrap instead of clipping */
 
 /* ---- chapter layout -------------------------------------------------- */
 .layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:300px 1fr;gap:32px;padding:24px 20px 64px}

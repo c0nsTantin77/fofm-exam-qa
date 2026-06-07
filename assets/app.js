@@ -628,17 +628,58 @@
     fbLink.removeAttribute("href");
   }
 
-  // ---- mobile: start with the contents panel collapsed so questions are
-  //      immediately reachable; desktop keeps the always-on sidebar TOC ----
+  // ---- topbar "you are here" pill + floating contents popover ----------
+  //  The pill always shows the section currently in view (scroll-spy); tapping
+  //  it opens a floating panel that is the full table of contents.
   (function () {
-    const tw = document.querySelector(".toc-wrap");
-    if (tw && window.matchMedia("(max-width:860px)").matches) tw.removeAttribute("open");
-  })();
+    const pill = document.getElementById("nowAt");
+    const pop = document.getElementById("tocPop");
+    const here = pill && pill.querySelector(".nowat-here");
+    const links = pop ? Array.from(pop.querySelectorAll("a[href^='#']")) : [];
+    if (!pill || !pop || !links.length) return;
 
-  // ---- TOC scroll-spy: highlight the topic section currently in view ----
-  (function () {
-    const links = Array.from(document.querySelectorAll(".toc a[href^='#']"));
-    if (!links.length || !("IntersectionObserver" in window)) return;
+    // position the panel: on phones make it a full-width dropdown pinned to the
+    // viewport (titles wrap to the screen width, nothing clips); on desktop keep
+    // it under the pill but nudged left so it never runs off the right edge.
+    const place = () => {
+      if (window.innerWidth <= 700) {
+        const pr = pill.getBoundingClientRect();
+        pop.style.position = "fixed";
+        pop.style.left = "8px";
+        pop.style.right = "8px";
+        pop.style.width = "auto";
+        pop.style.maxWidth = "none";
+        pop.style.top = Math.round(pr.bottom + 6) + "px";
+      } else {
+        pop.style.position = "";
+        pop.style.right = "";
+        pop.style.top = "";
+        pop.style.width = "";
+        pop.style.maxWidth = "";
+        pop.style.left = "0px";
+        const r = pop.getBoundingClientRect();
+        const m = 8;
+        let shift = 0;
+        if (r.right > window.innerWidth - m) shift = (window.innerWidth - m) - r.right;
+        if (r.left + shift < m) shift = m - r.left;
+        pop.style.left = shift + "px";
+      }
+    };
+    // open / close the floating contents panel
+    const setOpen = (on) => {
+      pop.hidden = !on;
+      pill.setAttribute("aria-expanded", on ? "true" : "false");
+      if (on) place();
+    };
+    window.addEventListener("resize", () => { if (!pop.hidden) place(); });
+    pill.addEventListener("click", (e) => { e.stopPropagation(); setOpen(pop.hidden); });
+    pop.addEventListener("click", (e) => { if (e.target.closest("a")) setOpen(false); });
+    document.addEventListener("click", (e) => {
+      if (!pop.hidden && !pop.contains(e.target) && !pill.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+
+    // scroll-spy: reflect the section in view onto the pill + popover highlight
     const linkFor = new Map();
     links.forEach((a) => {
       const el = document.getElementById(decodeURIComponent(a.getAttribute("href").slice(1)));
@@ -646,20 +687,33 @@
     });
     let active = null;
     const setActive = (a) => {
-      if (a === active) return;
+      if (!a || a === active) return;
       if (active) active.classList.remove("active");
       active = a;
-      if (active) {
-        active.classList.add("active");
-        // keep the active item in view within a scrollable sidebar TOC
-        if (active.scrollIntoView) active.scrollIntoView({ block: "nearest" });
+      active.classList.add("active");
+      if (here) {                                   // mirror onto the pill label
+        here.textContent = "";
+        const n = a.querySelector(".toc-num");
+        if (n) {
+          const s = document.createElement("span");
+          s.className = "nowat-n";
+          s.textContent = n.textContent;
+          here.appendChild(s);
+        }
+        const lbl = a.querySelector(".toc-label");
+        here.appendChild(document.createTextNode(lbl ? lbl.textContent : a.textContent));
       }
+      if (!pop.hidden && active.scrollIntoView) active.scrollIntoView({ block: "nearest" });
     };
-    const io = new IntersectionObserver((entries) => {
-      const vis = entries.filter((e) => e.isIntersecting)
-        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-      if (vis.length) setActive(linkFor.get(vis[0].target));
-    }, { rootMargin: "-80px 0px -65% 0px", threshold: 0 });
-    linkFor.forEach((a, el) => io.observe(el));
+
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((entries) => {
+        const vis = entries.filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (vis.length) setActive(linkFor.get(vis[0].target));
+      }, { rootMargin: "-80px 0px -65% 0px", threshold: 0 });
+      linkFor.forEach((a, el) => io.observe(el));
+    }
+    setActive(links[0]);                            // initial label before scrolling
   })();
 })();

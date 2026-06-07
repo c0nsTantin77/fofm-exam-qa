@@ -24,6 +24,18 @@ def qid(kp_id, q):
 DATA = ROOT / "data"
 CHAPTERS_DIR = ROOT / "chapters"
 
+def _asset_ver():
+    """Short content hash of the CSS/JS so their URLs change when they change,
+    forcing browsers to fetch fresh assets (no stale cache after an update)."""
+    h = hashlib.sha1()
+    for rel in ("assets/style.css", "assets/app.js"):
+        p = ROOT / rel
+        if p.exists():
+            h.update(p.read_bytes())
+    return h.hexdigest()[:8]
+
+ASSET_VER = _asset_ver()
+
 # ---------------------------------------------------------------- helpers
 
 def esc(s: str) -> str:
@@ -345,7 +357,7 @@ gtag('config', 'G-163M4VJ1VD');
 <title>{esc(title)}</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
-<link rel="stylesheet" href="{base}assets/style.css">
+<link rel="stylesheet" href="{base}assets/style.css?v={ASSET_VER}">
 {extra_head}
 </head>
 <body>
@@ -355,7 +367,7 @@ gtag('config', 'G-163M4VJ1VD');
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
 <script defer src="{base}assets/config.js"></script>
-<script defer src="{base}assets/app.js"></script>
+<script defer src="{base}assets/app.js?v={ASSET_VER}"></script>
 </body>
 </html>
 """
@@ -406,6 +418,12 @@ def build():
         body = f"""
 <header class="topbar">
   <a class="brand" href="../index.html">{TUM_LOGO.format(base='../')}<span class="brand-back">← All<span class="brand-full"> chapters</span></span></a>
+  <div class="nowat-wrap">
+    <button id="nowAt" class="nowat" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="tocPop" title="Jump to a topic">
+      <span class="nowat-here">Contents</span><span class="nowat-caret" aria-hidden="true">▾</span>
+    </button>
+    <nav id="tocPop" class="toc-pop toc" hidden aria-label="Chapter contents"><ol>{toc}</ol></nav>
+  </div>
   <div class="filters">
     <input id="search" type="search" placeholder="Search questions…" autocomplete="off">
     <label><input type="checkbox" class="ftype" value="mc" checked> MC</label>
@@ -425,10 +443,6 @@ def build():
       <span class="stat"><b>{nai}</b> AI practice</span>
     </div>
     <div class="ch-progress" data-ch="{ch['id']}"></div>
-    <details class="toc-wrap" open>
-      <summary>Contents</summary>
-      <nav class="toc" aria-label="Chapter contents"><div class="toc-title">Contents</div><ol>{toc}</ol></nav>
-    </details>
     <div class="legend">
       <div><span class="badge freq-hot">🔥 n×</span> high frequency</div>
       <div><span class="src">SS22 3.1</span> source = exam + problem no.</div>

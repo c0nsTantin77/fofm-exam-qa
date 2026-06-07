@@ -14,7 +14,7 @@ gtag('config', 'G-163M4VJ1VD');
 <title>IV. Optimization · I2DL Exam Q&amp;A</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/style.css?v=d9a7646b">
 
 </head>
 <body>
@@ -22,6 +22,18 @@ gtag('config', 'G-163M4VJ1VD');
 
 <header class="topbar">
   <a class="brand" href="../index.html"><img class='tum-logo' src='../assets/tum.svg' alt='TUM' width='44' height='23'><span class="brand-back">← All<span class="brand-full"> chapters</span></span></a>
+  <div class="nowat-wrap">
+    <button id="nowAt" class="nowat" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="tocPop" title="Jump to a topic">
+      <span class="nowat-here">Contents</span><span class="nowat-caret" aria-hidden="true">▾</span>
+    </button>
+    <nav id="tocPop" class="toc-pop toc" hidden aria-label="Chapter contents"><ol><li><a href='#optimizers'><span class='toc-num'>4.1</span><span class='toc-label'>Optimization Algorithms (GD, SGD, Momentum, RMSprop, Adam)</span><span class='toc-n'>35</span></a></li>
+<li><a href='#over-underfitting'><span class='toc-num'>4.2</span><span class='toc-label'>Overfitting &amp; Underfitting</span><span class='toc-n'>19</span></a></li>
+<li><a href='#regularization'><span class='toc-num'>4.3</span><span class='toc-label'>Regularization (L1/L2, Weight Decay, Dropout, Early Stopping)</span><span class='toc-n'>22</span></a></li>
+<li><a href='#batchnorm'><span class='toc-num'>4.4</span><span class='toc-label'>Batch Normalization</span><span class='toc-n'>19</span></a></li>
+<li><a href='#weight-init'><span class='toc-num'>4.5</span><span class='toc-label'>Weight Initialization (Xavier / He)</span><span class='toc-n'>11</span></a></li>
+<li><a href='#hyperparams-lr'><span class='toc-num'>4.6</span><span class='toc-label'>Hyperparameter Tuning &amp; Learning Rate</span><span class='toc-n'>10</span></a></li>
+<li><a href='#transfer-learning'><span class='toc-num'>4.7</span><span class='toc-label'>Transfer Learning</span><span class='toc-n'>11</span></a></li></ol></nav>
+  </div>
   <div class="filters">
     <input id="search" type="search" placeholder="Search questions…" autocomplete="off">
     <label><input type="checkbox" class="ftype" value="mc" checked> MC</label>
@@ -41,16 +53,6 @@ gtag('config', 'G-163M4VJ1VD');
       <span class="stat"><b>8</b> AI practice</span>
     </div>
     <div class="ch-progress" data-ch="ch04"></div>
-    <details class="toc-wrap" open>
-      <summary>Contents</summary>
-      <nav class="toc" aria-label="Chapter contents"><div class="toc-title">Contents</div><ol><li><a href='#optimizers'><span class='toc-num'>4.1</span><span class='toc-label'>Optimization Algorithms (GD, SGD, Momentum, RMSprop, Adam)</span><span class='toc-n'>35</span></a></li>
-<li><a href='#over-underfitting'><span class='toc-num'>4.2</span><span class='toc-label'>Overfitting &amp; Underfitting</span><span class='toc-n'>19</span></a></li>
-<li><a href='#regularization'><span class='toc-num'>4.3</span><span class='toc-label'>Regularization (L1/L2, Weight Decay, Dropout, Early Stopping)</span><span class='toc-n'>22</span></a></li>
-<li><a href='#batchnorm'><span class='toc-num'>4.4</span><span class='toc-label'>Batch Normalization</span><span class='toc-n'>19</span></a></li>
-<li><a href='#weight-init'><span class='toc-num'>4.5</span><span class='toc-label'>Weight Initialization (Xavier / He)</span><span class='toc-n'>11</span></a></li>
-<li><a href='#hyperparams-lr'><span class='toc-num'>4.6</span><span class='toc-label'>Hyperparameter Tuning &amp; Learning Rate</span><span class='toc-n'>10</span></a></li>
-<li><a href='#transfer-learning'><span class='toc-num'>4.7</span><span class='toc-label'>Transfer Learning</span><span class='toc-n'>11</span></a></li></ol></nav>
-    </details>
     <div class="legend">
       <div><span class="badge freq-hot">🔥 n×</span> high frequency</div>
       <div><span class="src">SS22 3.1</span> source = exam + problem no.</div>
@@ -224,6 +226,6 @@ gtag('config', 'G-163M4VJ1VD');
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
 <script defer src="../assets/config.js"></script>
-<script defer src="../assets/app.js"></script>
+<script defer src="../assets/app.js?v=d9a7646b"></script>
 </body>
 </html>

@@ -14,7 +14,7 @@ gtag('config', 'G-163M4VJ1VD');
 <title>I. Machine Learning Basics · I2DL Exam Q&amp;A</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/style.css?v=d9a7646b">
 
 </head>
 <body>
@@ -22,6 +22,20 @@ gtag('config', 'G-163M4VJ1VD');
 
 <header class="topbar">
   <a class="brand" href="../index.html"><img class='tum-logo' src='../assets/tum.svg' alt='TUM' width='44' height='23'><span class="brand-back">← All<span class="brand-full"> chapters</span></span></a>
+  <div class="nowat-wrap">
+    <button id="nowAt" class="nowat" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="tocPop" title="Jump to a topic">
+      <span class="nowat-here">Contents</span><span class="nowat-caret" aria-hidden="true">▾</span>
+    </button>
+    <nav id="tocPop" class="toc-pop toc" hidden aria-label="Chapter contents"><ol><li><a href='#tasks'><span class='toc-num'>1.1</span><span class='toc-label'>Learning Paradigms &amp; Task Types</span><span class='toc-n'>11</span></a></li>
+<li><a href='#unsupervised-methods'><span class='toc-num'>1.2</span><span class='toc-label'>Unsupervised Methods: K-means, PCA, Autoencoders</span><span class='toc-n'>8</span></a></li>
+<li><a href='#splits'><span class='toc-num'>1.3</span><span class='toc-label'>Dataset Splits &amp; the Validation Set</span><span class='toc-n'>10</span></a></li>
+<li><a href='#shuffle-distribution'><span class='toc-num'>1.4</span><span class='toc-label'>Shuffling, Distribution Mismatch &amp; i.i.d.</span><span class='toc-n'>8</span></a></li>
+<li><a href='#data-leakage'><span class='toc-num'>1.5</span><span class='toc-label'>Data Leakage &amp; Split Integrity</span><span class='toc-n'>9</span></a></li>
+<li><a href='#augmentation'><span class='toc-num'>1.6</span><span class='toc-label'>Data Augmentation</span><span class='toc-n'>14</span></a></li>
+<li><a href='#preprocessing'><span class='toc-num'>1.7</span><span class='toc-label'>Data Processing: Normalization &amp; Standardization</span><span class='toc-n'>5</span></a></li>
+<li><a href='#dataloaders'><span class='toc-num'>1.8</span><span class='toc-label'>Datasets &amp; Dataloaders (Programming)</span><span class='toc-n'>9</span></a></li>
+<li><a href='#class-imbalance'><span class='toc-num'>1.9</span><span class='toc-label'>Class Imbalance</span><span class='toc-n'>6</span></a></li></ol></nav>
+  </div>
   <div class="filters">
     <input id="search" type="search" placeholder="Search questions…" autocomplete="off">
     <label><input type="checkbox" class="ftype" value="mc" checked> MC</label>
@@ -41,18 +55,6 @@ gtag('config', 'G-163M4VJ1VD');
       <span class="stat"><b>10</b> AI practice</span>
     </div>
     <div class="ch-progress" data-ch="ch01"></div>
-    <details class="toc-wrap" open>
-      <summary>Contents</summary>
-      <nav class="toc" aria-label="Chapter contents"><div class="toc-title">Contents</div><ol><li><a href='#tasks'><span class='toc-num'>1.1</span><span class='toc-label'>Learning Paradigms &amp; Task Types</span><span class='toc-n'>11</span></a></li>
-<li><a href='#unsupervised-methods'><span class='toc-num'>1.2</span><span class='toc-label'>Unsupervised Methods: K-means, PCA, Autoencoders</span><span class='toc-n'>8</span></a></li>
-<li><a href='#splits'><span class='toc-num'>1.3</span><span class='toc-label'>Dataset Splits &amp; the Validation Set</span><span class='toc-n'>10</span></a></li>
-<li><a href='#shuffle-distribution'><span class='toc-num'>1.4</span><span class='toc-label'>Shuffling, Distribution Mismatch &amp; i.i.d.</span><span class='toc-n'>8</span></a></li>
-<li><a href='#data-leakage'><span class='toc-num'>1.5</span><span class='toc-label'>Data Leakage &amp; Split Integrity</span><span class='toc-n'>9</span></a></li>
-<li><a href='#augmentation'><span class='toc-num'>1.6</span><span class='toc-label'>Data Augmentation</span><span class='toc-n'>14</span></a></li>
-<li><a href='#preprocessing'><span class='toc-num'>1.7</span><span class='toc-label'>Data Processing: Normalization &amp; Standardization</span><span class='toc-n'>5</span></a></li>
-<li><a href='#dataloaders'><span class='toc-num'>1.8</span><span class='toc-label'>Datasets &amp; Dataloaders (Programming)</span><span class='toc-n'>9</span></a></li>
-<li><a href='#class-imbalance'><span class='toc-num'>1.9</span><span class='toc-label'>Class Imbalance</span><span class='toc-n'>6</span></a></li></ol></nav>
-    </details>
     <div class="legend">
       <div><span class="badge freq-hot">🔥 n×</span> high frequency</div>
       <div><span class="src">SS22 3.1</span> source = exam + problem no.</div>
@@ -184,6 +186,6 @@ gtag('config', 'G-163M4VJ1VD');
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
 <script defer src="../assets/config.js"></script>
-<script defer src="../assets/app.js"></script>
+<script defer src="../assets/app.js?v=d9a7646b"></script>
 </body>
 </html>
