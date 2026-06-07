@@ -9,7 +9,7 @@ except Exception:
     pass
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-TXT = ROOT.parent / "AK" / "_txt"
+TXT = ROOT / "AK" / "_txt"
 
 EXAM_FILES = {
     "SS20": "SS_2020_Solutions.txt", "SS21": "SS_2021_Solutions.txt",
