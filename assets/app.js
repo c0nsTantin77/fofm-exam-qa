@@ -590,4 +590,32 @@
     fbLink.textContent = "Feedback form not configured yet";
     fbLink.removeAttribute("href");
   }
+
+  // ---- TOC scroll-spy: highlight the topic section currently in view ----
+  (function () {
+    const links = Array.from(document.querySelectorAll(".toc a[href^='#']"));
+    if (!links.length || !("IntersectionObserver" in window)) return;
+    const linkFor = new Map();
+    links.forEach((a) => {
+      const el = document.getElementById(decodeURIComponent(a.getAttribute("href").slice(1)));
+      if (el) linkFor.set(el, a);
+    });
+    let active = null;
+    const setActive = (a) => {
+      if (a === active) return;
+      if (active) active.classList.remove("active");
+      active = a;
+      if (active) {
+        active.classList.add("active");
+        // keep the active item in view within a scrollable sidebar TOC
+        if (active.scrollIntoView) active.scrollIntoView({ block: "nearest" });
+      }
+    };
+    const io = new IntersectionObserver((entries) => {
+      const vis = entries.filter((e) => e.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (vis.length) setActive(linkFor.get(vis[0].target));
+    }, { rootMargin: "-80px 0px -65% 0px", threshold: 0 });
+    linkFor.forEach((a, el) => io.observe(el));
+  })();
 })();

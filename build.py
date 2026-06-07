@@ -74,6 +74,48 @@ def md_block(s: str) -> str:
         out.append(f"<p>{md_inline(rest)}</p>")
     return "\n".join(out)
 
+_Q_MARKER = re.compile(r"\((?:\d+(?:\.\d+)*|[a-z]|[ivx]{1,3})\)")
+_A_BOLD = re.compile(r"\*\*[^*]+?\*\*")
+
+def _insert_breaks(s: str, positions) -> str:
+    """Insert a newline (→ <br>) before each given index, eating preceding spaces
+    and never doubling an existing newline. Apply back-to-front to keep indices."""
+    for pos in sorted(positions, reverse=True):
+        k = pos
+        while k > 0 and s[k - 1] == " ":
+            k -= 1
+        if k > 0 and s[k - 1] != "\n":
+            s = s[:k] + "\n" + s[pos:]
+    return s
+
+def break_question(s: str) -> str:
+    """Put a sub-part marker like '(8.3)' on a new line when it follows an inline
+    math formula (separating the setup from the question). Short consecutive
+    markers not preceded by a formula stay inline. Standalone markers only — so
+    function notation like f(x)/σ(x) (no leading space) is never split."""
+    cuts, prev = [], 0
+    for m in _Q_MARKER.finditer(s):
+        spaced = m.start() == 0 or s[m.start() - 1] in " \n"
+        if spaced and m.start() != 0 and "$" in s[prev:m.start()]:
+            cuts.append(m.start())
+        if spaced:
+            prev = m.end()
+    return _insert_breaks(s, cuts)
+
+def break_answer(s: str) -> str:
+    """Lay out a multi-part answer / knowledge summary: break before any **bold**
+    span that begins a new clause (preceded by . ? ! : ;) — so labels and key
+    terms (**6.3:**, **True:**, **L2**, **Dropout** …) each start on their own
+    line, while bold emphasis mid-sentence (preceded by a word) is left inline."""
+    cuts = []
+    for m in _A_BOLD.finditer(s):
+        if m.start() == 0:
+            continue
+        before = s[:m.start()].rstrip()
+        if before and before[-1] in ".?!:;":
+            cuts.append(m.start())
+    return _insert_breaks(s, cuts)
+
 def freq_badge(f: int) -> str:
     if f >= 6:
         cls, lab = "freq-hot", f"🔥 {f}×"
@@ -158,17 +200,19 @@ def source_tags(sources) -> str:
 
 LETTERS = "ABCDEFGH"
 
-def render_question(q, anchor) -> str:
+def render_question(q, anchor, qnum="") -> str:
     qtype = q["type"]
     is_ai = qtype == "ai"
     is_mc = qtype == "mc" or (is_ai and "options" in q)   # AI questions can be MC too
     fmt_label = "Multiple choice" if is_mc else "Open"
+    qn = f"<span class='q-num'>{esc(qnum)}</span>" if qnum else ""
 
     if is_ai:
         # AI items: keep the "AI-generated" marker, show the format (Open/MC) as a
         # badge instead of "practice", and drop the redundant right-side source chip.
         head = (
             f"<div class='q-head'>"
+            f"{qn}"
             f"<span class='qtype t-ai'>AI-generated</span>"
             f"<span class='fmt-badge'>{fmt_label}</span>"
             f"</div>"
@@ -178,17 +222,20 @@ def render_question(q, anchor) -> str:
         type_cls = {"mc": "t-mc", "open": "t-open"}[qtype]
         head = (
             f"<div class='q-head'>"
+            f"{qn}"
             f"<span class='qtype {type_cls}'>{type_label}</span>"
             f"{freq_badge(q.get('freq', 0))}"
             f"<span class='q-src'>{source_tags(q['sources'])}</span>"
             f"</div>"
         )
 
-    # md_block so questions that embed a ```code``` snippet render properly
-    qrender = md_block(q["q"]) if "```" in q["q"] else md_inline(q["q"])
+    # md_block so questions that embed a ```code``` snippet render properly;
+    # break_question puts a formula-led sub-part marker on its own line.
+    qsrc = break_question(q["q"])
+    qrender = md_block(qsrc) if "```" in qsrc else md_inline(qsrc)
     qbody = f"<div class='q-text'>{qrender}</div>"
 
-    answer_html = f"<div class='answer'><div class='answer-label'>Answer</div>{md_block(q['answer'])}</div>"
+    answer_html = f"<div class='answer'><div class='answer-label'>Answer</div>{md_block(break_answer(q['answer']))}</div>"
     extend_html = (
         f"<div class='extend'><div class='extend-label'>💡 Extended memory</div>{md_block(q['extend'])}</div>"
         if q.get("extend") else ""
@@ -264,15 +311,16 @@ def sorted_questions(kp):
     """Render order: by exam frequency (desc), stable. AI practice (freq 0) sinks last."""
     return sorted(kp["questions"], key=lambda q: q.get("freq", 0), reverse=True)
 
-def render_kp(kp) -> str:
+def render_kp(kp, kpnum="") -> str:
     qs = "\n".join(
-        render_question(q, qid(kp["id"], q))
-        for q in sorted_questions(kp)
+        render_question(q, qid(kp["id"], q), f"{kpnum}.{j}" if kpnum else "")
+        for j, q in enumerate(sorted_questions(kp), 1)
     )
+    num = f"<span class='kp-num'>{esc(kpnum)}</span> " if kpnum else ""
     return (
         f"<section class='kp' id='{kp['id']}'>"
-        f"<h2>{esc(kp['title'])}</h2>"
-        f"<div class='recap'>{md_block(kp['recap'])}</div>"
+        f"<h2>{num}{esc(kp['title'])}</h2>"
+        f"<div class='recap'>{md_block(break_answer(kp['recap']))}</div>"
         f"<div class='qlist'>{qs}</div>"
         f"</section>"
     )
@@ -285,6 +333,14 @@ def page_shell(title, body, *, depth, extra_head="", need_index=False) -> str:
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-163M4VJ1VD"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){{dataLayer.push(arguments);}}
+gtag('js', new Date());
+gtag('config', 'G-163M4VJ1VD');
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(title)}</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
@@ -333,12 +389,18 @@ def build():
                             + " " + tagtext + " " + " ".join(srcs)).lower(),
                 })
 
+        chnum = int(re.sub(r"\D", "", ch["id"]) or "0")
         toc = "\n".join(
-            f"<li><a href='#{kp['id']}'>{esc(kp['title'])}</a>"
-            f"<span class='toc-n'>{len(kp['questions'])}</span></li>"
-            for kp in data["knowledge_points"]
+            f"<li><a href='#{kp['id']}'>"
+            f"<span class='toc-num'>{chnum}.{i}</span>"
+            f"<span class='toc-label'>{esc(kp['title'])}</span>"
+            f"<span class='toc-n'>{len(kp['questions'])}</span></a></li>"
+            for i, kp in enumerate(data["knowledge_points"], 1)
         )
-        kps = "\n".join(render_kp(kp) for kp in data["knowledge_points"])
+        kps = "\n".join(
+            render_kp(kp, f"{chnum}.{i}")
+            for i, kp in enumerate(data["knowledge_points"], 1)
+        )
 
         body = f"""
 <header class="topbar">
@@ -362,9 +424,9 @@ def build():
       <span class="stat"><b>{nai}</b> AI practice</span>
     </div>
     <div class="ch-progress" data-ch="{ch['id']}"></div>
-    <details class="toc-wrap">
-      <summary>Jump to topic</summary>
-      <nav class="toc"><ol>{toc}</ol></nav>
+    <details class="toc-wrap" open>
+      <summary>Contents</summary>
+      <nav class="toc" aria-label="Chapter contents"><div class="toc-title">Contents</div><ol>{toc}</ol></nav>
     </details>
     <div class="legend">
       <div><span class="badge freq-hot">🔥 n×</span> high frequency</div>
