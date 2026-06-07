@@ -591,8 +591,8 @@
       if (!el) return;
       const others = Math.max(0, n - 1);
       el.textContent = others > 0
-        ? "🟢 目前有 " + others + " 人跟你一起在线刷题"
-        : "🟢 目前就你一个人在线刷题，加油！";
+        ? "🟢 " + others + (others === 1 ? " other person" : " others") + " studying with you right now"
+        : "🟢 You're the only one studying right now — keep going!";
       el.classList.add("show");
     }
     function start() {
