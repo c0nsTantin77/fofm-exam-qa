@@ -19,6 +19,7 @@ Popular Architectures (65) · RNNs & Transformers (57) · Appendix: Matrix Calcu
 - KaTeX formulas, collapsible answers, mobile-optimized.
 
 ## Recent updates
+- **2026-06-08** — Home page: toggle **By chapter / By exam** (each exam card shows your review progress), a refreshed Apple-flavoured hero, **one-tap Share** (copies a ready-to-send message), and a **Feedback & issues** card.
 - **2026-06-08** — Chapter navigation revamp: the contents menu is now a top-bar **"you are here" pill** (shows your current section, opens a floating popover that's **full-width on mobile**); assets are cache-busted so updates appear immediately.
 - **2026-06-07** — ✨ **You're never studying alone!** A live counter at the top of every page shows how many fellow students are grinding through I2DL right now — look up, someone's in the trenches with you. 💪
 - **2026-06-07** — Chapter-page readability: **numbered topics** (4.2) **& questions** (4.2.1), an **always-on left contents panel** that highlights your current section as you scroll, and tidier multi-part **answer/summary line breaks**.

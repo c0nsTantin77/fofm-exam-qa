@@ -347,7 +347,6 @@
       const byChapter = {};
       hits.forEach((e) => (byChapter[e.ct] = byChapter[e.ct] || []).push(e));
       let html =
-        "<a class='tp-back' href='exams.html'>← All exams</a>" +
         "<h1 class='tp-title'>" + esc(names[ex] || ex) + " <span class='tag'>" + esc(ex) + "</span></h1>" +
         "<p class='tp-sub'>" + hits.length + " question" + (hits.length > 1 ? "s" : "") +
         " across " + Object.keys(byChapter).length + " chapter(s).</p>";
@@ -363,8 +362,39 @@
       });
       examPage.innerHTML = html;
     }
-    if (current && counts[current]) renderExam(current); else renderOverview();
+    // bare exams.html (no ?e=) is now redundant with the homepage "By exam"
+    // view → bounce there; only the single-exam ?e=X pages render here.
+    if (current && counts[current]) renderExam(current);
+    else location.replace("index.html#by-exam");
   }
+
+  // ---- homepage: toggle the main grid between "By chapter" and "By exam" ----
+  (function () {
+    const toggle = document.querySelector(".view-toggle");
+    const vChapters = document.getElementById("view-chapters");
+    const vExams = document.getElementById("view-exams");
+    if (!toggle || !vChapters || !vExams) return;
+    const KEY = "i2dl_homeview";
+    const setView = (v) => {
+      const exams = v === "exams";
+      vExams.hidden = !exams;
+      vChapters.hidden = exams;
+      toggle.querySelectorAll(".vt-btn").forEach((b) => {
+        const on = b.dataset.view === v;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      try { localStorage.setItem(KEY, v); } catch (e) {}
+    };
+    toggle.addEventListener("click", (e) => {
+      const b = e.target.closest(".vt-btn");
+      if (b) setView(b.dataset.view);
+    });
+    let saved = "chapters";
+    try { saved = localStorage.getItem(KEY) || "chapters"; } catch (e) {}
+    if (location.hash === "#by-exam") saved = "exams";   // arriving from a single-exam page
+    setView(saved);
+  })();
 
   // ---- per-chapter totals + reviewed (shared by dashboard, cards, sidebar) ----
   function chapterStats() {
@@ -375,6 +405,23 @@
       o.total++; if (reviewedSet.has(e.a)) o.done++;
     });
     return { reviewedSet, byCh };
+  }
+  function examStats() {                            // per-exam reviewed/total (for the "By exam" cards)
+    const reviewedSet = new Set(Store.reviewedIds());
+    const byExam = {};
+    const examOf = (s) => { const m = s.match(/^(SS\d\d|WS\d\d|Mock)\b/); return m ? m[1] : null; };
+    INDEX.forEach((e) => {
+      const seen = new Set();
+      (e.srcs || []).forEach((s) => {
+        const x = examOf(s);
+        if (x && !seen.has(x)) {
+          seen.add(x);
+          const o = (byExam[x] = byExam[x] || { total: 0, done: 0 });
+          o.total++; if (reviewedSet.has(e.a)) o.done++;
+        }
+      });
+    });
+    return byExam;
   }
   function miniRing(pct, size) {
     const r = size / 2 - 3, C = 2 * Math.PI * r, off = C * (1 - pct / 100);
@@ -412,8 +459,16 @@
         "<a class='prog-link' href='review.html'>Review due &amp; wrong book →</a></div>";
       const pc = document.getElementById("progress"); if (pc) pc.hidden = false;
     }
-    document.querySelectorAll(".card-prog").forEach((el) => {
+    document.querySelectorAll(".card-prog[data-ch]").forEach((el) => {
       const o = byCh[el.dataset.ch]; if (!o) return;
+      const pct = o.total ? Math.round((100 * o.done) / o.total) : 0;
+      el.innerHTML = miniRing(pct, 38);
+      el.title = o.done + " / " + o.total + " reviewed";
+      el.classList.toggle("has-prog", o.done > 0);
+    });
+    const byExam = examStats();
+    document.querySelectorAll(".card-prog[data-exam]").forEach((el) => {
+      const o = byExam[el.dataset.exam]; if (!o) return;
       const pct = o.total ? Math.round((100 * o.done) / o.total) : 0;
       el.innerHTML = miniRing(pct, 38);
       el.title = o.done + " / " + o.total + " reviewed";
@@ -628,15 +683,46 @@
     fbLink.removeAttribute("href");
   }
 
+  // ---- share button: copy the site link so users can send it to a friend ----
+  document.querySelectorAll(".share-pill").forEach((btn) => {
+    const txt = btn.querySelector(".share-txt");
+    btn.addEventListener("click", async () => {
+      const url = btn.dataset.share || location.href;
+      let ok = false;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url); ok = true;
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = url; ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta); ta.focus(); ta.select();
+          ok = document.execCommand("copy"); document.body.removeChild(ta);
+        }
+      } catch (e) { ok = false; }
+      if (!txt) return;
+      const orig = btn.dataset.label || (btn.dataset.label = txt.textContent);
+      txt.textContent = ok ? "Copied — paste & send! 🎉" : "Press Ctrl+C to copy";
+      btn.classList.toggle("copied", ok);
+      clearTimeout(btn._t);
+      btn._t = setTimeout(() => { txt.textContent = orig; btn.classList.remove("copied"); }, 1800);
+    });
+  });
+
   // ---- topbar "you are here" pill + floating contents popover ----------
   //  The pill always shows the section currently in view (scroll-spy); tapping
   //  it opens a floating panel that is the full table of contents.
-  (function () {
+  // Reusable: wire the topbar pill + popover for whatever section links are
+  // currently inside #tocPop. Called on chapter pages (server-rendered links)
+  // and again on tag/exam pages once their sections are rendered by JS.
+  function setupContentsPill() {
     const pill = document.getElementById("nowAt");
     const pop = document.getElementById("tocPop");
     const here = pill && pill.querySelector(".nowat-here");
-    const links = pop ? Array.from(pop.querySelectorAll("a[href^='#']")) : [];
-    if (!pill || !pop || !links.length) return;
+    if (!pill || !pop) return;
+    const wrap = pill.closest(".nowat-wrap");
+    const links = Array.from(pop.querySelectorAll("a[href^='#']"));
+    if (!links.length) { if (wrap) wrap.hidden = true; return; }  // nothing to navigate → hide pill
+    if (wrap) wrap.hidden = false;
 
     // position the panel: on phones make it a full-width dropdown pinned to the
     // viewport (titles wrap to the screen width, nothing clips); on desktop keep
@@ -671,13 +757,16 @@
       pill.setAttribute("aria-expanded", on ? "true" : "false");
       if (on) place();
     };
-    window.addEventListener("resize", () => { if (!pop.hidden) place(); });
-    pill.addEventListener("click", (e) => { e.stopPropagation(); setOpen(pop.hidden); });
-    pop.addEventListener("click", (e) => { if (e.target.closest("a")) setOpen(false); });
-    document.addEventListener("click", (e) => {
-      if (!pop.hidden && !pop.contains(e.target) && !pill.contains(e.target)) setOpen(false);
-    });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+    if (!pill.dataset.wired) {                       // attach one-time listeners once
+      pill.dataset.wired = "1";
+      window.addEventListener("resize", () => { if (!pop.hidden) place(); });
+      pill.addEventListener("click", (e) => { e.stopPropagation(); setOpen(pop.hidden); });
+      pop.addEventListener("click", (e) => { if (e.target.closest("a")) setOpen(false); });
+      document.addEventListener("click", (e) => {
+        if (!pop.hidden && !pop.contains(e.target) && !pill.contains(e.target)) setOpen(false);
+      });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+    }
 
     // scroll-spy: reflect the section in view onto the pill + popover highlight
     const linkFor = new Map();
@@ -707,13 +796,17 @@
     };
 
     if ("IntersectionObserver" in window) {
+      if (pill._io) pill._io.disconnect();          // drop any previous observer on re-init
       const io = new IntersectionObserver((entries) => {
         const vis = entries.filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
         if (vis.length) setActive(linkFor.get(vis[0].target));
       }, { rootMargin: "-80px 0px -65% 0px", threshold: 0 });
       linkFor.forEach((a, el) => io.observe(el));
+      pill._io = io;
     }
     setActive(links[0]);                            // initial label before scrolling
-  })();
+  }
+
+  setupContentsPill();   // chapter pages: section links are server-rendered
 })();

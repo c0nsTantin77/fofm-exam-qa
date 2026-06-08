@@ -14,7 +14,7 @@ gtag('config', 'G-163M4VJ1VD');
 <title>I2DL Exam Q&amp;A · TUM IN2346</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
-<link rel="stylesheet" href="assets/style.css?v=d9a7646b">
+<link rel="stylesheet" href="assets/style.css?v=9ac29dd9">
 
 </head>
 <body>
@@ -25,13 +25,19 @@ gtag('config', 'G-163M4VJ1VD');
     <div class="hero-top"><img class='tum-logo' src='assets/tum.svg' alt='TUM' width='44' height='23'><span class="kicker">Technische Universität München · IN2346</span></div>
     <h1>Introduction to Deep Learning</h1>
     <ul class="hero-points">
-      <li><span class="hp-ic">🔎</span><span class="hp-t">Search by concept tag</span><span class="hp-d">jump between related questions across chapters</span></li>
-      <li><span class="hp-ic">✅</span><span class="hp-t">Interactive multiple-choice</span><span class="hp-d">pick, check, then reveal the answer</span></li>
-      <li><span class="hp-ic">🤖</span><span class="hp-t">AI-generated practice</span><span class="hp-d">extra questions on every knowledge point</span></li>
+      <li><div class="hp-head"><span class="hp-ic">🔎</span><span class="hp-t">Search by concept</span></div>
+        <span class="hp-d">Follow one idea across every chapter.</span></li>
+      <li><div class="hp-head"><span class="hp-ic">✅</span><span class="hp-t">Interactive quizzes</span></div>
+        <span class="hp-d">Pick. Check. Then see why.</span></li>
+      <li><div class="hp-head"><span class="hp-ic">🤖</span><span class="hp-t">AI practice</span></div>
+        <span class="hp-d">Fresh questions for every concept.</span></li>
     </ul>
-    <div class="exams-block">
-      <span class="exams-hint">Tap an exam to browse its questions ↓</span>
-      <div class="exams"><a class='exam' href='exams.html?e=SS20'>SS20</a> <a class='exam' href='exams.html?e=SS21'>SS21</a> <a class='exam' href='exams.html?e=WS21'>WS21</a> <a class='exam' href='exams.html?e=SS22'>SS22</a> <a class='exam' href='exams.html?e=WS22'>WS22</a> <a class='exam' href='exams.html?e=SS23'>SS23</a> <a class='exam' href='exams.html?e=WS23'>WS23</a> <a class='exam' href='exams.html?e=SS24'>SS24</a> <a class='exam' href='exams.html?e=WS24'>WS24</a> <a class='exam' href='exams.html?e=SS25'>SS25</a> <a class='exam' href='exams.html?e=WS26'>WS26</a> <a class='exam' href='exams.html?e=Mock'>Mock</a></div>
+    <div class="hero-cta">
+      <p class="hero-cta-text"><b>Free, for every TUM student.</b> Built to help you master I2DL. If it helps — pass it on.</p>
+      <div class="hero-cta-pills">
+        <button class="share-pill" type="button" data-share="Hey! Just found the best I2DL exam-prep tool — check it out: https://c0nsTantin77.github.io/i2dl-exam-qa/"><span class="share-ic" aria-hidden="true">🔗</span><span class="share-txt">Share with a friend</span></button>
+        <a class="share-pill" href="https://github.com/c0nsTantin77/i2dl-exam-qa" target="_blank" rel="noopener"><span class="share-ic" aria-hidden="true">⭐</span><span>Star on GitHub</span></a>
+      </div>
     </div>
   </div>
 </header>
@@ -48,10 +54,17 @@ gtag('config', 'G-163M4VJ1VD');
     <summary class="prog-head"><span class="prog-title">Your progress</span><span id="authctl" class="authctl"></span></summary>
     <div id="prog-body"></div>
   </details>
-  <div class="cards">
+  <div class="view-toggle" role="tablist" aria-label="Browse by">
+    <button type="button" class="vt-btn active" data-view="chapters" aria-selected="true">By chapter</button>
+    <button type="button" class="vt-btn" data-view="exams" aria-selected="false">By exam</button>
+  </div>
+  <div class="cards" id="view-chapters">
     <a class='card' href='chapters/ch01.html'><div class='card-top'><span class='card-roman'>I</span><span class='card-prog' data-ch='ch01'></span></div><h3>Machine Learning Basics</h3><div class='card-meta'>80 questions · 9 topics</div></a><a class='card' href='chapters/ch02.html'><div class='card-top'><span class='card-roman'>II</span><span class='card-prog' data-ch='ch02'></span></div><h3>Neural Networks</h3><div class='card-meta'>96 questions · 7 topics</div></a><a class='card' href='chapters/ch03.html'><div class='card-top'><span class='card-roman'>III</span><span class='card-prog' data-ch='ch03'></span></div><h3>Convolutions</h3><div class='card-meta'>67 questions · 6 topics</div></a><a class='card' href='chapters/ch04.html'><div class='card-top'><span class='card-roman'>IV</span><span class='card-prog' data-ch='ch04'></span></div><h3>Optimization</h3><div class='card-meta'>127 questions · 7 topics</div></a><a class='card' href='chapters/ch05.html'><div class='card-top'><span class='card-roman'>V</span><span class='card-prog' data-ch='ch05'></span></div><h3>Popular Architectures</h3><div class='card-meta'>65 questions · 7 topics</div></a><a class='card' href='chapters/ch06.html'><div class='card-top'><span class='card-roman'>VI</span><span class='card-prog' data-ch='ch06'></span></div><h3>RNNs &amp; Transformers</h3><div class='card-meta'>57 questions · 4 topics</div></a><a class='card' href='chapters/ch07.html'><div class='card-top'><span class='card-roman'>VII</span><span class='card-prog' data-ch='ch07'></span></div><h3>Appendix: Matrix Calculus</h3><div class='card-meta'>20 questions · 3 topics</div></a>
   </div>
-  <aside class='updates'><h2>📣 Recent updates</h2><ul class='up-list'><li><span class='up-date'>2026-06-08</span><span class='up-text'>Revamped chapter navigation: a “you are here” chip in the top bar shows your current section and opens a contents menu that fits your phone screen — tap it to jump anywhere.</span></li><li><span class='up-date'>2026-06-07</span><span class='up-text'>✨ You're never studying alone! A little live counter now sits at the top of every page, showing how many fellow students are grinding through I2DL right there with you. Look up — someone's in the trenches with you right now. 💪</span></li><li><span class='up-date'>2026-06-07</span><span class='up-text'>Easier-to-read chapter pages: numbered topics &amp; questions, an always-visible contents sidebar that tracks where you are, and cleaner line breaks in multi-part answers and summaries.</span></li></ul></aside>
+  <div class="examgrid" id="view-exams" hidden>
+    <a class='examcard' href='exams.html?e=SS20'><span class='examcard-top'><span class='examcard-code'>SS20</span><span class='card-prog' data-exam='SS20'></span></span><span class='examcard-name'>SoSe 2020</span><span class='examcard-n'>44 questions</span></a><a class='examcard' href='exams.html?e=SS21'><span class='examcard-top'><span class='examcard-code'>SS21</span><span class='card-prog' data-exam='SS21'></span></span><span class='examcard-name'>SoSe 2021</span><span class='examcard-n'>36 questions</span></a><a class='examcard' href='exams.html?e=WS21'><span class='examcard-top'><span class='examcard-code'>WS21</span><span class='card-prog' data-exam='WS21'></span></span><span class='examcard-name'>WiSe 2021/22</span><span class='examcard-n'>27 questions</span></a><a class='examcard' href='exams.html?e=SS22'><span class='examcard-top'><span class='examcard-code'>SS22</span><span class='card-prog' data-exam='SS22'></span></span><span class='examcard-name'>SoSe 2022</span><span class='examcard-n'>49 questions</span></a><a class='examcard' href='exams.html?e=WS22'><span class='examcard-top'><span class='examcard-code'>WS22</span><span class='card-prog' data-exam='WS22'></span></span><span class='examcard-name'>WiSe 2022/23</span><span class='examcard-n'>42 questions</span></a><a class='examcard' href='exams.html?e=SS23'><span class='examcard-top'><span class='examcard-code'>SS23</span><span class='card-prog' data-exam='SS23'></span></span><span class='examcard-name'>SoSe 2023</span><span class='examcard-n'>43 questions</span></a><a class='examcard' href='exams.html?e=WS23'><span class='examcard-top'><span class='examcard-code'>WS23</span><span class='card-prog' data-exam='WS23'></span></span><span class='examcard-name'>WiSe 2023/24</span><span class='examcard-n'>30 questions</span></a><a class='examcard' href='exams.html?e=SS24'><span class='examcard-top'><span class='examcard-code'>SS24</span><span class='card-prog' data-exam='SS24'></span></span><span class='examcard-name'>SoSe 2024</span><span class='examcard-n'>41 questions</span></a><a class='examcard' href='exams.html?e=WS24'><span class='examcard-top'><span class='examcard-code'>WS24</span><span class='card-prog' data-exam='WS24'></span></span><span class='examcard-name'>WiSe 2024/25</span><span class='examcard-n'>43 questions</span></a><a class='examcard' href='exams.html?e=SS25'><span class='examcard-top'><span class='examcard-code'>SS25</span><span class='card-prog' data-exam='SS25'></span></span><span class='examcard-name'>SoSe 2025</span><span class='examcard-n'>36 questions</span></a><a class='examcard' href='exams.html?e=WS26'><span class='examcard-top'><span class='examcard-code'>WS26</span><span class='card-prog' data-exam='WS26'></span></span><span class='examcard-name'>WiSe 2025/26</span><span class='examcard-n'>39 questions</span></a><a class='examcard' href='exams.html?e=Mock'><span class='examcard-top'><span class='examcard-code'>Mock</span><span class='card-prog' data-exam='Mock'></span></span><span class='examcard-name'>Mock exam</span><span class='examcard-n'>6 questions</span></a>
+  </div>
+  <aside class='updates'><h2>📣 Recent updates</h2><ul class='up-list'><li><span class='up-date'>2026-06-08</span><span class='up-text'>New on the home page: flip between “By chapter” and “By exam” — every past paper now shows your review progress at a glance. Loving the deck? One tap on “Share with a friend” copies a ready-to-send message. 🎉</span></li><li><span class='up-date'>2026-06-08</span><span class='up-text'>Revamped chapter navigation: a “you are here” chip in the top bar shows your current section and opens a contents menu that fits your phone screen — tap it to jump anywhere.</span></li><li><span class='up-date'>2026-06-07</span><span class='up-text'>✨ You're never studying alone! A little live counter now sits at the top of every page, showing how many fellow students are grinding through I2DL right there with you. Look up — someone's in the trenches with you right now. 💪</span></li></ul></aside>
   <section class="how">
     <h2>How to use this deck</h2>
     <div class="how-grid">
@@ -82,9 +95,12 @@ gtag('config', 'G-163M4VJ1VD');
     </div>
   </section>
   <section class="feedback" id="feedback">
-    <div class="feedback-text"><span class="feedback-title">💬 Feedback</span>
+    <div class="feedback-text"><span class="feedback-title">💬 Feedback &amp; issues</span>
       <span class="feedback-sub">Spotted a wrong answer or have a suggestion? It goes straight to the author.</span></div>
-    <a class="feedback-link" id="feedback-link" target="_blank" rel="noopener">Open the feedback form →</a>
+    <div class="feedback-actions">
+      <a class="feedback-link" id="feedback-link" target="_blank" rel="noopener">Open the feedback form →</a>
+      <a class="feedback-issue" href="https://github.com/c0nsTantin77/i2dl-exam-qa/issues" target="_blank" rel="noopener">Open an issue →</a>
+    </div>
   </section>
   <p class="hubnote">All 7 chapters complete — 512 questions across 43 knowledge points, from 12 past exams + the course summary.</p>
 </main>
@@ -105,11 +121,7 @@ gtag('config', 'G-163M4VJ1VD');
         points are merged. Items tagged <span class="src-ai">AI-generated</span> are model-written
         practice and are not from past exams.</p>
         <p>Formulas rendered with <a href="https://katex.org/" rel="noopener">KaTeX</a>.
-        Built from the official I2DL materials for personal study. Spotted a mistake?
-        <a href="https://github.com/c0nsTantin77/i2dl-exam-qa/issues" rel="noopener">Open an issue on the repo</a>.</p>
-        <p><a class="gh-star" href="https://github.com/c0nsTantin77/i2dl-exam-qa" rel="noopener">
-          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          Star this project on GitHub</a></p>
+        Built from the official I2DL materials for personal study.</p>
       </div>
     </div>
   </div>
@@ -120,6 +132,6 @@ gtag('config', 'G-163M4VJ1VD');
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
 <script defer src="assets/config.js"></script>
-<script defer src="assets/app.js?v=d9a7646b"></script>
+<script defer src="assets/app.js?v=9ac29dd9"></script>
 </body>
 </html>

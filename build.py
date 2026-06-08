@@ -189,11 +189,7 @@ def site_footer(exams, *, base) -> str:
         points are merged. Items tagged <span class="src-ai">AI-generated</span> are model-written
         practice and are not from past exams.</p>
         <p>Formulas rendered with <a href="https://katex.org/" rel="noopener">KaTeX</a>.
-        Built from the official I2DL materials for personal study. Spotted a mistake?
-        <a href="https://github.com/c0nsTantin77/i2dl-exam-qa/issues" rel="noopener">Open an issue on the repo</a>.</p>
-        <p><a class="gh-star" href="https://github.com/c0nsTantin77/i2dl-exam-qa" rel="noopener">
-          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          Star this project on GitHub</a></p>
+        Built from the official I2DL materials for personal study.</p>
       </div>
     </div>
   </div>
@@ -491,9 +487,26 @@ def build():
         cards.append(inner)
 
     import urllib.parse as _up0
-    exams = " ".join(
-        f"<a class='exam' href='exams.html?e={_up0.quote(e)}'>{esc(e)}</a>"
-        for e in manifest["exams"]
+
+    # exam launcher cards (server-rendered, for the homepage "By exam" view).
+    # count each question once per exam it appears in (mirrors exams.html).
+    from collections import Counter as _Counter
+    exam_counts = _Counter()
+    for _e in search_index:
+        _seen = set()
+        for _s in _e.get("srcs", []):
+            _m = re.match(r"(SS\d\d|WS\d\d|Mock)\b", _s)
+            _x = _m.group(1) if _m else None
+            if _x and _x not in _seen:
+                _seen.add(_x)
+                exam_counts[_x] += 1
+    examcards = "".join(
+        f"<a class='examcard' href='exams.html?e={_up0.quote(e)}'>"
+        f"<span class='examcard-top'><span class='examcard-code'>{esc(e)}</span>"
+        f"<span class='card-prog' data-exam='{esc(e)}'></span></span>"
+        f"<span class='examcard-name'>{esc(EXAM_NAMES.get(e, e))}</span>"
+        f"<span class='examcard-n'>{exam_counts[e]} questions</span></a>"
+        for e in manifest["exams"] if exam_counts.get(e)
     )
 
     # popular concept-tag chips (top by question count)
@@ -533,13 +546,19 @@ def build():
     <div class="hero-top">{TUM_LOGO.format(base='')}<span class="kicker">Technische Universität München · IN2346</span></div>
     <h1>Introduction to Deep Learning</h1>
     <ul class="hero-points">
-      <li><span class="hp-ic">🔎</span><span class="hp-t">Search by concept tag</span><span class="hp-d">jump between related questions across chapters</span></li>
-      <li><span class="hp-ic">✅</span><span class="hp-t">Interactive multiple-choice</span><span class="hp-d">pick, check, then reveal the answer</span></li>
-      <li><span class="hp-ic">🤖</span><span class="hp-t">AI-generated practice</span><span class="hp-d">extra questions on every knowledge point</span></li>
+      <li><div class="hp-head"><span class="hp-ic">🔎</span><span class="hp-t">Search by concept</span></div>
+        <span class="hp-d">Follow one idea across every chapter.</span></li>
+      <li><div class="hp-head"><span class="hp-ic">✅</span><span class="hp-t">Interactive quizzes</span></div>
+        <span class="hp-d">Pick. Check. Then see why.</span></li>
+      <li><div class="hp-head"><span class="hp-ic">🤖</span><span class="hp-t">AI practice</span></div>
+        <span class="hp-d">Fresh questions for every concept.</span></li>
     </ul>
-    <div class="exams-block">
-      <span class="exams-hint">Tap an exam to browse its questions ↓</span>
-      <div class="exams">{exams}</div>
+    <div class="hero-cta">
+      <p class="hero-cta-text"><b>Free, for every TUM student.</b> Built to help you master I2DL. If it helps — pass it on.</p>
+      <div class="hero-cta-pills">
+        <button class="share-pill" type="button" data-share="Hey! Just found the best I2DL exam-prep tool — check it out: https://c0nsTantin77.github.io/i2dl-exam-qa/"><span class="share-ic" aria-hidden="true">🔗</span><span class="share-txt">Share with a friend</span></button>
+        <a class="share-pill" href="https://github.com/c0nsTantin77/i2dl-exam-qa" target="_blank" rel="noopener"><span class="share-ic" aria-hidden="true">⭐</span><span>Star on GitHub</span></a>
+      </div>
     </div>
   </div>
 </header>
@@ -556,8 +575,15 @@ def build():
     <summary class="prog-head"><span class="prog-title">Your progress</span><span id="authctl" class="authctl"></span></summary>
     <div id="prog-body"></div>
   </details>
-  <div class="cards">
+  <div class="view-toggle" role="tablist" aria-label="Browse by">
+    <button type="button" class="vt-btn active" data-view="chapters" aria-selected="true">By chapter</button>
+    <button type="button" class="vt-btn" data-view="exams" aria-selected="false">By exam</button>
+  </div>
+  <div class="cards" id="view-chapters">
     {''.join(cards)}
+  </div>
+  <div class="examgrid" id="view-exams" hidden>
+    {examcards}
   </div>
   {updates_html}
   <section class="how">
@@ -590,9 +616,12 @@ def build():
     </div>
   </section>
   <section class="feedback" id="feedback">
-    <div class="feedback-text"><span class="feedback-title">💬 Feedback</span>
+    <div class="feedback-text"><span class="feedback-title">💬 Feedback &amp; issues</span>
       <span class="feedback-sub">Spotted a wrong answer or have a suggestion? It goes straight to the author.</span></div>
-    <a class="feedback-link" id="feedback-link" target="_blank" rel="noopener">Open the feedback form →</a>
+    <div class="feedback-actions">
+      <a class="feedback-link" id="feedback-link" target="_blank" rel="noopener">Open the feedback form →</a>
+      <a class="feedback-issue" href="https://github.com/c0nsTantin77/i2dl-exam-qa/issues" target="_blank" rel="noopener">Open an issue →</a>
+    </div>
   </section>
   <p class="hubnote">All 7 chapters complete — {total_q} questions across {total_topics} knowledge points, from 12 past exams + the course summary.</p>
 </main>
@@ -627,7 +656,7 @@ def build():
     exam_meta = json.dumps({"order": manifest["exams"], "names": EXAM_NAMES}, ensure_ascii=False)
     exam_body = f"""
 <header class="topbar">
-  <a class="brand" href="index.html">{TUM_LOGO.format(base='')}<span class="brand-back">← All<span class="brand-full"> chapters</span></span></a>
+  <a class="brand" href="index.html#by-exam">{TUM_LOGO.format(base='')}<span class="brand-back">← All<span class="brand-full"> exams</span></span></a>
 </header>
 <main class="tagpage" id="exampage" data-exams='{exam_meta}'>
   <div id="exampage-body"><p class="hint">Loading…</p></div>
