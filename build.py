@@ -513,7 +513,7 @@ def build():
     import urllib.parse as _up
     from collections import Counter
     tagc = Counter(t for e in search_index for t in e.get("tg", []))
-    poptags = [t for t, _ in tagc.most_common(4)]
+    poptags = [t for t, _ in tagc.most_common(6)]
     chips = "".join(
         f"<a class='ptag' href='tags.html?t={_up.quote(t)}'>{esc(t)}"
         f"<span class='ptag-n'>{tagc[t]}</span></a>" for t in poptags
@@ -536,8 +536,9 @@ def build():
             for u in ups
         )
         updates_html = (
-            "<aside class='updates'><h2>📣 Recent updates</h2>"
-            f"<ul class='up-list'>{items}</ul></aside>"
+            "<details class='updates collapsible' open><summary class='collapse-head'>"
+            "<span>📣 Recent updates</span></summary>"
+            f"<ul class='up-list'>{items}</ul></details>"
         )
 
     body = f"""
@@ -586,8 +587,8 @@ def build():
     {examcards}
   </div>
   {updates_html}
-  <section class="how">
-    <h2>How to use this deck</h2>
+  <details class="how collapsible" open>
+    <summary class="collapse-head"><span>🧭 How to use this deck</span></summary>
     <div class="how-grid">
       <div class="how-col">
         <h3>🔎 Find</h3>
@@ -614,7 +615,7 @@ def build():
         </ul>
       </div>
     </div>
-  </section>
+  </details>
   <section class="feedback" id="feedback">
     <div class="feedback-text"><span class="feedback-title">💬 Feedback &amp; issues</span>
       <span class="feedback-sub">Spotted a wrong answer or have a suggestion? It goes straight to the author.</span></div>
@@ -642,6 +643,12 @@ def build():
     tag_body = f"""
 <header class="topbar">
   <a class="brand" href="index.html">{TUM_LOGO.format(base='')}<span class="brand-back">← All<span class="brand-full"> chapters</span></span></a>
+  <div class="nowat-wrap" hidden>
+    <button id="nowAt" class="nowat" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="tocPop" title="Jump to a chapter group">
+      <span class="nowat-here">Contents</span><span class="nowat-caret" aria-hidden="true">▾</span>
+    </button>
+    <nav id="tocPop" class="toc-pop toc" hidden aria-label="Sections"><ol></ol></nav>
+  </div>
 </header>
 <main class="tagpage" id="tagpage" data-tagcount="{len(tag_counts)}">
   <div id="tagpage-body"><p class="hint">Loading…</p></div>
@@ -657,6 +664,12 @@ def build():
     exam_body = f"""
 <header class="topbar">
   <a class="brand" href="index.html#by-exam">{TUM_LOGO.format(base='')}<span class="brand-back">← All<span class="brand-full"> exams</span></span></a>
+  <div class="nowat-wrap" hidden>
+    <button id="nowAt" class="nowat" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="tocPop" title="Jump to a chapter group">
+      <span class="nowat-here">Contents</span><span class="nowat-caret" aria-hidden="true">▾</span>
+    </button>
+    <nav id="tocPop" class="toc-pop toc" hidden aria-label="Sections"><ol></ol></nav>
+  </div>
 </header>
 <main class="tagpage" id="exampage" data-exams='{exam_meta}'>
   <div id="exampage-body"><p class="hint">Loading…</p></div>

@@ -291,8 +291,11 @@
         "<h1 class='tp-title'>Tag: <span class='tag'>" + esc(tag) + "</span></h1>" +
         "<p class='tp-sub'>" + hits.length + " question" + (hits.length > 1 ? "s" : "") +
         " across " + Object.keys(byChapter).length + " chapter(s).</p>";
+      const groups = [];
       Object.keys(byChapter).forEach((ct) => {
-        html += "<h2 class='tp-ch'>" + esc(ct) + "</h2><div class='tp-list'>" +
+        const id = "sec-" + slug(ct);
+        groups.push({ id: id, title: ct, n: byChapter[ct].length });
+        html += "<h2 class='tp-ch' id='" + id + "'>" + esc(ct) + "</h2><div class='tp-list'>" +
           byChapter[ct].map((e) =>
             "<a class='ghit' href='" + qHref(e) + "'>" +
             "<span class='ghit-tag'>" + (TYPE[e.t] || e.t) + "</span>" +
@@ -301,6 +304,7 @@
           ).join("") + "</div>";
       });
       tagPage.innerHTML = html;
+      buildContents(groups);
     }
 
     if (current && counts[current]) renderTag(current); else renderOverview();
@@ -350,8 +354,11 @@
         "<h1 class='tp-title'>" + esc(names[ex] || ex) + " <span class='tag'>" + esc(ex) + "</span></h1>" +
         "<p class='tp-sub'>" + hits.length + " question" + (hits.length > 1 ? "s" : "") +
         " across " + Object.keys(byChapter).length + " chapter(s).</p>";
+      const groups = [];
       Object.keys(byChapter).forEach((ct) => {
-        html += "<h2 class='tp-ch'>" + esc(ct) + "</h2><div class='tp-list'>" +
+        const id = "sec-" + slug(ct);
+        groups.push({ id: id, title: ct, n: byChapter[ct].length });
+        html += "<h2 class='tp-ch' id='" + id + "'>" + esc(ct) + "</h2><div class='tp-list'>" +
           byChapter[ct].map((e) => {
             const lbl = (e.srcs || []).filter((s) => examOf(s) === ex).map(labelOf).join(", ");
             return "<a class='ghit' href='" + qHref(e) + "'>" +
@@ -361,6 +368,7 @@
           }).join("") + "</div>";
       });
       examPage.innerHTML = html;
+      buildContents(groups);
     }
     // bare exams.html (no ?e=) is now redundant with the homepage "By exam"
     // view → bounce there; only the single-exam ?e=X pages render here.
@@ -806,6 +814,23 @@
       pill._io = io;
     }
     setActive(links[0]);                            // initial label before scrolling
+  }
+
+  // slugify a chapter title into a stable anchor id
+  function slug(s) {
+    return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  }
+
+  // Build the popover list from rendered chapter-groups, then (re)wire the pill.
+  // groups: [{ id, title, n }]
+  function buildContents(groups) {
+    const pop = document.getElementById("tocPop");
+    if (!pop) return;
+    pop.innerHTML = "<ol>" + groups.map((g) =>
+      "<li><a href='#" + g.id + "'><span class='toc-label'>" + esc(g.title) +
+      "</span><span class='toc-n'>" + g.n + "</span></a></li>"
+    ).join("") + "</ol>";
+    setupContentsPill();
   }
 
   setupContentsPill();   // chapter pages: section links are server-rendered
