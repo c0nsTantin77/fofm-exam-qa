@@ -45,6 +45,9 @@ npm run preview    # serve the built dist/ locally
 npm run check      # astro check (type-check .astro/.ts)
 ```
 
+> On **Windows PowerShell** the `npm` shim is `npm.ps1`, which can be blocked by the
+> execution policy — use **`npm.cmd run …`** instead (e.g. `npm.cmd run preview`).
+
 Content validators still run on the JSON source:
 
 ```bash

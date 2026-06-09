@@ -5,9 +5,12 @@ import vue from "@astrojs/vue";
 // GitHub Pages project site: served under /i2dl-exam-qa/.
 // Math is rendered at build time (KaTeX renderToString in src/lib/md.ts),
 // so there is no client-side KaTeX JS — only the stylesheet is loaded.
+// SITE_BASE lets a preview build live under a sub-path (e.g.
+// /i2dl-exam-qa/preview) without touching the production root. Defaults to the
+// production base. All internal links use this via import.meta.env.BASE_URL.
 export default defineConfig({
   site: "https://c0nsTantin77.github.io",
-  base: "/i2dl-exam-qa",
+  base: process.env.SITE_BASE || "/i2dl-exam-qa",
   trailingSlash: "ignore",
   integrations: [vue()],
   build: {
