@@ -1,16 +1,37 @@
 import { setupContentsPill } from "./contents";
+import { clearHighlights, highlightIn } from "./highlight";
 
-// Chapter-page interactions: keyword/type filter, expand-all, back-to-top,
-// deep-link opening, and the topbar contents pill (server-rendered links).
+// Chapter-page interactions: keyword/type filter (+ keyword highlighting),
+// expand-all, back-to-top, deep-link opening, and the topbar contents pill.
 
 function initFilter(): void {
   const search = document.getElementById("search") as HTMLInputElement | null;
   const typeBoxes = Array.from(document.querySelectorAll<HTMLInputElement>(".ftype"));
   const noResults = document.querySelector<HTMLElement>(".noresults");
+  const content = document.querySelector<HTMLElement>(".content");
   if (!search && !typeBoxes.length) return;
 
   const activeTypes = () =>
     new Set(typeBoxes.filter((b) => b.checked).map((b) => b.value));
+
+  // Highlight matched keywords in visible cards (question + answer + extend),
+  // skipping KaTeX. Debounced so fast typing doesn't thrash the DOM walk.
+  let hlTimer: ReturnType<typeof setTimeout> | null = null;
+  const scheduleHighlight = (term: string) => {
+    if (!content) return;
+    if (hlTimer) clearTimeout(hlTimer);
+    hlTimer = setTimeout(() => {
+      clearHighlights(content);
+      if (!term) return;
+      const targets: HTMLElement[] = [];
+      content
+        .querySelectorAll<HTMLElement>(
+          "details.q:not([hidden]) .q-text, details.q:not([hidden]) .answer, details.q:not([hidden]) .extend",
+        )
+        .forEach((el) => targets.push(el));
+      highlightIn(targets, term);
+    }, 120);
+  };
 
   const applyFilter = () => {
     const term = (search ? search.value : "").trim().toLowerCase();
@@ -31,6 +52,7 @@ function initFilter(): void {
       kp.hidden = kpVisible === 0;
     });
     if (noResults) noResults.hidden = visible !== 0;
+    scheduleHighlight(term);
   };
 
   if (search) search.addEventListener("input", applyFilter);
