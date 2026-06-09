@@ -2,3 +2,10 @@ _txt/
 __pycache__/
 *.pyc
 .DS_Store
+
+# Astro / Node build artifacts (generated, not committed)
+node_modules/
+dist/
+.astro/
+*.log
+npm-debug.log*

@@ -1,0 +1,154 @@
+---
+import type { QuestionData } from "../content.config";
+import { renderQuestion, renderAnswer, mdInline } from "../lib/md";
+import { url } from "../lib/paths";
+
+interface Props {
+  q: QuestionData;
+  anchor: string;
+  qnum?: string;
+}
+const { q, anchor, qnum = "" } = Astro.props;
+
+const isAi = q.type === "ai";
+const isMc = q.type === "mc" || (isAi && Array.isArray(q.options));
+const fmtLabel = isMc ? "Multiple choice" : "Open";
+
+function freqBadge(f: number): { cls: string; label: string } {
+  if (f >= 6) return { cls: "freq-hot", label: `🔥 ${f}×` };
+  if (f >= 3) return { cls: "freq-mid", label: `🔥 ${f}×` };
+  if (f >= 1) return { cls: "freq-low", label: `${f}×` };
+  return { cls: "freq-ai", label: "practice" };
+}
+const fb = freqBadge(q.freq);
+
+const typeLabel = { mc: "Multiple Choice", open: "Open", ai: "AI" }[q.type];
+const typeCls = { mc: "t-mc", open: "t-open", ai: "t-ai" }[q.type];
+
+const LETTERS = "ABCDEFGH";
+const qHtml = renderQuestion(q.q);
+const answerHtml = renderAnswer(q.answer);
+const extendHtml = q.extend ? renderAnswer(q.extend) : "";
+
+const options = (q.options ?? []).map((o, i) => ({
+  letter: LETTERS[i],
+  correct: o.correct,
+  textHtml: mdInline(o.text),
+}));
+const correctLetters = options.filter((o) => o.correct).map((o) => o.letter);
+const correctLine = correctLetters.length
+  ? correctLetters.join(", ")
+  : "none (all options are false)";
+
+const tags = q.tags ?? [];
+---
+
+<details class="q" id={anchor} data-type={q.type} data-freq={q.freq}>
+  <summary>
+    <div class="q-head">
+      {qnum && <span class="q-num">{qnum}</span>}
+      {
+        isAi ? (
+          <>
+            <span class="qtype t-ai">AI-generated</span>
+            <span class="fmt-badge">{fmtLabel}</span>
+          </>
+        ) : (
+          <>
+            <span class={`qtype ${typeCls}`}>{typeLabel}</span>
+            <span class={`badge ${fb.cls}`} title="Times this point appears across exams">
+              {fb.label}
+            </span>
+            <span class="q-src">
+              {q.sources.map((s) => (
+                <span class={s.toLowerCase().startsWith("ai") ? "src-ai" : "src"}>{s}</span>
+              ))}
+            </span>
+          </>
+        )
+      }
+    </div>
+    <div class="q-text" set:html={qHtml} />
+  </summary>
+  <div class="q-body">
+    {
+      isMc ? (
+        <div class="quiz">
+          <p class="quiz-hint">
+            Select the options you think are correct (it may be none), then check.
+          </p>
+          <ul class="options interactive">
+            {options.map((o) => (
+              <li class="opt">
+                <label>
+                  <input type="checkbox" data-correct={String(o.correct)} />
+                  <span class="opt-letter">{o.letter}</span>
+                  <span class="opt-text" set:html={o.textHtml} />
+                  <span class="opt-mark" aria-hidden="true" />
+                </label>
+              </li>
+            ))}
+          </ul>
+          <div class="quiz-actions">
+            <button type="button" class="check-btn">
+              Check answer
+            </button>
+            <button type="button" class="reset-btn" hidden>
+              Try again
+            </button>
+          </div>
+          <div class="reveal" hidden>
+            <div class="verdict" role="status" />
+            <div class="correct-line">
+              ✅ Correct: <b>{correctLine}</b>
+            </div>
+            <div class="answer">
+              <div class="answer-label">Answer</div>
+              <Fragment set:html={answerHtml} />
+            </div>
+            {extendHtml && (
+              <div class="extend">
+                <div class="extend-label">💡 Extended memory</div>
+                <Fragment set:html={extendHtml} />
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div class="answer">
+            <div class="answer-label">Answer</div>
+            <Fragment set:html={answerHtml} />
+          </div>
+          {extendHtml && (
+            <div class="extend">
+              <div class="extend-label">💡 Extended memory</div>
+              <Fragment set:html={extendHtml} />
+            </div>
+          )}
+        </>
+      )
+    }
+    {
+      tags.length > 0 && (
+        <div class="tags">
+          {tags.map((t) => (
+            <a class="tag" href={`${url("/tags")}?t=${encodeURIComponent(t)}`}>
+              {t}
+            </a>
+          ))}
+        </div>
+      )
+    }
+    <div class="study">
+      <label class="study-rev"><input type="checkbox" class="rev-box" /> Reviewed</label>
+      <button type="button" class="wrong-btn">★ Wrong book</button>
+      <button type="button" class="note-btn">📝 Note</button>
+      <span class="srs-due"></span>
+      <div class="note-wrap" hidden>
+        <textarea class="note-area" rows="3" placeholder="Your notes for this question…"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+</details>

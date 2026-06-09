@@ -32,16 +32,45 @@ Popular Architectures (65) · RNNs & Transformers (57) · Appendix: Matrix Calcu
 - **2026-06-06** — Browse by exam paper (`SS23 6.1` jumps to a question), concept-tag pages, AI multiple-choice.
 
 ## Develop
-Pure Python stdlib — content lives in `data/*.json`, `build.py` generates the site.
+Built with **[Astro](https://astro.build) + Vue islands**. Content stays in `data/*.json`
+(validated by a Zod schema); formulas are rendered to HTML **at build time** with KaTeX, so
+pages ship no client-side math JS. Interactive bits (search, tag/exam/review browsing) are Vue
+islands; per-question quiz/study controls and the progress dashboard are small ES-module scripts.
 
 ```bash
-python build.py                  # regenerate index.html + chapters/*.html + search-index.json
+npm install
+npm run dev        # local dev server (hot reload)
+npm run build      # → dist/  (static site)
+npm run preview    # serve the built dist/ locally
+npm run check      # astro check (type-check .astro/.ts)
+```
+
+Content validators still run on the JSON source:
+
+```bash
 python tools/check_sources.py    # verify every SSyy x.y citation against the exam text
-python tools/check_math.py       # validate KaTeX
+python tools/check_math.py       # validate KaTeX delimiters / macros
 python tools/coverage_report.py  # per-exam coverage → COVERAGE.md
 ```
 
-Deploy with `deploy.ps1` (needs a one-time `gh auth login`).
+### Repository layout
+```
+data/                 chapter JSON (content source of truth) + manifest + coverage
+src/
+  content.config.ts   content collection + Zod schema
+  lib/                qid · md (markdown+KaTeX) · content/search · exams · paths · config
+  lib/client/         store · quiz · study · progress · cloud · presence · contents · …
+  components/         Layout · Topbar · SiteFooter · QuestionCard · KnowledgePoint
+  components/islands/ GlobalSearch · TagBrowser · ExamBrowser · ReviewPage (Vue)
+  pages/              index · chapters/[id] · tags · exams · review · search-index.json
+public/               static assets (tum.svg, .nojekyll)
+tools/                content mining + validation scripts (Python)
+```
+
+### Deploy
+Pushing to `main` runs `.github/workflows/deploy.yml` (build + publish to GitHub Pages).
+**One-time:** set **Settings → Pages → Source = GitHub Actions** (was "main / root"). `dist/`,
+`node_modules/`, and `.astro/` are git-ignored — the repo holds source only.
 
 ---
 *For personal revision. Answers follow the official I2DL sample solutions; AI-generated items are marked.*

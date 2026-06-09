@@ -1,3 +1,20 @@
+> ## ✅ 完成记录（2026-06-09）—— 方案 A 已落地（`astro-migration` 分支）
+>
+> 全量迁移到 **Astro 6 + Vue islands** 完成并通过 `astro check`（0 error）+ 本地 `build`/`preview` 验证。`main` 分支保持原样、线上不受影响；**未部署**（等批准）。
+>
+> **做到的：** `.astro` 组件取代 build.py 的 f-string；`data/*.json` 接入 content collection + **Zod schema**（取代手写结构校验）；**构建期 KaTeX**（`src/lib/md.ts` 的 `katex.renderToString`，**删掉运行时 KaTeX JS**，字体自托管）；593 行 app.js 拆成 `src/lib/client/*` 多个作用域清晰的 ES 模块 + 4 个 Vue 岛屿；`dist/`/`node_modules/`/`.astro/` 移出仓库，改 GitHub Actions 部署；旧产物（index/chapters/*.html、search-index.js、build.py、deploy.ps1、assets/）已删除。
+>
+> **与原计划的务实偏离（有意为之）：**
+> 1. **搜索没用 Pagefind**，而是构建期生成结构化 `/search-index.json`（端点）由岛屿 fetch。原因：Pagefind 只做全文，而 tags/exams/review 页面依赖每题的结构化字段（type/sources/tags），全文索引无法驱动这些分组页。比旧的 inline `window.SEARCH_INDEX` 更干净。
+> 2. **岛屿划分**：search/tags/exams/review 这类「动态长列表」页用 **Vue 岛屿**（收益最大）；逐题的 quiz/study 控件与进度仪表盘用**框架无关的 ES 模块脚本**（章节页有上百题，若每题一个 Vue 实例反而是负优化）。这才是诚实的 islands 架构。
+> 3. **KaTeX 用 `renderToString` 而非 remark/rehype-katex**：内容是 JSON 字符串不是 .md，没有 markdown 管线可挂；直接在 md 渲染器里渲染数学更直接。
+> 4. **qid 算法逐字节复刻**（`src/lib/qid.ts` 的 sha1），锚点与 localStorage/Firestore 进度键全部沿用 → **老用户进度无缝继承**（已验证 ch01 锚点与旧站一致）。
+> 5. Node 用便携版 24 LTS（winget 机器级 MSI 卡在提权）。`tools/`（挖题+校验脚本）保持原样，重排留作后续。
+>
+> **部署步骤（待你同意）：** 合并分支到 main → GitHub **Settings→Pages→Source 改为 "GitHub Actions"**（原为 main/root）→ Actions 自动 build+deploy。详见 README「Deploy」。
+>
+> ---
+
 # i2dl-exam-qa 重构方案
 
 > 目标:简化代码、提升可维护性/可读性、模块化。

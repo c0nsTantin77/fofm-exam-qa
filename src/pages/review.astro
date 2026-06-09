@@ -1,0 +1,21 @@
+---
+import Layout from "../components/Layout.astro";
+import Topbar from "../components/Topbar.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import ReviewPage from "../components/islands/ReviewPage.vue";
+import { url } from "../lib/paths";
+---
+
+<Layout title="Review · I2DL Exam Q&A">
+  <Topbar backHref={url("/")} backFull=" chapters">
+    <div class="filters" slot="filters">
+      <button id="exportBtn" type="button" class="io-btn">⬇ Export</button>
+      <label class="io-btn" for="importFile">⬆ Import</label>
+      <input id="importFile" type="file" accept="application/json" hidden />
+    </div>
+  </Topbar>
+  <main class="tagpage">
+    <ReviewPage client:load />
+  </main>
+  <SiteFooter />
+</Layout>
