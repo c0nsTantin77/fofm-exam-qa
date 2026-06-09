@@ -54,6 +54,8 @@
 .ghit-q{font-weight:600;font-size:.92rem}
 .ghit-meta{display:block;font-size:.76rem;color:var(--muted);margin-top:2px}
 .gempty{padding:16px;color:var(--muted);font-size:.9rem}
+/* matched search keyword in results: bold + italic + soft highlight */
+.ghit-hl{background:#fff3bf;color:inherit;font-weight:700;font-style:italic;border-radius:3px;padding:0 1px}
 details.q.flash{animation:flash 1.6s ease}
 @keyframes flash{0%,100%{box-shadow:var(--shadow)}30%{box-shadow:0 0 0 3px var(--tum)}}
 

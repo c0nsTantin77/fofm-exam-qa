@@ -30,6 +30,19 @@ const examBanner = computed(() => {
 
 const showResults = computed(() => term.value.length > 0);
 const examHref = (code: string) => `${url("/exams")}?e=${code}`;
+
+// Highlight the matched search words in a result (bold + italic). Escape the
+// text first, then wrap matches — the index text is plain, so this is safe.
+const words = computed(() => term.value.split(/\s+/).filter(Boolean));
+const escapeHtml = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function highlight(text: string): string {
+  const esc = escapeHtml(text);
+  if (!words.value.length) return esc;
+  const re = new RegExp("(" + words.value.map(escapeRe).join("|") + ")", "gi");
+  return esc.replace(re, '<mark class="ghit-hl">$1</mark>');
+}
 </script>
 
 <template>
@@ -61,7 +74,7 @@ const examHref = (code: string) => `${url("/exams")}?e=${code}`;
         <div class="gcount">{{ hits.length }} match{{ hits.length > 1 ? "es" : "" }}</div>
         <a v-for="e in hits" :key="e.a" class="ghit" :href="questionHref(e)">
           <span class="ghit-tag">{{ TYPE_LABEL[e.t] || e.t }}</span>
-          <span class="ghit-q">{{ e.q }}</span>
+          <span class="ghit-q" v-html="highlight(e.q)"></span>
           <span class="ghit-meta">{{ e.ct }} · {{ e.kp }} · {{ e.src }}</span>
         </a>
       </template>

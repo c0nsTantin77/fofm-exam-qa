@@ -51,6 +51,10 @@ const toc: TocItem[] = data.knowledge_points.map((kp, i) => ({
         <span class="stat"><b>{stats.ai}</b> AI practice</span>
       </div>
       <div class="ch-progress" data-ch={data.id}></div>
+      <p class="hint">
+        Knowledge points are ordered by the lecture syllabus; questions within each point are
+        sorted by exam frequency. Click any question to reveal the answer.
+      </p>
       <div class="legend">
         <div><span class="badge freq-hot">🔥 n×</span> high frequency</div>
         <div><span class="src">SS22 3.1</span> source = exam + problem no.</div>
@@ -63,10 +67,6 @@ const toc: TocItem[] = data.knowledge_points.map((kp, i) => ({
     </aside>
 
     <main class="content">
-      <p class="hint">
-        Knowledge points are ordered by the lecture syllabus; questions within each point are
-        sorted by exam frequency. Click any question to reveal the answer.
-      </p>
       {
         data.knowledge_points.map((kp, i) => (
           <KnowledgePoint kp={kp} kpnum={`${chnum}.${i + 1}`} />
