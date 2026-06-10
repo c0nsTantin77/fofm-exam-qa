@@ -7,7 +7,9 @@ import { url } from "../lib/paths";
 ---
 
 <Layout title="Concept tags · I2DL Exam Q&A">
-  <Topbar backHref={url("/")} backFull=" chapters" contentsPlaceholder />
+  <Topbar backHref={url("/")} backFull=" chapters" contentsPlaceholder>
+    <div class="filters" slot="filters"><div id="tp-filter-slot"></div></div>
+  </Topbar>
   <main class="tagpage">
     <TagBrowser client:load />
   </main>

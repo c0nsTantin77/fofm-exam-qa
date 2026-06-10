@@ -113,6 +113,13 @@ a.tag:hover{background:var(--tum);color:#fff;text-decoration:none}   /* only cli
 .tp-title{font-size:1.6rem;margin:.2em 0 .1em}
 .tp-sub{color:var(--muted);margin:.2em 0 1.2em}
 .tp-back{display:inline-block;margin-bottom:8px;font-weight:600}
+/* topbar filter box on the single tag / exam pages (teleported into the topbar) */
+.tp-search{border:1px solid var(--line);border-radius:10px;padding:7px 12px;font-size:.9rem;
+  min-width:220px;background:#fff;color:var(--ink)}
+.tp-search::placeholder{color:#9aa6b2}
+.tp-search:focus{outline:2px solid var(--tum);border-color:var(--tum)}
+@media(max-width:860px){.tp-search{flex:1;width:100%;min-width:0}}
+@media(max-width:560px){.tp-search{font-size:16px}}   /* 16px stops iOS zoom-on-focus */
 .tagcloud{display:flex;flex-wrap:wrap;gap:10px}
 .tagbig{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
   border-radius:999px;padding:8px 14px;font-weight:600;color:var(--ink);box-shadow:var(--shadow)}
