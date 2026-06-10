@@ -28,6 +28,15 @@ export function initShare(): void {
       } catch {
         ok = false;
       }
+      // GA4 share event — only for the real "share with a friend" button
+      // (has data-share), so the GitHub-star link doesn't fire it.
+      if (ok && btn.dataset.share) {
+        (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag?.(
+          "event",
+          "share",
+          { method: "copy_link", content_type: "website", item_id: "share-with-a-friend" },
+        );
+      }
       if (!txt) return;
       const orig = btn.dataset.label || (btn.dataset.label = txt.textContent ?? "");
       txt.textContent = ok ? "Copied — paste & send! 🎉" : "Press Ctrl+C to copy";

@@ -19,6 +19,7 @@ Popular Architectures (65) · RNNs & Transformers (57) · Appendix: Matrix Calcu
 - KaTeX formulas, collapsible answers, mobile-optimized.
 
 ## Recent updates
+- **2026-06-09** — 🔍 Search now **highlights your match**: the home-page search and each chapter's filter box light up the words you typed (bold + soft highlight) in the question & answer; formulas stay intact.
 - **2026-06-09** — ⚡ Under-the-hood glow-up: the whole site was **rebuilt with Astro + Vue**. Formulas now render **instantly** (no load-time flicker), pages are lighter and faster, and all your old bookmarks & links still work. 🚀
 - **2026-06-08** — Home-page polish: collapsible **Recent updates / How to use** panels, more **Popular tags**, the in-page **contents menu** restored on exam & tag pages, and tighter mobile spacing.
 - **2026-06-08** — Home page: toggle **By chapter / By exam** (each exam card shows your review progress), a refreshed Apple-flavoured hero, **one-tap Share** (copies a ready-to-send message), and a **Feedback & issues** card.

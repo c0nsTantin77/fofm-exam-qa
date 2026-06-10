@@ -54,8 +54,10 @@ const popTags = [...tagCounts.entries()]
   .map(([t, n]) => ({ t, n }));
 
 const recentUpdates = (updates as { date: string; text: string }[]).slice(0, 3);
+// UTM tags so friend-shared visits show up in GA4 as source/medium
+// "share / referral" (campaign "friend"), instead of blending into Direct.
 const shareText =
-  "Hey! Just found the best I2DL exam-prep tool — check it out: https://c0nsTantin77.github.io/i2dl-exam-qa/";
+  "Hey! Just found the best I2DL exam-prep tool — check it out: https://c0nsTantin77.github.io/i2dl-exam-qa/?utm_source=share&utm_medium=referral&utm_campaign=friend";
 ---
 
 <Layout title="I2DL Exam Q&A · TUM IN2346">

@@ -1,4 +1,5 @@
 [
+  {"date": "2026-06-09", "text": "🔍 Search now highlights your match: type in the home-page search or a chapter's filter box and the words you typed light up (bold + soft highlight) right in the question and answer — the hit jumps out, formulas stay intact."},
   {"date": "2026-06-09", "text": "⚡ Under-the-hood glow-up: the whole site was rebuilt with Astro + Vue. Formulas now render instantly (no more flicker on load), pages are lighter and faster — and all your old bookmarks & links still work. Same deck, smoother ride. 🚀"},
   {"date": "2026-06-08", "text": "Home-page tidy-up: the “Recent updates” and “How to use” panels now fold away, more popular tags are shown, and the in-page contents menu is back on the exam & tag pages."},
   {"date": "2026-06-08", "text": "New on the home page: flip between “By chapter” and “By exam” — every past paper now shows your review progress at a glance. Loving the deck? One tap on “Share with a friend” copies a ready-to-send message. 🎉"},
