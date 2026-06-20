@@ -71,6 +71,32 @@ details.q[open]{border-color:#bcd4f0}
 .extend-label{color:#b8860b}
 .noresults{text-align:center;color:var(--muted);padding:30px}
 
+/* ---- open-question self-test ---- */
+.selftest{margin-top:14px}
+.self-area{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:.92rem;
+  font-family:inherit;resize:vertical;background:#fffdf7}
+.self-area:focus{outline:2px solid var(--tum);border-color:var(--tum)}
+.self-area[readonly]{background:#f5f7fa;color:var(--ink);cursor:default}
+.self-score{margin:10px 0 2px;font-size:.85rem;font-weight:600;color:var(--no)}
+.self-score.good{color:var(--ok)}
+.open-reveal .answer strong.kw-hit{color:#1c7a3f;background:#eafff1;border-radius:4px;padding:0 2px}
+.open-reveal .answer strong.kw-miss{color:var(--no);background:#fff2f2;border-radius:4px;padding:0 2px;
+  text-decoration:underline wavy rgba(224,49,49,.5)}
+.self-assess{margin-top:12px;padding-top:11px;border-top:1px dashed var(--line);
+  display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+.self-assess-q{font-size:.84rem;font-weight:600;color:var(--muted)}
+.self-btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 13px;
+  font-size:.82rem;font-weight:600;cursor:pointer}
+.got-btn{color:var(--ok)}
+.got-btn:hover{border-color:var(--ok);background:#ebfbee}
+.miss-btn{color:var(--no)}
+.miss-btn:hover{border-color:var(--no);background:#fff5f5}
+.self-assess[data-done] .self-btn{opacity:.5;pointer-events:none}
+.self-assess[data-done="got"] .got-btn,.self-assess[data-done="miss"] .miss-btn{opacity:1;font-weight:800}
+.self-assess[data-done]::after{font-size:.8rem;font-weight:700}
+.self-assess[data-done="got"]::after{content:"✓ marked reviewed";color:var(--ok)}
+.self-assess[data-done="miss"]::after{content:"★ added to wrong book";color:var(--no)}
+
 /* ---- concept tags ---- */
 .tags{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);
   display:flex;flex-wrap:wrap;gap:6px;align-items:center}

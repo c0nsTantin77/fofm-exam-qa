@@ -115,18 +115,31 @@ const tags = q.tags ?? [];
           </div>
         </div>
       ) : (
-        <>
-          <div class="answer">
-            <div class="answer-label">Answer</div>
-            <Fragment set:html={answerHtml} />
+        <div class="selftest">
+          <p class="quiz-hint">Try it first — write your answer, then reveal to self-check.</p>
+          <textarea class="self-area" rows="3" placeholder="Write your answer (optional)…"></textarea>
+          <div class="quiz-actions">
+            <button type="button" class="check-btn reveal-btn">Show answer</button>
           </div>
-          {extendHtml && (
-            <div class="extend">
-              <div class="extend-label">💡 Extended memory</div>
-              <Fragment set:html={extendHtml} />
+          <p class="self-score" role="status" hidden />
+          <div class="open-reveal" hidden>
+            <div class="answer">
+              <div class="answer-label">Answer</div>
+              <Fragment set:html={answerHtml} />
             </div>
-          )}
-        </>
+            {extendHtml && (
+              <div class="extend">
+                <div class="extend-label">💡 Extended memory</div>
+                <Fragment set:html={extendHtml} />
+              </div>
+            )}
+            <div class="self-assess" hidden>
+              <span class="self-assess-q">How did you do?</span>
+              <button type="button" class="self-btn got-btn">✓ Got it</button>
+              <button type="button" class="self-btn miss-btn">✗ Missed → wrong book</button>
+            </div>
+          </div>
+        </div>
       )
     }
     {

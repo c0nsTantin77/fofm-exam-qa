@@ -2,6 +2,7 @@
 // init guards on the elements it needs, so it is safe to run on every page.
 import { initQuizzes } from "./quiz";
 import { initStudy } from "./study";
+import { initOpenAnswer } from "./open-answer";
 import { initChapterUI } from "./chapter-ui";
 import { initProgress } from "./progress";
 import { initShare } from "./share";
@@ -16,6 +17,7 @@ runMigrations();
 
 // per-question interactions (chapter pages)
 initQuizzes();
+initOpenAnswer();
 initStudy();
 
 // chapter-page chrome (filter / expand / back-to-top / deep-link / contents pill)
