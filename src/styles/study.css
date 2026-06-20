@@ -25,6 +25,21 @@
 .note-area{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:.9rem;
   font-family:inherit;resize:vertical;background:#fffdf7}
 .note-area:focus{outline:2px solid var(--tum);border-color:var(--tum)}
+.note-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:5px;
+  font-size:.72rem;color:var(--muted)}
+.note-md-hint .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#eef2f7;border-radius:5px;padding:1px 5px}
+.note-count{font-variant-numeric:tabular-nums}
+.note-count.near{color:var(--no);font-weight:700}
+.note-preview{margin-top:8px;padding:9px 12px;border:1px solid var(--line);border-left:3px solid var(--tum);
+  border-radius:8px;background:#fff;font-size:.9rem;line-height:1.5;overflow-wrap:anywhere}
+.note-preview:empty{display:none}
+.note-preview>:first-child{margin-top:0}
+.note-preview>:last-child{margin-bottom:0}
+.note-preview p{margin:.3em 0}
+.note-preview ul,.note-preview ol{margin:.3em 0;padding-left:1.4em}
+.note-preview code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#eef2f7;
+  border-radius:5px;padding:1px 5px;font-size:.86em}
+.note-preview a{color:var(--tum);text-decoration:underline}
 details.q.is-reviewed{border-color:#b2f2bb}
 details.q.is-reviewed>summary::after{content:"✓ reviewed";float:right;font-size:.7rem;font-weight:700;color:var(--ok)}
 details.q.has-note .note-btn{background:#fffaf0;border-color:#ffe2a8;color:#b8860b}

@@ -9,3 +9,7 @@ dist/
 .astro/
 *.log
 npm-debug.log*
+
+# Local editor / tooling config (machine-specific, not committed)
+.claude/
+.vscode/
