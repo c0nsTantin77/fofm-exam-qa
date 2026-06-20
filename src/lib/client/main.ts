@@ -8,7 +8,11 @@ import { initShare } from "./share";
 import { initHomeView, initFeedbackLink } from "./home";
 import { initReviewIO } from "./review-io";
 import { initCloud } from "./cloud";
+import { runMigrations } from "./migrate";
 import { APP_CONFIG } from "../config";
+
+// migrate study data off de-duplicated question ids before anything reads it
+runMigrations();
 
 // per-question interactions (chapter pages)
 initQuizzes();

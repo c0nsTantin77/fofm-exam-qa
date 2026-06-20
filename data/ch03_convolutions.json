@@ -262,38 +262,6 @@
           ]
         },
         {
-          "type": "mc",
-          "freq": 1,
-          "sources": [
-            "WS23 1.8"
-          ],
-          "q": "For a conv layer (kernel $k$, padding 1, stride 1, $m$ filters) on input $C\\times N\\times N$, which affect the output shape?",
-          "answer": "**$N$, $k$, and $m$** affect the output shape (spatial size from $N,k$; output channels $=m$). The input channel count **$C$ does not** change the output shape (only per-filter depth).",
-          "extend": "Output shape = (m, H_out, W_out); $C$ sets filter depth, not the output dimensions.",
-          "options": [
-            {
-              "text": "N",
-              "correct": true
-            },
-            {
-              "text": "k",
-              "correct": true
-            },
-            {
-              "text": "m",
-              "correct": true
-            },
-            {
-              "text": "C",
-              "correct": false
-            }
-          ],
-          "tags": [
-            "Convolution",
-            "Parameter counting"
-          ]
-        },
-        {
           "type": "open",
           "freq": 1,
           "sources": [
@@ -385,20 +353,6 @@
               "correct": true
             }
           ],
-          "tags": [
-            "Convolution",
-            "Parameter counting"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "SS24 2.8"
-          ],
-          "q": "For an input batch $10\\times20\\times30\\times40$ (N×C×H×W), how many parameters are in a single $3\\times3$ convolution filter with stride 2, including bias?",
-          "answer": "A single filter spans all input channels: $3\\times3\\times20+1=\\mathbf{181}$ (the $+1$ is the bias; stride doesn't affect parameter count).",
-          "extend": "Filter params = $k\\cdot k\\cdot C_{in}+1$; stride/padding don't change it.",
           "tags": [
             "Convolution",
             "Parameter counting"

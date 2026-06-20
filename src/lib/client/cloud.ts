@@ -2,6 +2,7 @@ import { Store, setCloudSchedule, type Progress } from "./store";
 import { applyAllStudy } from "./study";
 import { renderProgressUI } from "./progress";
 import { startPresence } from "./presence";
+import { runMigrations } from "./migrate";
 import type { FirebaseConfig } from "../config";
 
 // Cloud sync (Firebase) — localStorage stays primary; this batches the single
@@ -52,7 +53,9 @@ async function pullMergePush(): Promise<void> {
     const cloud = doc.exists ? doc.data().progress || {} : {};
     const merged = mergeProgress(Store.data(), cloud);
     Store.importBlob(JSON.stringify(merged));
-    await db.collection("users").doc(uid).set({ progress: merged, updated: Date.now() }, { merge: true });
+    // a cloud doc from another device may still carry pre-dedup ids
+    runMigrations();
+    await db.collection("users").doc(uid).set({ progress: Store.data(), updated: Date.now() }, { merge: true });
     applyAllStudy();
     renderProgressUI();
   } catch (e) {

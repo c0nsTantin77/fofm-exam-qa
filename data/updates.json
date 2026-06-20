@@ -1,4 +1,5 @@
 [
+  {"date": "2026-06-20", "text": "🧹 Content clean-up: fixed the logistic-regression answer (it is a non-linear function — only its decision boundary is linear), tagged the early-stopping question, and removed 14 duplicate questions across the chapters. Your reviewed / wrong-book / notes / spaced-repetition data is automatically carried over to the kept questions, so nothing is lost."},
   {"date": "2026-06-09", "text": "🔍 Search now highlights your match: type in the home-page search or a chapter's filter box and the words you typed light up (bold + soft highlight) right in the question and answer — the hit jumps out, formulas stay intact."},
   {"date": "2026-06-09", "text": "⚡ Under-the-hood glow-up: the whole site was rebuilt with Astro + Vue. Formulas now render instantly (no more flicker on load), pages are lighter and faster — and all your old bookmarks & links still work. Same deck, smoother ride. 🚀"},
   {"date": "2026-06-08", "text": "Home-page tidy-up: the “Recent updates” and “How to use” panels now fold away, more popular tags are shown, and the in-page contents menu is back on the exam & tag pages."},

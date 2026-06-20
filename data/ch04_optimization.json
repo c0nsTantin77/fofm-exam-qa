@@ -2054,6 +2054,7 @@
           "extend": "ReLU halves the variance (zeros out negatives), so He uses $2/n_{in}$ to compensate; Xavier ($1/n_{in}$-style) is for symmetric activations (tanh).",
           "tags": [
             "ReLU",
+            "Sigmoid",
             "Tanh",
             "Weight initialization"
           ]
@@ -2218,21 +2219,6 @@
           "tags": [
             "Weight initialization",
             "Fully-connected"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "SS21 2.4"
-          ],
-          "q": "How does Xavier initialization set the weights? What mean/variance do the weights and the outputs have?",
-          "answer": "Weights are drawn **Gaussian with zero mean** and **variance $1/n$** where $n$ is the number of input neurons. As a result the **outputs also have zero mean and roughly the same variance as the inputs** — keeping activations well-scaled across layers.",
-          "extend": "Xavier: $\\mathcal N(0,1/n_{in})$ ⇒ output variance ≈ input variance (for tanh/sigmoid).",
-          "tags": [
-            "Sigmoid",
-            "Tanh",
-            "Weight initialization"
           ]
         },
         {

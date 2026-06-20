@@ -1786,40 +1786,6 @@
             "Loss functions",
             "Regression"
           ]
-        },
-        {
-          "type": "mc",
-          "freq": 1,
-          "sources": [
-            "WS23 1.6"
-          ],
-          "q": "For a regression task with labels in $[-1,1]$, which final activations could be used?",
-          "answer": "**Valid (bounded to $[-1,1]$):** $2\\sigma(x)-1$, $\\tanh(10x)$, and $\\min(\\max(-1,x),1)$ (clamp). **Invalid:** $\\max(-1,x)$ is unbounded above.",
-          "extend": "Match the output range to the label range — both sides must be bounded.",
-          "options": [
-            {
-              "text": "f(x) = 2σ(x) - 1 (sigmoid).",
-              "correct": true
-            },
-            {
-              "text": "f(x) = tanh(10x)",
-              "correct": true
-            },
-            {
-              "text": "f(x) = max(-1, x)",
-              "correct": false
-            },
-            {
-              "text": "f(x) = min(max(-1, x), 1)",
-              "correct": true
-            }
-          ],
-          "tags": [
-            "Sigmoid",
-            "Tanh",
-            "Loss functions",
-            "Regression"
-          ]
         }
       ]
     },

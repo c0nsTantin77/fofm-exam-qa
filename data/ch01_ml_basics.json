@@ -50,7 +50,7 @@
           "options": [
             {
               "text": "Is a linear function.",
-              "correct": true
+              "correct": false
             },
             {
               "text": "Is a supervised learning algorithm.",
@@ -65,8 +65,8 @@
               "correct": true
             }
           ],
-          "answer": "All four are correct. Despite the name “regression”, logistic regression is a **linear, supervised, binary classifier** trained with (binary) cross-entropy.",
-          "extend": "Don't be fooled by the word *regression*: logistic regression outputs a probability via sigmoid and is used for **classification**. The decision boundary is linear in the inputs.",
+          "answer": "**Three are correct:** it is a **supervised** algorithm, uses a (binary) **cross-entropy** loss, and performs **binary classification**.\n**Not** a linear function: logistic regression applies a **non-linear sigmoid** to a linear combination of the inputs, $x\\mapsto\\sigma(w^\\top x+b)$, so as a function it is **non-linear** — only its *decision boundary* is linear.",
+          "extend": "Course convention: because of the **sigmoid**, logistic regression counts as a **non-linear function** (the three marked-correct options are supervised / cross-entropy / binary classification). What is linear is only the **decision boundary** $w^\\top x+b=0$. Don't be fooled by the word *regression* — it is used for **classification**.",
           "tags": [
             "Sigmoid",
             "Loss functions",
@@ -176,37 +176,6 @@
           "tags": [
             "Dataset splits",
             "Class imbalance"
-          ]
-        },
-        {
-          "type": "mc",
-          "freq": 1,
-          "sources": [
-            "SS23 1.6"
-          ],
-          "q": "Which statements about Semantic Segmentation are true?",
-          "answer": "**True:** *its precision can be influenced by lighting conditions and image quality*. **False:** it is **supervised** (needs pixel labels), it is **pixel-level** (not broad whole-image categories), and a fixed architecture **cannot** handle an arbitrary number of classes without change (the output layer depends on #classes).",
-          "extend": "Semantic segmentation = supervised, pixel-wise classification; output channels tied to #classes.",
-          "options": [
-            {
-              "text": "Semantic segmentation is unsupervised and needs no labels.",
-              "correct": false
-            },
-            {
-              "text": "It classifies whole images into broad categories without pixel precision.",
-              "correct": false
-            },
-            {
-              "text": "One architecture handles any number of classes without change.",
-              "correct": false
-            },
-            {
-              "text": "Precision can be influenced by lighting conditions and image quality.",
-              "correct": true
-            }
-          ],
-          "tags": [
-            "Supervised vs unsupervised"
           ]
         },
         {
@@ -382,40 +351,6 @@
           ]
         },
         {
-          "type": "mc",
-          "freq": 1,
-          "sources": [
-            "WS22 1.9"
-          ],
-          "q": "Which methods can be used in unsupervised learning?",
-          "answer": "**Autoencoder, PCA, and K-means** are unsupervised (no labels). **Linear regression** is supervised (needs target values).",
-          "extend": "Unsupervised = learn structure without labels: AE, PCA, K-means. Regression needs targets.",
-          "options": [
-            {
-              "text": "Autoencoder.",
-              "correct": true
-            },
-            {
-              "text": "PCA.",
-              "correct": true
-            },
-            {
-              "text": "K-means.",
-              "correct": true
-            },
-            {
-              "text": "Linear Regression.",
-              "correct": false
-            }
-          ],
-          "tags": [
-            "Autoencoder",
-            "Supervised vs unsupervised",
-            "Clustering / PCA",
-            "Regression"
-          ]
-        },
-        {
           "type": "open",
           "freq": 1,
           "sources": [
@@ -465,6 +400,7 @@
           "answer": "**Training (1p):** used to **train the model's parameters (weights)** — compute gradients and optimize the loss.\n**Validation (1p):** used for **hyperparameter tuning** and to **check generalization / performance on unseen data** during training (a sanity check) — *not* used to update weights.\n**Test (1p):** used for the **final, one-time evaluation** of overall performance on truly unseen data.\nMeaningful split (0.5p): training portion $>50\\%$, e.g. $\\{60,20,20\\}$, $\\{80,10,10\\}$, $\\{70,15,15\\}$.",
           "extend": "Note the scoring nuance (WS22): for validation, you must mention *unseen data / hyperparameter tuning* — merely saying “check if it's overfitting” or “validate the model” scores 0. Each split has a distinct, non-overlapping job.",
           "tags": [
+            "Regularization",
             "Overfitting",
             "Dataset splits"
           ]
@@ -481,6 +417,7 @@
           "extend": "Without a validation set you lose your in-training overfitting detector. Don't sacrifice it for marginally more training data — you'd be flying blind.",
           "tags": [
             "Regularization",
+            "Early stopping",
             "Overfitting",
             "Dataset splits"
           ]
@@ -560,46 +497,6 @@
             "Data augmentation",
             "Dataset splits",
             "i.i.d. / distribution"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "WS22 8.1"
-          ],
-          "q": "Explain the purpose of the train, validation, and test splits and how each is used. What percentages are common?",
-          "answer": "**Train** (>50%, e.g. 60–80%): fits the **model parameters** (compute gradients, optimize loss). **Validation:** **hyperparameter tuning** and checking generalization on unseen data (model selection, early stopping). **Test:** the **final, one-time evaluation** of overall performance. Common split: 60/20/20, 70/15/15, or 80/10/10.",
-          "extend": "Train fits weights, val tunes hyperparameters / selects models, test reports the final unbiased score once.",
-          "tags": [
-            "Regularization",
-            "Dataset splits"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "WS21 2.1"
-          ],
-          "q": "In k-fold cross-validation, a larger $k$ increases confidence in the validation score. What is a practical disadvantage and why?",
-          "answer": "**Higher training cost / time.** With larger $k$ you train and validate the model **$k$ separate times** (on nearly the full dataset each time), so compute grows roughly linearly with $k$.",
-          "extend": "More folds → more confidence but $k$× the training runs; it's a compute–reliability trade-off.",
-          "tags": [
-            "Dataset splits"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "WS26 P3a"
-          ],
-          "q": "For handwritten-digit recognition, describe how you would split your dataset so the model is trained, tuned, and evaluated.",
-          "answer": "Use **three disjoint splits**: a **training** set (the majority, >50%), a **validation** set (for hyperparameter tuning / model selection), and a **test** set (final evaluation). E.g. 70/15/15 or 80/10/10.",
-          "extend": "Three splits: train fits, val tunes, test reports — training portion >50%.",
-          "tags": [
-            "Dataset splits"
           ]
         }
       ]
@@ -702,19 +599,6 @@
             "Data augmentation",
             "Normalization",
             "Transfer learning",
-            "i.i.d. / distribution"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "WS22 8.4"
-          ],
-          "q": "Your classifier trained on Amazon product photos works well there, but misclassifies objects you photograph yourself. Give one reason.",
-          "answer": "**Domain gap** — your own photos come from a **different data distribution** (lighting, backgrounds, angles, camera) than the Amazon training images, so the learned features don't transfer.",
-          "extend": "Train/deploy distribution mismatch (domain shift) is the classic cause of good-train / bad-real performance.",
-          "tags": [
             "i.i.d. / distribution"
           ]
         },
@@ -1158,37 +1042,6 @@
           ]
         },
         {
-          "type": "mc",
-          "freq": 1,
-          "sources": [
-            "WS21 1.1"
-          ],
-          "q": "For MNIST handwritten-digit classification, which data augmentations are suitable?",
-          "answer": "**Suitable:** add Gaussian noise, rotate by $\\pm10°$, change contrast — these keep the digit recognizable and label-preserving. **Unsuitable:** **vertical flip** (it changes/destroys the digit, e.g. turning a 6 upside down).",
-          "extend": "Augment within the data's natural variation; vertical-flipping digits creates out-of-distribution, mislabeled samples.",
-          "options": [
-            {
-              "text": "Add Gaussian noise to the images.",
-              "correct": true
-            },
-            {
-              "text": "Vertically flip the images.",
-              "correct": false
-            },
-            {
-              "text": "Rotate the images by 10 degrees.",
-              "correct": true
-            },
-            {
-              "text": "Change the contrast of the images.",
-              "correct": true
-            }
-          ],
-          "tags": [
-            "Data augmentation"
-          ]
-        },
-        {
           "type": "open",
           "freq": 1,
           "sources": [
@@ -1200,40 +1053,6 @@
           "tags": [
             "Overfitting",
             "Data augmentation"
-          ]
-        },
-        {
-          "type": "mc",
-          "freq": 1,
-          "sources": [
-            "SS23 1.8"
-          ],
-          "q": "Which statements about data augmentation in a supervised setup are true?",
-          "answer": "**True:** it *generates additional labeled data for training* and *helps reduce overfitting by introducing variations*. **False:** it is **not** image-only (works for audio, text…), and it is applied to **training**, not the test set.",
-          "extend": "Augmentation expands the labeled train set with label-preserving variations; never applied to test.",
-          "options": [
-            {
-              "text": "Data augmentation generates additional labeled data for training.",
-              "correct": true
-            },
-            {
-              "text": "Data augmentation can help reduce overfitting by introducing variations.",
-              "correct": true
-            },
-            {
-              "text": "Data augmentation is only applicable to image data.",
-              "correct": false
-            },
-            {
-              "text": "Data augmentation should only be applied to the testing set.",
-              "correct": false
-            }
-          ],
-          "tags": [
-            "Overfitting",
-            "Data augmentation",
-            "Dataset splits",
-            "Supervised vs unsupervised"
           ]
         }
       ]
@@ -1438,20 +1257,6 @@
           "tags": [
             "Optimizers",
             "Dataloader"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "SS23 7.5"
-          ],
-          "q": "In PyTorch, state the input/output of `Dataset.__getitem__` in a supervised setting, and explain the role of the DataLoader.",
-          "answer": "`__getitem__` takes an **index/key** and returns the **sample and its label** (a tuple/dict of input + ground truth). The **DataLoader** wraps the Dataset to provide **batching** (also shuffling and parallel loading) for efficient training.",
-          "extend": "Dataset.__getitem__ = one (input,label) by index; DataLoader = batch/shuffle/parallelize.",
-          "tags": [
-            "Dataloader",
-            "Supervised vs unsupervised"
           ]
         },
         {
