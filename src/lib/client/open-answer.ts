@@ -3,9 +3,52 @@ import { applyAllStudy } from "./study";
 
 // Self-test for open / AI short-answer questions: the reference answer is hidden
 // behind "Show answer" with an optional "write your answer" box, mirroring the
-// MC quiz flow. After revealing, the student self-assesses (Got it → reviewed,
-// Missed → wrong book) and can "Try again" to re-attempt. There is no single
-// ground truth, so this stays a self-check (no auto-grading).
+// MC quiz flow. On reveal, the reference's **bold** key terms are scored against
+// the student's text — terms they wrote turn green (hit), terms they missed turn
+// red — then they self-assess (Got it → reviewed, Missed → wrong book) and can
+// "Try again" to re-attempt. There is no single ground truth, so this stays a
+// self-check (no auto-grading / no pass-fail).
+
+const STOP = new Set([
+  "the", "a", "an", "of", "to", "is", "are", "and", "or", "in", "on", "for", "with",
+  "as", "it", "its", "by", "be", "that", "this", "which", "not", "no", "also", "can",
+  "used", "use", "using", "via", "your", "you", "we", "they", "their", "from", "at",
+  "any", "all", "one", "two", "each", "per", "must", "may", "only", "more", "less",
+]);
+
+const norm = (s: string): string =>
+  s.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+const reEsc = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const EMPH = new Set(["not", "true", "false", "yes", "no", "both", "all", "none"]);
+
+/** Turn a reference **bold** span into a comparable key term, or null if it is a
+ *  label / scoring marker / emphasis word / whole sentence rather than a term
+ *  worth scoring (e.g. "Training (1p):", "Three are correct:", "Not"). */
+function cleanTerm(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (/[:：]\s*$/.test(trimmed)) return null; // labels end with a colon
+  const t = trimmed
+    .replace(/\(\s*\d+(?:\.\d+)?\s*p\s*\)/gi, "") // drop "(1p)" / "(0.5p)" scoring marks
+    .replace(/[.,;]+\s*$/, "")
+    .trim();
+  if (!t || !/[a-zA-Z]/.test(t)) return null;
+  const words = t.split(/\s+/).filter(Boolean);
+  if (words.length > 5) return null; // sentence-like, not a term
+  if (words.length === 1 && (t.length < 3 || EMPH.has(t.toLowerCase()))) return null;
+  return t;
+}
+
+/** Does the student's text cover this key term? */
+function termHit(term: string, userNorm: string): boolean {
+  const t = norm(term);
+  if (!t) return false;
+  if (userNorm.includes(t)) return true;
+  const words = t.split(" ").filter((w) => w.length >= 3 && !STOP.has(w));
+  if (!words.length) return new RegExp("(^| )" + reEsc(t) + "( |$)").test(userNorm);
+  const present = words.filter((w) => new RegExp("(^| )" + reEsc(w)).test(userNorm)).length;
+  return present >= Math.ceil(words.length * 0.6);
+}
 
 export function initOpenAnswer(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>(".selftest").forEach((st) => {
@@ -19,7 +62,11 @@ export function initOpenAnswer(root: ParentNode = document): void {
     const againBtn = st.querySelector<HTMLButtonElement>(".self-again");
     const reveal = st.querySelector<HTMLElement>(".open-reveal");
     const assess = st.querySelector<HTMLElement>(".self-assess");
+    const score = st.querySelector<HTMLElement>(".self-score");
     if (!revealBtn || !reveal) return;
+
+    const strongs = (): HTMLElement[] =>
+      Array.from(reveal.querySelectorAll<HTMLElement>(".answer strong"));
 
     const show = (): void => {
       reveal.hidden = false;
@@ -27,7 +74,27 @@ export function initOpenAnswer(root: ParentNode = document): void {
       if (againBtn) againBtn.hidden = false;
       if (assess) assess.hidden = false;
       if (ta) ta.readOnly = true;
+
+      // score the reference's bold key terms against what the student wrote
+      const userNorm = norm(ta?.value ?? "");
+      if (!userNorm) return;
+      let total = 0;
+      let hit = 0;
+      strongs().forEach((el) => {
+        const term = cleanTerm(el.textContent ?? "");
+        if (!term) return;
+        total++;
+        const ok = termHit(term, userNorm);
+        el.classList.add(ok ? "kw-hit" : "kw-miss");
+        if (ok) hit++;
+      });
+      if (score && total) {
+        score.hidden = false;
+        score.textContent = `Matched ${hit} / ${total} key terms — green = in your answer, red = missing.`;
+        score.classList.toggle("good", hit >= Math.ceil(total / 2));
+      }
     };
+
     const reset = (): void => {
       reveal.hidden = true;
       revealBtn.hidden = false;
@@ -36,11 +103,18 @@ export function initOpenAnswer(root: ParentNode = document): void {
         assess.hidden = true;
         delete assess.dataset.done;
       }
+      if (score) {
+        score.hidden = true;
+        score.textContent = "";
+        score.classList.remove("good");
+      }
+      strongs().forEach((el) => el.classList.remove("kw-hit", "kw-miss"));
       if (ta) {
         ta.readOnly = false;
         ta.focus();
       }
     };
+
     revealBtn.addEventListener("click", show);
     againBtn?.addEventListener("click", reset);
 

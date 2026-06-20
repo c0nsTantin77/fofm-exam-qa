@@ -123,6 +123,7 @@ const tags = q.tags ?? [];
             <button type="button" class="reset-btn self-again" hidden>Try again</button>
           </div>
           <div class="open-reveal" hidden>
+            <p class="self-score" role="status" hidden></p>
             <div class="answer">
               <div class="answer-label">Answer</div>
               <Fragment set:html={answerHtml} />
