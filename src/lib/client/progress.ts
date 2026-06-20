@@ -81,9 +81,14 @@ export function renderProgressUI(): void {
       "<div class='pstat'><b>" + pct + "%</b>reviewed</div>" +
       "<div class='pstat'><b class='due'>" + dueCount + "</b>due today</div>" +
       "<div class='pstat'><b class='wrong'>" + wrongCount + "</b>wrong book</div></div>";
-    progBody.innerHTML =
-      "<div class='prog-top'>" + ring + stats +
-      "<a class='prog-link' href='" + url("/review") + "'>Review due &amp; wrong book →</a></div>";
+    const reviewUrl = url("/review");
+    const cta =
+      dueCount > 0
+        ? "<a class='prog-link primary' href='" + reviewUrl + "'>🧠 Review " + dueCount + " due now →</a>"
+        : wrongCount > 0
+          ? "<a class='prog-link' href='" + reviewUrl + "'>★ " + wrongCount + " in wrong book →</a>"
+          : "<a class='prog-link' href='" + reviewUrl + "'>Review &amp; wrong book →</a>";
+    progBody.innerHTML = "<div class='prog-top'>" + ring + stats + cta + "</div>";
     const pc = document.getElementById("progress");
     if (pc) pc.hidden = false;
   }
