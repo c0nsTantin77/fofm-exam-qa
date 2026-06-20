@@ -461,6 +461,7 @@
           "extend": "Any decision (epoch, hyperparameter, architecture) made using the test set leaks information. Touch test exactly once, at the very end.",
           "tags": [
             "Regularization",
+            "Early stopping",
             "Dataset splits",
             "Data leakage"
           ]
@@ -494,6 +495,7 @@
           ],
           "tags": [
             "Regularization",
+            "Early stopping",
             "Data augmentation",
             "Dataset splits",
             "i.i.d. / distribution"
@@ -950,6 +952,7 @@
           "extend": "Augmentation lowers *validation* loss but tends to raise *training* loss (training data is harder) — a frequently-tested distinction between the two curves.",
           "tags": [
             "Regularization",
+            "Early stopping",
             "Overfitting",
             "Data augmentation"
           ]

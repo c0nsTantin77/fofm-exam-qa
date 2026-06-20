@@ -6,7 +6,7 @@ import katex from "katex";
 // Math is rendered with KaTeX. Pulled in via a dynamic import (see study.ts) so
 // the heavy KaTeX bundle only loads on pages where a note actually exists.
 
-export const NOTE_MAX = 2000;
+export const NOTE_MAX = 1000;
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

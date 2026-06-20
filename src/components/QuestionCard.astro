@@ -116,12 +116,12 @@ const tags = q.tags ?? [];
         </div>
       ) : (
         <div class="selftest">
-          <p class="quiz-hint">Try it first — write your answer, then reveal to self-check.</p>
+          <p class="quiz-hint">Try it first — write your answer, then reveal to compare.</p>
           <textarea class="self-area" rows="3" placeholder="Write your answer (optional)…"></textarea>
           <div class="quiz-actions">
             <button type="button" class="check-btn reveal-btn">Show answer</button>
+            <button type="button" class="reset-btn self-again" hidden>Try again</button>
           </div>
-          <p class="self-score" role="status" hidden />
           <div class="open-reveal" hidden>
             <div class="answer">
               <div class="answer-label">Answer</div>
@@ -162,11 +162,11 @@ const tags = q.tags ?? [];
         <textarea
           class="note-area"
           rows="3"
-          maxlength="2000"
+          maxlength="1000"
           placeholder="Your notes — Markdown & $math$ supported…"></textarea>
         <div class="note-foot">
           <span class="note-md-hint">Markdown &amp; <span class="mono">$math$</span></span>
-          <span class="note-count">0 / 2000</span>
+          <span class="note-count">0 / 1000</span>
         </div>
         <div class="note-preview md-note" hidden></div>
       </div>

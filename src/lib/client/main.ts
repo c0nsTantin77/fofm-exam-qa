@@ -3,6 +3,7 @@
 import { initQuizzes } from "./quiz";
 import { initStudy } from "./study";
 import { initOpenAnswer } from "./open-answer";
+import { initMode } from "./mode";
 import { initChapterUI } from "./chapter-ui";
 import { initProgress } from "./progress";
 import { initShare } from "./share";
@@ -16,6 +17,7 @@ import { APP_CONFIG } from "../config";
 runMigrations();
 
 // per-question interactions (chapter pages)
+initMode();
 initQuizzes();
 initOpenAnswer();
 initStudy();

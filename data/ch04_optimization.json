@@ -788,6 +788,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting",
             "Data augmentation"
@@ -805,6 +806,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting"
           ]
@@ -821,6 +823,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting",
             "Data augmentation"
@@ -855,6 +858,7 @@
           ],
           "tags": [
             "Regularization",
+            "Early stopping",
             "Overfitting",
             "Learning rate",
             "Data augmentation"
@@ -874,6 +878,7 @@
           "tags": [
             "Batch normalization",
             "Regularization",
+            "Early stopping",
             "Overfitting",
             "Optimizers",
             "CNN"
@@ -938,6 +943,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting",
             "Adam"
@@ -954,6 +960,7 @@
           "extend": "Patience = grace epochs of no val-improvement before stopping; resets whenever val loss hits a new best.",
           "tags": [
             "Regularization",
+            "Early stopping",
             "Overfitting"
           ]
         },
@@ -1034,6 +1041,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting",
             "Data augmentation"
@@ -1172,6 +1180,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting",
             "Data augmentation"
@@ -1306,6 +1315,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting",
             "Data augmentation"
@@ -1342,6 +1352,7 @@
             "ReLU",
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting"
           ]

@@ -6,7 +6,7 @@ import { Store } from "./store";
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
-const NOTE_MAX = 2000;
+const NOTE_MAX = 1000;
 
 // The note Markdown renderer pulls in KaTeX, so it is loaded on demand — only
 // when a note actually needs rendering — keeping chapter pages lean otherwise.

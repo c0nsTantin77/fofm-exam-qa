@@ -32,6 +32,10 @@ const toc: TocItem[] = data.knowledge_points.map((kp, i) => ({
 <Layout title={`${data.roman}. ${data.title} · I2DL Exam Q&A`}>
   <Topbar backHref={url("/")} backFull=" chapters" toc={toc}>
     <div class="filters" slot="filters">
+      <div class="mode-toggle" role="group" aria-label="Study mode">
+        <button type="button" class="mode-btn" data-set-mode="review" title="Show answers">📖 Review</button>
+        <button type="button" class="mode-btn" data-set-mode="test" title="Hide answers — select / write, then check">📝 Test</button>
+      </div>
       <input id="search" type="search" placeholder="Search questions…" autocomplete="off" />
       <label><input type="checkbox" class="ftype" value="mc" checked /> MC</label>
       <label><input type="checkbox" class="ftype" value="open" checked /> Open</label>

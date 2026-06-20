@@ -77,11 +77,6 @@ details.q[open]{border-color:#bcd4f0}
   font-family:inherit;resize:vertical;background:#fffdf7}
 .self-area:focus{outline:2px solid var(--tum);border-color:var(--tum)}
 .self-area[readonly]{background:#f5f7fa;color:var(--ink);cursor:default}
-.self-score{margin:10px 0 2px;font-size:.85rem;font-weight:600;color:var(--no)}
-.self-score.good{color:var(--ok)}
-.open-reveal .answer strong.kw-hit{color:#1c7a3f;background:#eafff1;border-radius:4px;padding:0 2px}
-.open-reveal .answer strong.kw-miss{color:var(--no);background:#fff2f2;border-radius:4px;padding:0 2px;
-  text-decoration:underline wavy rgba(224,49,49,.5)}
 .self-assess{margin-top:12px;padding-top:11px;border-top:1px dashed var(--line);
   display:flex;flex-wrap:wrap;align-items:center;gap:9px}
 .self-assess-q{font-size:.84rem;font-weight:600;color:var(--muted)}
@@ -96,6 +91,19 @@ details.q[open]{border-color:#bcd4f0}
 .self-assess[data-done]::after{font-size:.8rem;font-weight:700}
 .self-assess[data-done="got"]::after{content:"✓ marked reviewed";color:var(--ok)}
 .self-assess[data-done="miss"]::after{content:"★ added to wrong book";color:var(--no)}
+
+/* ---- review mode: reveal every answer, hide the interactive controls ---- */
+[data-mode="review"] .quiz-hint{display:none}
+[data-mode="review"] .quiz-actions{display:none}
+[data-mode="review"] .options.interactive{pointer-events:none}
+[data-mode="review"] .reveal[hidden],
+[data-mode="review"] .open-reveal[hidden]{display:block}
+[data-mode="review"] .verdict:empty{display:none}
+[data-mode="review"] .self-area{display:none}
+[data-mode="review"] .self-assess{display:none}
+[data-mode="review"] .opt input[data-correct="true"]~.opt-mark::after{content:"✅"}
+[data-mode="review"] .opt input[data-correct="false"]~.opt-mark::after{content:"❌";opacity:.45}
+[data-mode="review"] .opt:has(input[data-correct="true"]) label{background:#ebfbee;border-color:#b2f2bb}
 
 /* ---- concept tags ---- */
 .tags{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);
