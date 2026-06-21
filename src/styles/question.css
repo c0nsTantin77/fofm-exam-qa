@@ -100,8 +100,9 @@ details.q[open]{border-color:#bcd4f0}
 [data-mode="review"] .quiz-hint{display:none}
 [data-mode="review"] .quiz-actions{display:none}
 [data-mode="review"] .options.interactive{pointer-events:none}
+/* must beat base.css `[hidden]{display:none!important}` */
 [data-mode="review"] .reveal[hidden],
-[data-mode="review"] .open-reveal[hidden]{display:block}
+[data-mode="review"] .open-reveal[hidden]{display:block!important}
 [data-mode="review"] .verdict:empty{display:none}
 [data-mode="review"] .self-area{display:none}
 [data-mode="review"] .self-assess{display:none}
