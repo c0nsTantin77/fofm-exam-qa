@@ -88,8 +88,7 @@ details.q[open]{border-color:#bcd4f0}
 .calc-mark{font-weight:800;font-size:.95rem}
 .calc-in.ok~.calc-mark{color:var(--ok)}
 .calc-in.bad~.calc-mark{color:var(--no)}
-.open-reveal .answer strong.kw-hit{color:#1c7a3f;background:#eafff1;border-radius:4px;padding:0 2px}
-.open-reveal .answer strong.kw-miss{color:#c92a2a;background:#fff0f0;border-radius:4px;padding:0 2px}
+.open-reveal mark.kw-hit{background:#c3fae8;color:inherit;border-radius:3px;padding:0 2px;font-weight:600}
 .self-assess{margin-top:12px;padding-top:11px;border-top:1px dashed var(--line);
   display:flex;flex-wrap:wrap;align-items:center;gap:9px}
 .self-assess-q{font-size:.84rem;font-weight:600;color:var(--muted)}
