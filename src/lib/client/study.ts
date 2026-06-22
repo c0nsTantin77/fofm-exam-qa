@@ -6,6 +6,39 @@ import { Store } from "./store";
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
+const NOTE_MAX = 1000;
+
+// The note Markdown renderer pulls in KaTeX, so it is loaded on demand — only
+// when a note actually needs rendering — keeping chapter pages lean otherwise.
+let renderNote: ((s: string) => string) | null = null;
+const previewTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
+
+async function paintNotePreview(preview: HTMLElement | null, raw: string): Promise<void> {
+  if (!preview) return;
+  if (!raw) {
+    preview.hidden = true;
+    preview.textContent = "";
+    return;
+  }
+  if (!renderNote) renderNote = (await import("../md-notes")).renderNote;
+  preview.innerHTML = renderNote(raw);
+  preview.hidden = false;
+}
+
+/** Debounced preview render, so live typing doesn't re-render on every keystroke. */
+function scheduleNotePreview(preview: HTMLElement | null, raw: string): void {
+  if (!preview) return;
+  const prev = previewTimers.get(preview);
+  if (prev) clearTimeout(prev);
+  previewTimers.set(preview, setTimeout(() => void paintNotePreview(preview, raw), 250));
+}
+
+function paintNoteCount(count: HTMLElement | null, len: number): void {
+  if (!count) return;
+  count.textContent = len + " / " + NOTE_MAX;
+  count.classList.toggle("near", len > NOTE_MAX * 0.9);
+}
+
 /** (Re)reflect saved state onto one control bar. */
 function applyStudy(bar: HTMLElement): void {
   const qel = bar.closest("details.q") as HTMLElement | null;
@@ -14,12 +47,19 @@ function applyStudy(bar: HTMLElement): void {
   const rev = bar.querySelector(".rev-box") as HTMLInputElement;
   const wrongBtn = bar.querySelector(".wrong-btn") as HTMLElement;
   const noteArea = bar.querySelector(".note-area") as HTMLTextAreaElement;
+  const noteCount = bar.querySelector(".note-count") as HTMLElement | null;
+  const notePreview = bar.querySelector(".note-preview") as HTMLElement | null;
   const due = bar.querySelector(".srs-due") as HTMLElement;
 
   rev.checked = Store.isReviewed(id);
   wrongBtn.classList.toggle("on", Store.isWrong(id));
-  if (!noteArea.matches(":focus")) noteArea.value = Store.note(id);
-  qel.classList.toggle("has-note", !!Store.note(id));
+  const noteText = Store.note(id);
+  if (!noteArea.matches(":focus")) {
+    noteArea.value = noteText;
+    paintNoteCount(noteCount, noteText.length);
+    void paintNotePreview(notePreview, noteText);
+  }
+  qel.classList.toggle("has-note", !!noteText);
   qel.classList.toggle("is-reviewed", Store.isReviewed(id));
 
   const d = Store.due(id);
@@ -47,6 +87,8 @@ export function initStudy(root: ParentNode = document): void {
     const noteBtn = bar.querySelector(".note-btn") as HTMLElement;
     const noteWrap = bar.querySelector(".note-wrap") as HTMLElement;
     const noteArea = bar.querySelector(".note-area") as HTMLTextAreaElement;
+    const noteCount = bar.querySelector(".note-count") as HTMLElement | null;
+    const notePreview = bar.querySelector(".note-preview") as HTMLElement | null;
 
     applyStudy(bar);
     rev.addEventListener("change", () => {
@@ -62,8 +104,16 @@ export function initStudy(root: ParentNode = document): void {
       if (!noteWrap.hidden) noteArea.focus();
     });
     noteArea.addEventListener("input", () => {
-      Store.setNote(id, noteArea.value.trim());
-      applyStudy(bar);
+      let v = noteArea.value;
+      if (v.length > NOTE_MAX) {
+        v = v.slice(0, NOTE_MAX);
+        noteArea.value = v;
+      }
+      const trimmed = v.trim();
+      Store.setNote(id, trimmed);
+      qel.classList.toggle("has-note", !!trimmed);
+      paintNoteCount(noteCount, v.length);
+      scheduleNotePreview(notePreview, trimmed);
     });
   });
 }

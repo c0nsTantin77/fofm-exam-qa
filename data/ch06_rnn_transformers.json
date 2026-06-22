@@ -22,6 +22,11 @@
             "Tanh",
             "RNN",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "value": 45
+            }
           ]
         },
         {
@@ -211,6 +216,11 @@
             "Tanh",
             "RNN",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "value": 192
+            }
           ]
         },
         {
@@ -240,6 +250,20 @@
           "tags": [
             "ReLU",
             "RNN"
+          ],
+          "calc": [
+            {
+              "label": "h1",
+              "value": 0
+            },
+            {
+              "label": "h2",
+              "value": 4
+            },
+            {
+              "label": "h3",
+              "value": 4
+            }
           ]
         },
         {
@@ -286,6 +310,16 @@
           "tags": [
             "ReLU",
             "RNN"
+          ],
+          "calc": [
+            {
+              "label": "h2",
+              "value": 0
+            },
+            {
+              "label": "h3",
+              "value": 3
+            }
           ]
         },
         {
@@ -996,22 +1030,6 @@
           "extend": "Attention has no built-in notion of order; positional encodings supply it (RNNs get order from sequential processing).",
           "tags": [
             "RNN",
-            "Attention",
-            "Positional encoding"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "WS23 2.2"
-          ],
-          "q": "Why is positional encoding used in Transformers, and what problem arises without it?",
-          "answer": "It **adds information about token position** in the sequence. **Without it**, attention treats the input as an **unordered set** (no inherent notion of order), so the model can't use word order — yet order changes meaning ('dog bites man' ≠ 'man bites dog').",
-          "extend": "No recurrence/convolution ⇒ no built-in order ⇒ positional encoding supplies it.",
-          "tags": [
-            "Convolution",
-            "Transformer",
             "Attention",
             "Positional encoding"
           ]

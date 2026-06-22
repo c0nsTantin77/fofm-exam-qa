@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import type { SearchEntry } from "../../lib/types";
 import { loadIndex, questionHref } from "../../lib/client/index-data";
+import { highlightHtml } from "../../lib/client/highlight";
 import { url } from "../../lib/paths";
 import { slug, buildContents, type ContentsGroup } from "../../lib/client/contents";
 import { EXAM_NAMES, examOf, labelOf } from "../../lib/exams";
@@ -9,6 +10,8 @@ import { EXAM_NAMES, examOf, labelOf } from "../../lib/exams";
 const index = ref<SearchEntry[]>([]);
 const loaded = ref(false);
 const current = ref<string | null>(null);
+const filter = ref("");
+const fWords = computed(() => filter.value.trim().toLowerCase().split(/\s+/).filter(Boolean));
 
 const counts = computed(() => {
   const c: Record<string, number> = {};
@@ -45,8 +48,10 @@ interface Group extends ContentsGroup {
   entries: SearchEntry[];
 }
 const byChapter = computed<Group[]>(() => {
+  const ws = fWords.value;
   const map = new Map<string, SearchEntry[]>();
   hits.value.forEach((e) => {
+    if (ws.length && !ws.every((w) => e.txt.includes(w))) return;
     if (!map.has(e.ct)) map.set(e.ct, []);
     map.get(e.ct)!.push(e);
   });
@@ -57,6 +62,19 @@ const byChapter = computed<Group[]>(() => {
     entries,
   }));
 });
+const groups = computed<ContentsGroup[]>(() =>
+  byChapter.value.map((g) => ({ id: g.id, title: g.title, n: g.n })),
+);
+const shownCount = computed(() => byChapter.value.reduce((n, g) => n + g.entries.length, 0));
+
+// keep the topbar contents pill in sync when filtering changes the sections
+watch(
+  () => groups.value.map((g) => g.id).join("|"),
+  () => {
+    if (activeExam.value) buildContents(groups.value);
+  },
+  { flush: "post" },
+);
 
 const examName = computed(() =>
   activeExam.value ? EXAM_NAMES[activeExam.value] ?? activeExam.value : "",
@@ -82,7 +100,7 @@ onMounted(async () => {
   loaded.value = true;
   document.title = activeExam.value + " · Browse by exam · I2DL";
   await nextTick();
-  buildContents(byChapter.value.map((g) => ({ id: g.id, title: g.title, n: g.n })));
+  buildContents(groups.value);
 });
 </script>
 
@@ -91,15 +109,26 @@ onMounted(async () => {
   <div v-else>
     <h1 class="tp-title">{{ examName }} <span class="tag">{{ activeExam }}</span></h1>
     <p class="tp-sub">
-      {{ hits.length }} question{{ hits.length > 1 ? "s" : "" }} across {{ byChapter.length }}
-      chapter(s).
+      {{ shownCount }} question{{ shownCount === 1 ? "" : "s" }}<template v-if="filter.trim()"> of
+        {{ hits.length }}</template>
+      across {{ byChapter.length }} chapter{{ byChapter.length === 1 ? "" : "s" }}.
     </p>
+    <Teleport to="#tp-filter-slot">
+      <input
+        v-model="filter"
+        class="tp-search"
+        type="search"
+        :placeholder="`Filter these ${hits.length} questions…`"
+        aria-label="Filter questions"
+      />
+    </Teleport>
+    <p v-if="!byChapter.length" class="tp-empty">No questions match “{{ filter }}”.</p>
     <template v-for="g in byChapter" :key="g.id">
       <h2 class="tp-ch" :id="g.id">{{ g.title }}</h2>
       <div class="tp-list">
         <a v-for="e in g.entries" :key="e.a" class="ghit" :href="questionHref(e)">
           <span class="ghit-tag">{{ tagFor(e) }}</span>
-          <span class="ghit-q">{{ e.q }}</span>
+          <span class="ghit-q" v-html="highlightHtml(e.q, fWords)"></span>
           <span class="ghit-meta">{{ e.kp }}</span>
         </a>
       </div>

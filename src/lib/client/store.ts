@@ -144,4 +144,45 @@ export const Store = {
     }
     persist();
   },
+
+  /** Remap study data from removed (de-duplicated) question ids onto the kept
+   *  question id, so reviewed / wrong / notes / SRS survive a content merge
+   *  instead of orphaning. Idempotent: once an old id is gone it is a no-op.
+   *  Returns the number of fields moved. */
+  migrate(pairs: [string, string][]): number {
+    let changed = 0;
+    for (const [oldId, newId] of pairs) {
+      if (oldId === newId) continue;
+      if (P.notes[oldId]) {
+        P.notes[newId] = P.notes[newId]
+          ? P.notes[newId] + "\n\n" + P.notes[oldId]
+          : P.notes[oldId];
+        delete P.notes[oldId];
+        changed++;
+      }
+      for (const k of ["reviewed", "wrong"] as const) {
+        if (P[k][oldId] != null) {
+          P[k][newId] = P[k][newId] != null ? Math.min(P[k][newId], P[k][oldId]) : P[k][oldId];
+          delete P[k][oldId];
+          changed++;
+        }
+      }
+      if (P.srs[oldId]) {
+        const o = P.srs[oldId];
+        const n = P.srs[newId];
+        // keep the more-advanced schedule (higher n; tie → earlier due)
+        P.srs[newId] = !n
+          ? o
+          : o.n > n.n
+            ? o
+            : o.n < n.n
+              ? n
+              : (o.due ?? "9999") <= (n.due ?? "9999") ? o : n;
+        delete P.srs[oldId];
+        changed++;
+      }
+    }
+    if (changed) persist();
+    return changed;
+  },
 };

@@ -788,6 +788,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting",
             "Data augmentation"
@@ -805,6 +806,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting"
           ]
@@ -821,6 +823,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting",
             "Data augmentation"
@@ -855,6 +858,7 @@
           ],
           "tags": [
             "Regularization",
+            "Early stopping",
             "Overfitting",
             "Learning rate",
             "Data augmentation"
@@ -874,6 +878,7 @@
           "tags": [
             "Batch normalization",
             "Regularization",
+            "Early stopping",
             "Overfitting",
             "Optimizers",
             "CNN"
@@ -938,6 +943,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting",
             "Adam"
@@ -954,6 +960,7 @@
           "extend": "Patience = grace epochs of no val-improvement before stopping; resets whenever val loss hits a new best.",
           "tags": [
             "Regularization",
+            "Early stopping",
             "Overfitting"
           ]
         },
@@ -1034,6 +1041,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting",
             "Data augmentation"
@@ -1172,6 +1180,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting",
             "Data augmentation"
@@ -1306,6 +1315,7 @@
           "tags": [
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting",
             "Data augmentation"
@@ -1342,6 +1352,7 @@
             "ReLU",
             "Dropout",
             "Regularization",
+            "Early stopping",
             "L1/L2",
             "Overfitting"
           ]
@@ -2033,6 +2044,11 @@
             "Batch normalization",
             "Normalization",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "value": 6
+            }
           ]
         }
       ]
@@ -2054,6 +2070,7 @@
           "extend": "ReLU halves the variance (zeros out negatives), so He uses $2/n_{in}$ to compensate; Xavier ($1/n_{in}$-style) is for symmetric activations (tanh).",
           "tags": [
             "ReLU",
+            "Sigmoid",
             "Tanh",
             "Weight initialization"
           ]
@@ -2218,21 +2235,6 @@
           "tags": [
             "Weight initialization",
             "Fully-connected"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "SS21 2.4"
-          ],
-          "q": "How does Xavier initialization set the weights? What mean/variance do the weights and the outputs have?",
-          "answer": "Weights are drawn **Gaussian with zero mean** and **variance $1/n$** where $n$ is the number of input neurons. As a result the **outputs also have zero mean and roughly the same variance as the inputs** — keeping activations well-scaled across layers.",
-          "extend": "Xavier: $\\mathcal N(0,1/n_{in})$ ⇒ output variance ≈ input variance (for tanh/sigmoid).",
-          "tags": [
-            "Sigmoid",
-            "Tanh",
-            "Weight initialization"
           ]
         },
         {

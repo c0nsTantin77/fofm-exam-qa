@@ -24,6 +24,20 @@
           "tags": [
             "Convolution",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "label": "(a)",
+              "value": 181
+            },
+            {
+              "label": "(b)",
+              "value": 33
+            },
+            {
+              "label": "(c)",
+              "value": 448
+            }
           ]
         },
         {
@@ -104,6 +118,12 @@
           "tags": [
             "Convolution",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "label": "(b) stride",
+              "value": 4
+            }
           ]
         },
         {
@@ -262,38 +282,6 @@
           ]
         },
         {
-          "type": "mc",
-          "freq": 1,
-          "sources": [
-            "WS23 1.8"
-          ],
-          "q": "For a conv layer (kernel $k$, padding 1, stride 1, $m$ filters) on input $C\\times N\\times N$, which affect the output shape?",
-          "answer": "**$N$, $k$, and $m$** affect the output shape (spatial size from $N,k$; output channels $=m$). The input channel count **$C$ does not** change the output shape (only per-filter depth).",
-          "extend": "Output shape = (m, H_out, W_out); $C$ sets filter depth, not the output dimensions.",
-          "options": [
-            {
-              "text": "N",
-              "correct": true
-            },
-            {
-              "text": "k",
-              "correct": true
-            },
-            {
-              "text": "m",
-              "correct": true
-            },
-            {
-              "text": "C",
-              "correct": false
-            }
-          ],
-          "tags": [
-            "Convolution",
-            "Parameter counting"
-          ]
-        },
-        {
           "type": "open",
           "freq": 1,
           "sources": [
@@ -308,22 +296,12 @@
             "Pooling",
             "Convolution",
             "Parameter counting"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 2,
-          "sources": [
-            "SS23 6.2"
           ],
-          "q": "For the same net, what is the receptive field of a neuron after the 3rd convolutional layer (Conv1→Pool1→Conv2→Pool2→Conv3, conv $k{=}3$, pool $2\\times2,s{=}2$)?",
-          "answer": "Step the RF forward: Conv1 $3$ → Pool1 $3+1(2{-}1)=4$ → Conv2 $4+(1\\cdot2)(3{-}1)=8$ → Pool2 $8+(1\\cdot2\\cdot1)(2{-}1)=10$ → Conv3 $10+(1\\cdot2\\cdot1\\cdot2)(3{-}1)=\\mathbf{18}$.",
-          "extend": "RF accumulates kernel growth scaled by the product of preceding strides (pools have stride 2).",
-          "tags": [
-            "L1/L2",
-            "Receptive field",
-            "Convolution",
-            "Parameter counting"
+          "calc": [
+            {
+              "label": "conv1 params",
+              "value": 448
+            }
           ]
         },
         {
@@ -385,20 +363,6 @@
               "correct": true
             }
           ],
-          "tags": [
-            "Convolution",
-            "Parameter counting"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "SS24 2.8"
-          ],
-          "q": "For an input batch $10\\times20\\times30\\times40$ (N×C×H×W), how many parameters are in a single $3\\times3$ convolution filter with stride 2, including bias?",
-          "answer": "A single filter spans all input channels: $3\\times3\\times20+1=\\mathbf{181}$ (the $+1$ is the bias; stride doesn't affect parameter count).",
-          "extend": "Filter params = $k\\cdot k\\cdot C_{in}+1$; stride/padding don't change it.",
           "tags": [
             "Convolution",
             "Parameter counting"
@@ -781,6 +745,12 @@
             "Receptive field",
             "Pooling",
             "Convolution"
+          ],
+          "calc": [
+            {
+              "label": "RF",
+              "value": 18
+            }
           ]
         },
         {
@@ -845,6 +815,12 @@
             "Receptive field",
             "Convolution",
             "Fully-connected"
+          ],
+          "calc": [
+            {
+              "label": "conv1 RF",
+              "value": 5
+            }
           ]
         },
         {
@@ -860,6 +836,12 @@
             "Receptive field",
             "Convolution",
             "CNN"
+          ],
+          "calc": [
+            {
+              "label": "RF (M)",
+              "value": 17
+            }
           ]
         },
         {
@@ -878,6 +860,12 @@
             "Pooling",
             "Convolution",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "label": "(a) RF",
+              "value": 10
+            }
           ]
         },
         {
@@ -893,6 +881,12 @@
             "Receptive field",
             "Convolution",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "label": "total params",
+              "value": 16252
+            }
           ]
         },
         {
@@ -960,6 +954,12 @@
             "Receptive field",
             "Pooling",
             "Fully-connected"
+          ],
+          "calc": [
+            {
+              "label": "RF after pool1",
+              "value": 6
+            }
           ]
         }
       ]
@@ -1293,22 +1293,6 @@
             "Convolution",
             "Data augmentation",
             "Transfer learning"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "Summary III.5 Q13"
-          ],
-          "q": "To feed an intermediate feature map (output tensor of a conv layer) into a transformer to learn pixel relations, how do you reshape the tensor?",
-          "answer": "Move the channels to the last dimension and flatten the spatial dims: $(B\\times C\\times H\\times W)\\to(B\\times H\\times W\\times C)\\to(B\\times (H\\cdot W)\\times C)$. Now each pixel — a $C$-dim vector across channels — is a **token** for the transformer.",
-          "extend": "This 'patch/pixel → token' reshape is the bridge from CNN feature maps to attention (the core idea behind Vision Transformers).",
-          "tags": [
-            "Convolution",
-            "CNN",
-            "Transformer",
-            "Attention"
           ]
         },
         {

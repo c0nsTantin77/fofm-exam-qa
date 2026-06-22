@@ -22,8 +22,8 @@ export function highlightHtml(text: string, needles: string[]): string {
 // ---- live DOM highlighting (chapter-page filter) ------------------------
 
 /** Remove all highlight marks under `root`, merging the text back together. */
-export function clearHighlights(root: HTMLElement): void {
-  const marks = root.querySelectorAll("mark." + HL_CLASS);
+export function clearHighlights(root: HTMLElement, className: string = HL_CLASS): void {
+  const marks = root.querySelectorAll("mark." + className);
   if (!marks.length) return;
   marks.forEach((m) => {
     m.parentNode?.replaceChild(document.createTextNode(m.textContent || ""), m);
@@ -41,29 +41,51 @@ function isInside(node: Node, root: Node): boolean {
   return false;
 }
 
-function wrapMatches(textNode: Text, lowerNeedle: string): void {
+const isWordChar = (c: string): boolean => /[a-z0-9]/.test(c);
+
+function wrapMatches(
+  textNode: Text,
+  lowerNeedle: string,
+  className: string,
+  wholeWord: boolean,
+): void {
   const text = textNode.nodeValue || "";
   const lower = text.toLowerCase();
+  const len = lowerNeedle.length;
   let idx = lower.indexOf(lowerNeedle);
   if (idx === -1) return;
   const frag = document.createDocumentFragment();
   let last = 0;
+  let any = false;
   while (idx !== -1) {
-    if (idx > last) frag.appendChild(document.createTextNode(text.slice(last, idx)));
-    const mark = document.createElement("mark");
-    mark.className = HL_CLASS;
-    mark.textContent = text.slice(idx, idx + lowerNeedle.length);
-    frag.appendChild(mark);
-    last = idx + lowerNeedle.length;
-    idx = lower.indexOf(lowerNeedle, last);
+    const boundary =
+      !wholeWord ||
+      ((idx === 0 || !isWordChar(lower[idx - 1])) &&
+        (idx + len >= lower.length || !isWordChar(lower[idx + len])));
+    if (boundary) {
+      if (idx > last) frag.appendChild(document.createTextNode(text.slice(last, idx)));
+      const mark = document.createElement("mark");
+      mark.className = className;
+      mark.textContent = text.slice(idx, idx + len);
+      frag.appendChild(mark);
+      last = idx + len;
+      any = true;
+    }
+    idx = lower.indexOf(lowerNeedle, idx + len);
   }
+  if (!any) return;
   if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
   textNode.parentNode?.replaceChild(frag, textNode);
 }
 
 /** Highlight every occurrence of `needle` (a literal substring) inside the given
  *  containers, skipping KaTeX. Collect first, then mutate (don't edit mid-walk). */
-export function highlightIn(containers: HTMLElement[], needle: string): void {
+export function highlightIn(
+  containers: HTMLElement[],
+  needle: string,
+  className: string = HL_CLASS,
+  wholeWord = false,
+): void {
   const lower = needle.toLowerCase();
   if (!lower) return;
   for (const container of containers) {
@@ -78,6 +100,6 @@ export function highlightIn(containers: HTMLElement[], needle: string): void {
     const targets: Text[] = [];
     let n: Node | null;
     while ((n = walker.nextNode())) targets.push(n as Text);
-    for (const t of targets) wrapMatches(t, lower);
+    for (const t of targets) wrapMatches(t, lower, className, wholeWord);
   }
 }

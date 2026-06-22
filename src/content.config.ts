@@ -11,6 +11,12 @@ const option = z.object({
   correct: z.boolean(),
 });
 
+const calcAnswer = z.object({
+  label: z.string().optional(),
+  value: z.number(),
+  tol: z.number().optional(),
+});
+
 const question = z
   .object({
     type: z.enum(["open", "mc", "ai"]),
@@ -21,6 +27,7 @@ const question = z
     extend: z.string().optional(),
     tags: z.array(z.string()).optional(),
     options: z.array(option).optional(),
+    calc: z.array(calcAnswer).optional(),
   })
   .refine((q) => q.type !== "mc" || (q.options?.length ?? 0) >= 2, {
     message: "multiple-choice questions need at least two options",
