@@ -26,6 +26,16 @@ function userWords(s: string): string[] {
   ];
 }
 
+/** Light singular/plural variants so e.g. "parameter" also matches "parameters"
+ *  (common in this domain: weights, gradients, layers, filters…). */
+function wordVariants(w: string): string[] {
+  const v = new Set([w]);
+  if (w.length >= 4 && w.endsWith("s")) v.add(w.slice(0, -1));
+  if (w.length >= 5 && w.endsWith("es")) v.add(w.slice(0, -2));
+  if (!w.endsWith("s")) v.add(w + "s");
+  return [...v].filter((x) => x.length >= 3);
+}
+
 export function initOpenAnswer(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>(".selftest").forEach((st) => {
     if (st.dataset.wired) return;
@@ -70,7 +80,7 @@ export function initOpenAnswer(root: ParentNode = document): void {
       const words = userWords(ta?.value ?? "");
       if (words.length) {
         const targets = refParts();
-        for (const w of words) highlightIn(targets, w, "kw-hit", true);
+        for (const w of words) for (const v of wordVariants(w)) highlightIn(targets, v, "kw-hit", true);
       }
     };
 
