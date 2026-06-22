@@ -8,17 +8,21 @@ Every problem from 12 past exams + the official course summary, classified by
 🔗 **Live:** https://c0nsTantin77.github.io/i2dl-exam-qa/
 
 ## Contents
-**512 questions** across 7 chapters and 43 knowledge points (every point also has an AI practice question):
-Machine Learning Basics (80) · Neural Networks (96) · Convolutions (67) · Optimization (127) ·
-Popular Architectures (65) · RNNs & Transformers (57) · Appendix: Matrix Calculus (20).
+**492 questions** across 7 chapters and 43 knowledge points (every point also has an AI practice question):
+Machine Learning Basics (69) · Neural Networks (93) · Convolutions (63) · Optimization (126) ·
+Popular Architectures (65) · RNNs & Transformers (56) · Appendix: Matrix Calculus (20).
 
 ## Features
 - **Site-wide search** + per-question **concept tags** to review a theme across chapters.
-- **Interactive multiple-choice**: pick → check → reveal ✅/❌, an explicit "Correct: A, C" line, answer + analysis.
+- **Interactive multiple-choice, short-answer** (matching words light up green, including common singular/plural forms) **& number-checked calculation questions**.
+- **Review / Test modes**: read answers immediately or hide them for active recall.
 - **Frequency-first** ordering (🔥 badges); every question **source-tagged** like `SS22 3.1`.
 - KaTeX formulas, collapsible answers, mobile-optimized.
 
 ## Recent updates
+- **2026-06-22** — 🧹 Feedback cleanup: removed **20 duplicate questions** (512 → **492**) and migrated reviewed / wrong-book / notes / spaced-repetition data from removed question IDs to the kept copies.
+- **2026-06-22** — 🎯 New study flow: chapter pages now have **Review / Test** modes, short-answer self-checks highlight overlapping answer words in green, and **21 calculation questions** accept typed numeric answers.
+- **2026-06-22** — ✍️ Better answer matching: lightweight singular/plural matching now catches pairs like `parameter`/`parameters`, `weight`/`weights`, and `gradient`/`gradients` without adding client-side NLP dependencies.
 - **2026-06-09** — 🔍 Search now **highlights your match**: the home-page search and each chapter's filter box light up the words you typed (bold + soft highlight) in the question & answer; formulas stay intact.
 - **2026-06-09** — ⚡ Under-the-hood glow-up: the whole site was **rebuilt with Astro + Vue**. Formulas now render **instantly** (no load-time flicker), pages are lighter and faster, and all your old bookmarks & links still work. 🚀
 - **2026-06-08** — Home-page polish: collapsible **Recent updates / How to use** panels, more **Popular tags**, the in-page **contents menu** restored on exam & tag pages, and tighter mobile spacing.
