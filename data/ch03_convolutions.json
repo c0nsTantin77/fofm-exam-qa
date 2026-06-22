@@ -280,22 +280,6 @@
         },
         {
           "type": "open",
-          "freq": 2,
-          "sources": [
-            "SS23 6.2"
-          ],
-          "q": "For the same net, what is the receptive field of a neuron after the 3rd convolutional layer (Conv1→Pool1→Conv2→Pool2→Conv3, conv $k{=}3$, pool $2\\times2,s{=}2$)?",
-          "answer": "Step the RF forward: Conv1 $3$ → Pool1 $3+1(2{-}1)=4$ → Conv2 $4+(1\\cdot2)(3{-}1)=8$ → Pool2 $8+(1\\cdot2\\cdot1)(2{-}1)=10$ → Conv3 $10+(1\\cdot2\\cdot1\\cdot2)(3{-}1)=\\mathbf{18}$.",
-          "extend": "RF accumulates kernel growth scaled by the product of preceding strides (pools have stride 2).",
-          "tags": [
-            "L1/L2",
-            "Receptive field",
-            "Convolution",
-            "Parameter counting"
-          ]
-        },
-        {
-          "type": "open",
           "freq": 1,
           "sources": [
             "SS21 3.1"
@@ -1247,22 +1231,6 @@
             "Convolution",
             "Data augmentation",
             "Transfer learning"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "Summary III.5 Q13"
-          ],
-          "q": "To feed an intermediate feature map (output tensor of a conv layer) into a transformer to learn pixel relations, how do you reshape the tensor?",
-          "answer": "Move the channels to the last dimension and flatten the spatial dims: $(B\\times C\\times H\\times W)\\to(B\\times H\\times W\\times C)\\to(B\\times (H\\cdot W)\\times C)$. Now each pixel — a $C$-dim vector across channels — is a **token** for the transformer.",
-          "extend": "This 'patch/pixel → token' reshape is the bridge from CNN feature maps to attention (the core idea behind Vision Transformers).",
-          "tags": [
-            "Convolution",
-            "CNN",
-            "Transformer",
-            "Attention"
           ]
         },
         {

@@ -25,6 +25,14 @@ const MERGES: Record<string, string> = {
   q60971c7c9: "qc856181a3", // weight-init: Xavier weights/variance (SS21 2.4)
   qb9cb3ecd4: "qba9be6d52", // positional-encoding: why PE in transformers (WS23 2.2)
   q693fd3af5: "q916edb6fa", // splits: how to split dataset (WS26 P3a)
+
+  // 2026-06 cross-knowledge-point merges (same question living in two places)
+  q92b3de5bb: "qd306874ec", // logistic regression: regression-models -> tasks
+  qd946ec341: "qd6ed802c5", // autoencoder MC: unsupervised-methods -> autoencoders
+  q52db3b313: "qc6cb6915d", // FC backprop dims: fc-layers -> backprop
+  qf02bc8f43: "q0cf798fbc", // receptive field: conv-def -> receptive-field
+  q2c7d794c8: "q6f50809de", // feature map -> transformer: handcrafted -> positional-encoding
+  q5438ec3d3: "q0e41f7c23", // horizontal-flip error: dataloaders -> augmentation
 };
 
 const PAIRS = Object.entries(MERGES) as [string, string][];

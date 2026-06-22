@@ -283,40 +283,6 @@
           ]
         },
         {
-          "type": "mc",
-          "freq": 1,
-          "sources": [
-            "SS23 1.1"
-          ],
-          "q": "Which of the following statements are true about Autoencoders?",
-          "options": [
-            {
-              "text": "Only usable for image data, not other data types.",
-              "correct": false
-            },
-            {
-              "text": "Autoencoders can be used for dimensionality reduction.",
-              "correct": true
-            },
-            {
-              "text": "Autoencoders require labeled training data.",
-              "correct": false
-            },
-            {
-              "text": "Autoencoders can be trained without a loss function.",
-              "correct": false
-            }
-          ],
-          "answer": "Only **“can be used for dimensionality reduction”** is true. Autoencoders work on any data type, are **unsupervised** (no labels — the input is its own target), and are trained with a **reconstruction loss** (e.g. L2).",
-          "extend": "Autoencoder bottleneck = learned low-dimensional code → dimensionality reduction / compression. “Self-supervised”: the label is the input itself.",
-          "tags": [
-            "Autoencoder",
-            "Loss functions",
-            "Supervised vs unsupervised",
-            "Clustering / PCA"
-          ]
-        },
-        {
           "type": "open",
           "freq": 2,
           "sources": [
@@ -1259,20 +1225,6 @@
           "extend": "All data in RAM ⇒ full-batch GD or second-order methods become feasible (no mini-batch noise).",
           "tags": [
             "Optimizers",
-            "Dataloader"
-          ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "SS23 7.6"
-          ],
-          "q": "Adding random horizontal flip as augmentation makes both train and val loss stay high. What's a likely reason (depth-prediction task)?",
-          "answer": "You probably **flipped the input image but not the ground-truth depth map** (or the flip is invalid for the target) — the input no longer matches its label, so the model can't learn. The flip must be applied **consistently to the target**.",
-          "extend": "Geometric augmentations must transform the label too; otherwise input–target pairs become inconsistent.",
-          "tags": [
-            "Data augmentation",
             "Dataloader"
           ]
         }

@@ -178,21 +178,6 @@
             "Fully-connected",
             "Parameter counting"
           ]
-        },
-        {
-          "type": "open",
-          "freq": 1,
-          "sources": [
-            "SS22 2.2",
-            "SS22 2.3"
-          ],
-          "q": "FC layer $Y=XW+b$ with $X_{N\\times D},W_{D\\times M}$ and upstream $\\text{dout}=\\frac{\\partial L}{\\partial Y}$. (2.2) Dimensions of $b$ and dout? (2.3) What is $\\frac{\\partial L}{\\partial X}$ and its dimensions?",
-          "answer": "**2.2** $b$ is $1\\times M$ (broadcast over the batch); dout is $N\\times M$. **2.3** $\\frac{\\partial L}{\\partial X}=\\text{dout}\\cdot W^\\top$, of shape $N\\times D$ (matches $X$).",
-          "extend": "Backprop shapes mirror the forward shapes: $\\partial L/\\partial X$ matches $X$, computed as $\\text{dout}\\,W^\\top$.",
-          "tags": [
-            "Backpropagation",
-            "Fully-connected"
-          ]
         }
       ]
     },
@@ -1822,40 +1807,6 @@
           "extend": "Closed form wins on small linear problems; iterative GD wins when data is huge or the problem is non-linear (i.e. real deep learning).",
           "tags": [
             "Learning rate",
-            "Regression"
-          ]
-        },
-        {
-          "type": "mc",
-          "freq": 2,
-          "sources": [
-            "SS20 P1f"
-          ],
-          "q": "Logistic regression (check all that apply).",
-          "options": [
-            {
-              "text": "Is a linear function.",
-              "correct": true
-            },
-            {
-              "text": "Is a supervised learning algorithm.",
-              "correct": true
-            },
-            {
-              "text": "Uses a type of cross-entropy loss.",
-              "correct": true
-            },
-            {
-              "text": "Allows to perform binary classification.",
-              "correct": true
-            }
-          ],
-          "answer": "**All four** are correct. Despite the name, logistic regression is a **linear, supervised, binary classifier** trained with (binary) cross-entropy.",
-          "extend": "‘Regression’ in the name refers to the linear score; the sigmoid + CE turn it into a classifier. Decision boundary is linear.",
-          "tags": [
-            "Sigmoid",
-            "Loss functions",
-            "Supervised vs unsupervised",
             "Regression"
           ]
         },
