@@ -2044,6 +2044,11 @@
             "Batch normalization",
             "Normalization",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "value": 6
+            }
           ]
         }
       ]

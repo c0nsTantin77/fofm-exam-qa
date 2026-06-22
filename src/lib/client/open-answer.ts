@@ -58,11 +58,11 @@ export function initOpenAnswer(root: ParentNode = document): void {
     if (!qel) return;
     const id = qel.id;
     const ta = st.querySelector<HTMLTextAreaElement>(".self-area");
+    const calcInputs = Array.from(st.querySelectorAll<HTMLInputElement>(".calc-in"));
     const revealBtn = st.querySelector<HTMLButtonElement>(".reveal-btn");
     const againBtn = st.querySelector<HTMLButtonElement>(".self-again");
     const reveal = st.querySelector<HTMLElement>(".open-reveal");
     const assess = st.querySelector<HTMLElement>(".self-assess");
-    const score = st.querySelector<HTMLElement>(".self-score");
     if (!revealBtn || !reveal) return;
 
     const strongs = (): HTMLElement[] =>
@@ -75,24 +75,30 @@ export function initOpenAnswer(root: ParentNode = document): void {
       if (assess) assess.hidden = false;
       if (ta) ta.readOnly = true;
 
-      // score the reference's bold key terms against what the student wrote
+      // calculation questions: check each typed number against its expected value
+      calcInputs.forEach((inp) => {
+        const exp = parseFloat(inp.dataset.val ?? "");
+        const tol = Math.max(parseFloat(inp.dataset.tol ?? "0") || 0, 1e-9);
+        const got = parseFloat((inp.value ?? "").replace(/[, ]/g, ""));
+        const filled = inp.value.trim() !== "";
+        const ok = filled && Number.isFinite(got) && Math.abs(got - exp) <= tol;
+        inp.classList.toggle("ok", ok);
+        inp.classList.toggle("bad", filled && !ok);
+        const mark = inp.parentElement?.querySelector(".calc-mark");
+        if (mark) mark.textContent = !filled ? "" : ok ? "✓" : "✗";
+        inp.readOnly = true;
+      });
+
+      // highlight the reference's bold key terms vs what the student wrote:
+      // green = they mentioned it, red = they missed it (no count — the bold
+      // terms still need a manual curation pass before a score would be meaningful)
       const userNorm = norm(ta?.value ?? "");
       if (!userNorm) return;
-      let total = 0;
-      let hit = 0;
       strongs().forEach((el) => {
         const term = cleanTerm(el.textContent ?? "");
         if (!term) return;
-        total++;
-        const ok = termHit(term, userNorm);
-        el.classList.add(ok ? "kw-hit" : "kw-miss");
-        if (ok) hit++;
+        el.classList.add(termHit(term, userNorm) ? "kw-hit" : "kw-miss");
       });
-      if (score && total) {
-        score.hidden = false;
-        score.textContent = `Matched ${hit} / ${total} key terms — green = in your answer, red = missing.`;
-        score.classList.toggle("good", hit >= Math.ceil(total / 2));
-      }
     };
 
     const reset = (): void => {
@@ -103,15 +109,18 @@ export function initOpenAnswer(root: ParentNode = document): void {
         assess.hidden = true;
         delete assess.dataset.done;
       }
-      if (score) {
-        score.hidden = true;
-        score.textContent = "";
-        score.classList.remove("good");
-      }
       strongs().forEach((el) => el.classList.remove("kw-hit", "kw-miss"));
+      calcInputs.forEach((inp) => {
+        inp.readOnly = false;
+        inp.classList.remove("ok", "bad");
+        const mark = inp.parentElement?.querySelector(".calc-mark");
+        if (mark) mark.textContent = "";
+      });
       if (ta) {
         ta.readOnly = false;
         ta.focus();
+      } else if (calcInputs[0]) {
+        calcInputs[0].focus();
       }
     };
 

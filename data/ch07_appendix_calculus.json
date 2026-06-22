@@ -218,6 +218,12 @@
             "Activation functions",
             "Backpropagation",
             "Data leakage"
+          ],
+          "calc": [
+            {
+              "label": "5.3 loss",
+              "value": 2.5
+            }
           ]
         },
         {
@@ -289,6 +295,12 @@
           "extend": "The chain rule sums over every intermediate that depends on $x_1$; here only one term survives because $f$ is element-wise.",
           "tags": [
             "Backpropagation"
+          ],
+          "calc": [
+            {
+              "label": "dL/dx1",
+              "value": 2
+            }
           ]
         },
         {

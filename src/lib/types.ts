@@ -8,6 +8,14 @@ export interface OptionData {
   text: string;
   correct: boolean;
 }
+export interface CalcAnswer {
+  /** optional label for multi-part numeric answers, e.g. "(a)" or "MSE" */
+  label?: string;
+  /** expected numeric value */
+  value: number;
+  /** allowed absolute tolerance (default exact) */
+  tol?: number;
+}
 export interface QuestionData {
   type: "open" | "mc" | "ai";
   freq: number;
@@ -17,6 +25,8 @@ export interface QuestionData {
   extend?: string;
   tags?: string[];
   options?: OptionData[];
+  /** numeric answer boxes for calculation questions (typed & auto-checked) */
+  calc?: CalcAnswer[];
 }
 export interface KnowledgePointData {
   id: string;

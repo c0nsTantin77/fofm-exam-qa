@@ -77,8 +77,17 @@ details.q[open]{border-color:#bcd4f0}
   font-family:inherit;resize:vertical;background:#fffdf7}
 .self-area:focus{outline:2px solid var(--tum);border-color:var(--tum)}
 .self-area[readonly]{background:#f5f7fa;color:var(--ink);cursor:default}
-.self-score{margin:0 0 10px;font-size:.84rem;font-weight:600;color:#c92a2a}
-.self-score.good{color:var(--ok)}
+.calc-fields{display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 2px}
+.calc-field{display:inline-flex;align-items:center;gap:6px;font-size:.9rem}
+.calc-label{font-weight:600;color:var(--muted)}
+.calc-in{width:90px;border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:.92rem;
+  font-family:inherit;background:#fffdf7;font-variant-numeric:tabular-nums}
+.calc-in:focus{outline:2px solid var(--tum);border-color:var(--tum)}
+.calc-in.ok{border-color:#69db7c;background:#ebfbee}
+.calc-in.bad{border-color:#ff8787;background:#fff5f5}
+.calc-mark{font-weight:800;font-size:.95rem}
+.calc-in.ok~.calc-mark{color:var(--ok)}
+.calc-in.bad~.calc-mark{color:var(--no)}
 .open-reveal .answer strong.kw-hit{color:#1c7a3f;background:#eafff1;border-radius:4px;padding:0 2px}
 .open-reveal .answer strong.kw-miss{color:#c92a2a;background:#fff0f0;border-radius:4px;padding:0 2px}
 .self-assess{margin-top:12px;padding-top:11px;border-top:1px dashed var(--line);
@@ -105,6 +114,7 @@ details.q[open]{border-color:#bcd4f0}
 [data-mode="review"] .open-reveal[hidden]{display:block!important}
 [data-mode="review"] .verdict:empty{display:none}
 [data-mode="review"] .self-area{display:none}
+[data-mode="review"] .calc-fields{display:none}
 [data-mode="review"] .self-assess{display:none}
 [data-mode="review"] .opt input[data-correct="true"]~.opt-mark::after{content:"✅"}
 [data-mode="review"] .opt input[data-correct="false"]~.opt-mark::after{content:"❌";opacity:.45}

@@ -22,6 +22,11 @@
             "Tanh",
             "RNN",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "value": 45
+            }
           ]
         },
         {
@@ -211,6 +216,11 @@
             "Tanh",
             "RNN",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "value": 192
+            }
           ]
         },
         {
@@ -240,6 +250,20 @@
           "tags": [
             "ReLU",
             "RNN"
+          ],
+          "calc": [
+            {
+              "label": "h1",
+              "value": 0
+            },
+            {
+              "label": "h2",
+              "value": 4
+            },
+            {
+              "label": "h3",
+              "value": 4
+            }
           ]
         },
         {
@@ -286,6 +310,16 @@
           "tags": [
             "ReLU",
             "RNN"
+          ],
+          "calc": [
+            {
+              "label": "h2",
+              "value": 0
+            },
+            {
+              "label": "h3",
+              "value": 3
+            }
           ]
         },
         {

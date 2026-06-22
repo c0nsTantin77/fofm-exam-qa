@@ -24,6 +24,20 @@
           "tags": [
             "Convolution",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "label": "(a)",
+              "value": 181
+            },
+            {
+              "label": "(b)",
+              "value": 33
+            },
+            {
+              "label": "(c)",
+              "value": 448
+            }
           ]
         },
         {
@@ -104,6 +118,12 @@
           "tags": [
             "Convolution",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "label": "(b) stride",
+              "value": 4
+            }
           ]
         },
         {
@@ -276,6 +296,12 @@
             "Pooling",
             "Convolution",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "label": "conv1 params",
+              "value": 448
+            }
           ]
         },
         {
@@ -719,6 +745,12 @@
             "Receptive field",
             "Pooling",
             "Convolution"
+          ],
+          "calc": [
+            {
+              "label": "RF",
+              "value": 18
+            }
           ]
         },
         {
@@ -783,6 +815,12 @@
             "Receptive field",
             "Convolution",
             "Fully-connected"
+          ],
+          "calc": [
+            {
+              "label": "conv1 RF",
+              "value": 5
+            }
           ]
         },
         {
@@ -798,6 +836,12 @@
             "Receptive field",
             "Convolution",
             "CNN"
+          ],
+          "calc": [
+            {
+              "label": "RF (M)",
+              "value": 17
+            }
           ]
         },
         {
@@ -816,6 +860,12 @@
             "Pooling",
             "Convolution",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "label": "(a) RF",
+              "value": 10
+            }
           ]
         },
         {
@@ -831,6 +881,12 @@
             "Receptive field",
             "Convolution",
             "Parameter counting"
+          ],
+          "calc": [
+            {
+              "label": "total params",
+              "value": 16252
+            }
           ]
         },
         {
@@ -898,6 +954,12 @@
             "Receptive field",
             "Pooling",
             "Fully-connected"
+          ],
+          "calc": [
+            {
+              "label": "RF after pool1",
+              "value": 6
+            }
           ]
         }
       ]

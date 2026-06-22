@@ -12,7 +12,9 @@ const { q, anchor, qnum = "" } = Astro.props;
 
 const isAi = q.type === "ai";
 const isMc = q.type === "mc" || (isAi && Array.isArray(q.options));
-const fmtLabel = isMc ? "Multiple choice" : "Open";
+const calc = q.calc ?? [];
+const isCalc = !isMc && calc.length > 0;
+const fmtLabel = isMc ? "Multiple choice" : isCalc ? "Calculation" : "Open";
 
 function freqBadge(f: number): { cls: string; label: string } {
   if (f >= 6) return { cls: "freq-hot", label: `🔥 ${f}×` };
@@ -114,6 +116,49 @@ const tags = q.tags ?? [];
             )}
           </div>
         </div>
+      ) : isCalc ? (
+        <div class="selftest calc">
+          <p class="quiz-hint">
+            Compute and enter the value{calc.length > 1 ? "s" : ""}, then check.
+          </p>
+          <div class="calc-fields">
+            {calc.map((c) => (
+              <label class="calc-field">
+                {c.label && <span class="calc-label">{c.label}</span>}
+                <input
+                  type="text"
+                  class="calc-in"
+                  autocomplete="off"
+                  inputmode="text"
+                  data-val={String(c.value)}
+                  data-tol={String(c.tol ?? 0)}
+                />
+                <span class="calc-mark" aria-hidden="true" />
+              </label>
+            ))}
+          </div>
+          <div class="quiz-actions">
+            <button type="button" class="check-btn reveal-btn">Check</button>
+            <button type="button" class="reset-btn self-again" hidden>Try again</button>
+          </div>
+          <div class="open-reveal" hidden>
+            <div class="answer">
+              <div class="answer-label">Answer</div>
+              <Fragment set:html={answerHtml} />
+            </div>
+            {extendHtml && (
+              <div class="extend">
+                <div class="extend-label">💡 Extended memory</div>
+                <Fragment set:html={extendHtml} />
+              </div>
+            )}
+            <div class="self-assess" hidden>
+              <span class="self-assess-q">How did you do?</span>
+              <button type="button" class="self-btn got-btn">✓ Got it</button>
+              <button type="button" class="self-btn miss-btn">✗ Missed → wrong book</button>
+            </div>
+          </div>
+        </div>
       ) : (
         <div class="selftest">
           <p class="quiz-hint">Try it first — write your answer, then reveal to compare.</p>
@@ -123,7 +168,6 @@ const tags = q.tags ?? [];
             <button type="button" class="reset-btn self-again" hidden>Try again</button>
           </div>
           <div class="open-reveal" hidden>
-            <p class="self-score" role="status" hidden></p>
             <div class="answer">
               <div class="answer-label">Answer</div>
               <Fragment set:html={answerHtml} />
