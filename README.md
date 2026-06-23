@@ -16,6 +16,7 @@ Popular Architectures (65) · RNNs & Transformers (56) · Appendix: Matrix Calcu
 - **Site-wide search** + per-question **concept tags** to review a theme across chapters.
 - **Interactive multiple-choice, short-answer** (matching words light up green, including common singular/plural forms) **& number-checked calculation questions**.
 - **Review / Test modes**: read answers immediately or hide them for active recall.
+- **Study tracking**: mark **Reviewed**, keep a **wrong book**, write per-question **notes (Markdown + $math$, live preview)**, and work a **spaced-repetition** review page grouped by chapter with progress rings — optionally **synced** across devices via Google sign-in.
 - **Frequency-first** ordering (🔥 badges); every question **source-tagged** like `SS22 3.1`.
 - KaTeX formulas, collapsible answers, mobile-optimized.
 
