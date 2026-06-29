@@ -74,6 +74,14 @@ const tags = q.tags ?? [];
   </summary>
   <div class="q-body">
     {
+      q.figure && (
+        <figure class="q-figure">
+          <img src={url(`/figures/${q.figure.src}`)} alt={q.figure.alt ?? ""} loading="lazy" />
+          {q.figure.caption && <figcaption set:html={mdInline(q.figure.caption)} />}
+        </figure>
+      )
+    }
+    {
       isMc ? (
         <div class="quiz">
           <p class="quiz-hint">

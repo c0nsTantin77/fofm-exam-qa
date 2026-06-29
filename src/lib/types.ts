@@ -16,6 +16,12 @@ export interface CalcAnswer {
   /** allowed absolute tolerance (default exact) */
   tol?: number;
 }
+export interface FigureData {
+  /** file under public/figures/, e.g. "ss24-p3.png" */
+  src: string;
+  alt?: string;
+  caption?: string;
+}
 export interface QuestionData {
   type: "open" | "mc" | "ai";
   freq: number;
@@ -27,6 +33,8 @@ export interface QuestionData {
   options?: OptionData[];
   /** numeric answer boxes for calculation questions (typed & auto-checked) */
   calc?: CalcAnswer[];
+  /** an exam figure shown with the question (stored under public/figures/) */
+  figure?: FigureData;
 }
 export interface KnowledgePointData {
   id: string;
