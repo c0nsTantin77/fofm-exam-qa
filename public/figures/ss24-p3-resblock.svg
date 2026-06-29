@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 130" font-family="system-ui,Segoe UI,Arial" font-size="12" fill="#1f2933">
+  <defs>
+    <marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#5b6470"/>
+    </marker>
+  </defs>
+  <!-- skip connection (dashed) from F₂ over the top into the adder -->
+  <path d="M70,52 V24 H440 V53" fill="none" stroke="#8794a3" stroke-dasharray="5 4" marker-end="url(#ar2)"/>
+  <!-- main path arrows -->
+  <g stroke="#5b6470" marker-end="url(#ar2)">
+    <line x1="91" y1="70" x2="177" y2="70"/>
+    <line x1="221" y1="70" x2="307" y2="70"/>
+    <line x1="351" y1="70" x2="423" y2="70"/>
+    <line x1="455" y1="70" x2="527" y2="70"/>
+  </g>
+  <g text-anchor="middle" fill="#3a4654">
+    <text x="134" y="62">A</text>
+    <text x="264" y="62">B</text>
+    <text x="387" y="62">C</text>
+  </g>
+  <!-- boxes + adder -->
+  <g stroke="#8794a3">
+    <rect x="49" y="52" width="42" height="36" rx="3" fill="#e7ecf2"/>
+    <rect x="179" y="52" width="42" height="36" rx="3" fill="#e7ecf2"/>
+    <rect x="309" y="52" width="42" height="36" rx="3" fill="#e7ecf2"/>
+    <rect x="529" y="52" width="42" height="36" rx="3" fill="#e7ecf2"/>
+    <circle cx="440" cy="70" r="15" fill="#eef2f7"/>
+  </g>
+  <text x="440" y="75" text-anchor="middle" font-size="16" fill="#1f2933">+</text>
+  <g text-anchor="middle" font-size="9.5" fill="#6b7785">
+    <text x="70" y="108">F₂ (1×1×2×2)</text>
+    <text x="200" y="108">G₁</text>
+    <text x="330" y="108">G₂</text>
+    <text x="550" y="108">F₃ (1×1×2×2)</text>
+  </g>
+</svg>
