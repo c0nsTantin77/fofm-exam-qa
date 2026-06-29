@@ -14,6 +14,35 @@ export interface SrsEntry {
   n: number;
   last?: string;
   due?: string;
+  ef?: number; // SM-2 ease factor (flashcard self-rating)
+  ivl?: number; // SM-2 interval in days
+  reps?: number; // SM-2 consecutive successful reps
+}
+
+export type Rating = "again" | "hard" | "good" | "easy";
+const RATING_Q: Record<Rating, number> = { again: 1, hard: 3, good: 4, easy: 5 };
+
+/** SM-2 next interval (days) from the current entry + a rating. Pure helper so
+ *  the UI can preview "what each button schedules" before committing. */
+export function sm2Next(s: SrsEntry | undefined, r: Rating): { ivl: number; ef: number; reps: number } {
+  let ef = s?.ef ?? 2.5;
+  let ivl = s?.ivl ?? 0;
+  let reps = s?.reps ?? 0;
+  const q = RATING_Q[r];
+  if (q < 3) {
+    reps = 0;
+    ivl = 1; // lapse → relearn tomorrow
+  } else {
+    if (reps === 0) ivl = r === "easy" ? 3 : 1;
+    else if (reps === 1) ivl = r === "hard" ? 4 : 6;
+    else {
+      const mult = r === "hard" ? 1.2 : r === "easy" ? ef * 1.3 : ef;
+      ivl = Math.max(1, Math.round(ivl * mult));
+    }
+    reps += 1;
+  }
+  ef = Math.max(1.3, ef + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)));
+  return { ivl, ef: Math.round(ef * 100) / 100, reps };
 }
 
 export interface Progress {
@@ -121,6 +150,26 @@ export const Store = {
     }
     save();
   },
+
+  /** Flashcard self-rating (SM-2). Schedules the next review and counts as
+   *  reviewed; a lapse ("again") drops the card into the wrong book. */
+  rate(id: string, r: Rating): void {
+    const s = P.srs[id] || { n: 0 };
+    const { ivl, ef, reps } = sm2Next(s, r);
+    s.ef = ef;
+    s.ivl = ivl;
+    s.reps = reps;
+    s.n = Math.min(reps || 1, SRS_DAYS.length);
+    s.last = today();
+    s.due = addDays(ivl);
+    P.srs[id] = s;
+    P.reviewed[id] = P.reviewed[id] || Date.now();
+    if (r === "again") P.wrong[id] = P.wrong[id] || Date.now();
+    bumpActivity();
+    save();
+  },
+
+  srsEntry: (id: string): SrsEntry | undefined => P.srs[id],
 
   setNote(id: string, text: string): void {
     if (text) P.notes[id] = text;

@@ -1,0 +1,147 @@
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref } from "vue";
+import { Store, sm2Next, type Rating } from "../../lib/client/store";
+
+interface Card {
+  a: string;
+  q: string;
+  ans: string;
+  ext: string;
+  t: string;
+  opts: { text: string; correct: boolean }[] | null;
+  src: string;
+  ct: string;
+  kp: string;
+  fig: { src: string; alt?: string; caption?: string } | null;
+}
+
+const props = defineProps<{ queue: string[]; label: string }>();
+const emit = defineEmits<{ (e: "close"): void }>();
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const cards = ref<Card[]>([]);
+const idx = ref(0);
+const revealed = ref(false);
+const loading = ref(true);
+const reviewed = ref(0);
+const renderer = ref<null | {
+  q: (s: string) => string;
+  a: (s: string) => string;
+  inline: (s: string) => string;
+}>(null);
+
+const LETTERS = "ABCDEFGH";
+const total = computed(() => cards.value.length);
+const current = computed(() => cards.value[idx.value] || null);
+const finished = computed(() => !loading.value && total.value > 0 && idx.value >= total.value);
+const empty = computed(() => !loading.value && total.value === 0);
+
+const qHtml = computed(() => (current.value && renderer.value ? renderer.value.q(current.value.q) : ""));
+const ansHtml = computed(() => (current.value && renderer.value ? renderer.value.a(current.value.ans) : ""));
+const extHtml = computed(() =>
+  current.value && current.value.ext && renderer.value ? renderer.value.a(current.value.ext) : "",
+);
+const optHtml = (t: string): string => (renderer.value ? renderer.value.inline(t) : t);
+
+function ivlLabel(r: Rating): string {
+  if (!current.value) return "";
+  const d = sm2Next(Store.srsEntry(current.value.a), r).ivl;
+  return d >= 1 ? `${d}d` : "<1d";
+}
+function rate(r: Rating): void {
+  if (!current.value || !revealed.value) return;
+  Store.rate(current.value.a, r);
+  reviewed.value += 1;
+  idx.value += 1;
+  revealed.value = false;
+}
+function onKey(e: KeyboardEvent): void {
+  if (e.key === "Escape") return emit("close");
+  if (finished.value || empty.value || loading.value) return;
+  if (!revealed.value && (e.key === " " || e.key === "Enter")) {
+    e.preventDefault();
+    revealed.value = true;
+  } else if (revealed.value && ["1", "2", "3", "4"].includes(e.key)) {
+    rate((["again", "hard", "good", "easy"] as Rating[])[Number(e.key) - 1]);
+  }
+}
+
+onMounted(async () => {
+  window.addEventListener("keydown", onKey);
+  try {
+    const all: Card[] = await fetch(`${base}/cards.json`).then((r) => r.json());
+    const byId: Record<string, Card> = {};
+    all.forEach((c) => (byId[c.a] = c));
+    cards.value = props.queue.map((a) => byId[a]).filter(Boolean);
+    const md = await import("../../lib/md");
+    renderer.value = { q: md.renderQuestion, a: md.renderAnswer, inline: md.mdInline };
+  } catch (e) {
+    console.warn("flashcards load failed", e);
+  } finally {
+    loading.value = false;
+  }
+});
+onUnmounted(() => window.removeEventListener("keydown", onKey));
+</script>
+
+<template>
+  <div class="fc-overlay">
+    <div class="fc-card">
+      <div class="fc-top">
+        <span class="fc-title">🃏 {{ label }}</span>
+        <span v-if="!loading && !finished && !empty" class="fc-prog">{{ idx + 1 }} / {{ total }}</span>
+        <button class="fc-x" @click="emit('close')" aria-label="Close">✕</button>
+      </div>
+
+      <div v-if="loading" class="fc-body"><p class="hint">Loading cards…</p></div>
+
+      <div v-else-if="empty" class="fc-body fc-empty">
+        <p>Nothing to study here right now. 🎉</p>
+        <button class="fc-btn" @click="emit('close')">Back to review</button>
+      </div>
+
+      <div v-else-if="finished" class="fc-body fc-empty">
+        <p>✅ Done — you rated <b>{{ reviewed }}</b> card{{ reviewed === 1 ? "" : "s" }}.</p>
+        <button class="fc-btn primary" @click="emit('close')">Finish</button>
+      </div>
+
+      <div v-else-if="current" class="fc-body">
+        <div class="fc-meta">{{ current.ct }} · {{ current.kp }} · {{ current.src }}</div>
+        <figure v-if="current.fig" class="q-figure">
+          <img :src="`${base}/figures/${current.fig.src}`" :alt="current.fig.alt || ''" />
+          <figcaption v-if="current.fig.caption">{{ current.fig.caption }}</figcaption>
+        </figure>
+        <div class="fc-q" v-html="qHtml"></div>
+        <ul v-if="current.opts" class="fc-opts">
+          <li v-for="(o, i) in current.opts" :key="i" :class="{ hit: revealed && o.correct }">
+            <span class="opt-letter">{{ LETTERS[i] }}</span>
+            <span class="opt-text" v-html="optHtml(o.text)"></span>
+            <span v-if="revealed" class="opt-mark">{{ o.correct ? "✅" : "❌" }}</span>
+          </li>
+        </ul>
+
+        <button v-if="!revealed" class="fc-btn primary fc-show" @click="revealed = true">
+          Show answer <small>(space)</small>
+        </button>
+
+        <div v-else class="fc-back">
+          <div class="answer">
+            <div class="answer-label">Answer</div>
+            <div v-html="ansHtml"></div>
+          </div>
+          <div v-if="extHtml" class="extend">
+            <div class="extend-label">💡 Extended memory</div>
+            <div v-html="extHtml"></div>
+          </div>
+          <div class="fc-rate">
+            <button class="fc-rate-btn again" @click="rate('again')">Again<small>{{ ivlLabel("again") }}</small></button>
+            <button class="fc-rate-btn hard" @click="rate('hard')">Hard<small>{{ ivlLabel("hard") }}</small></button>
+            <button class="fc-rate-btn good" @click="rate('good')">Good<small>{{ ivlLabel("good") }}</small></button>
+            <button class="fc-rate-btn easy" @click="rate('easy')">Easy<small>{{ ivlLabel("easy") }}</small></button>
+          </div>
+          <p class="fc-hint">Keys: 1 Again · 2 Hard · 3 Good · 4 Easy · Esc close</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

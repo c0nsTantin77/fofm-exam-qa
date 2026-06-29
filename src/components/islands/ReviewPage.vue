@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import type { SearchEntry } from "../../lib/types";
 import { loadIndex, questionHref, TYPE_LABEL } from "../../lib/client/index-data";
 import { Store, onChange } from "../../lib/client/store";
+import FlashcardDeck from "./FlashcardDeck.vue";
 
 const index = ref<SearchEntry[]>([]);
 const loaded = ref(false);
@@ -85,6 +86,42 @@ function removeWrong(id: string): void {
   version.value++;
 }
 
+// ---- flashcard launcher ----
+const fcQueue = ref<string[] | null>(null);
+const fcLabel = ref("");
+const dueIds = computed(() => {
+  void version.value;
+  return Store.dueList(Object.keys(byId.value));
+});
+const wrongIds = computed(() => {
+  void version.value;
+  return Store.wrongIds().filter((id) => byId.value[id]);
+});
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function startFc(scope: "due" | "wrong" | "all"): void {
+  if (scope === "due") {
+    fcQueue.value = dueIds.value;
+    fcLabel.value = "Due flashcards";
+  } else if (scope === "wrong") {
+    fcQueue.value = wrongIds.value;
+    fcLabel.value = "Wrong-book flashcards";
+  } else {
+    fcQueue.value = shuffle(Object.keys(byId.value));
+    fcLabel.value = "All (shuffled)";
+  }
+}
+function closeFc(): void {
+  fcQueue.value = null;
+  version.value++;
+}
+
 let unsub = () => {};
 onMounted(async () => {
   index.value = await loadIndex();
@@ -119,6 +156,22 @@ onUnmounted(() => unsub());
         </li>
       </ul>
     </details>
+
+    <section class="fc-launch">
+      <div class="fc-launch-txt">
+        <b>🃏 Flashcards</b>
+        <span>Anki-style: rate each card <i>Again / Hard / Good / Easy</i> and it reschedules itself (SM-2).</span>
+      </div>
+      <div class="fc-launch-btns">
+        <button class="fc-start primary" :disabled="!dueCount" @click="startFc('due')">
+          Study due ({{ dueCount }})
+        </button>
+        <button class="fc-start" :disabled="!wrongCount" @click="startFc('wrong')">
+          Wrong book ({{ wrongCount }})
+        </button>
+        <button class="fc-start ghost" @click="startFc('all')">All (shuffled)</button>
+      </div>
+    </section>
 
     <section class="rv-section">
       <h2 class="rv-h rv-h-due">🧠 Due today <span class="rv-cnt">{{ dueCount }}</span></h2>
@@ -186,5 +239,7 @@ onUnmounted(() => unsub());
         </div>
       </details>
     </section>
+
+    <FlashcardDeck v-if="fcQueue" :queue="fcQueue" :label="fcLabel" @close="closeFc" />
   </div>
 </template>
