@@ -145,6 +145,12 @@ export const Store = {
     persist();
   },
 
+  /** Wipe ALL study progress (reviewed / wrong / notes / SRS / activity). */
+  reset(): void {
+    for (const k of SECTIONS) (P as unknown as Record<string, unknown>)[k] = {};
+    persist();
+  },
+
   /** Remap study data from removed (de-duplicated) question ids onto the kept
    *  question id, so reviewed / wrong / notes / SRS survive a content merge
    *  instead of orphaning. Idempotent: once an old id is gone it is a no-op.

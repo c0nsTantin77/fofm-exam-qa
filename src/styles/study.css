@@ -9,9 +9,12 @@
   font-size:.8rem;font-weight:600;color:var(--muted);cursor:pointer}
 .wrong-btn:hover,.note-btn:hover{border-color:var(--tum);color:var(--tum)}
 .wrong-btn.on{background:#fff5f5;border-color:#ffc9c9;color:var(--no)}
-.srs-due{font-size:.7rem;font-weight:600;color:var(--muted);background:#eef2f7;border-radius:999px;padding:2px 9px}
+.srs-due{font-size:.7rem;font-weight:600;color:var(--muted);background:#eef2f7;border:0;border-radius:999px;
+  padding:3px 10px;cursor:pointer;font-family:inherit}
 .srs-due:empty{display:none}
+.srs-due:hover{background:#dde6f0}
 .srs-due.over{color:#fff;background:var(--no)}
+.srs-due.over:hover{background:#c92a2a}
 
 /* chapter-page sidebar progress bar */
 .ch-progress{margin:2px 0 14px}
@@ -92,6 +95,16 @@ details.q.has-note .note-btn{background:#fffaf0;border-color:#ffe2a8;color:#b886
 .io-btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 13px;font-size:.82rem;
   font-weight:600;color:var(--tum);cursor:pointer}
 .io-btn:hover{background:#f0f6ff;border-color:var(--tum)}
+.io-btn.danger{color:var(--no);border-color:#ffc9c9}
+.io-btn.danger:hover{background:#fff5f5;border-color:var(--no)}
+.reset-dlg{max-width:440px;border:1px solid var(--line);border-radius:14px;padding:22px 24px;
+  box-shadow:0 20px 60px rgba(16,24,40,.25);color:var(--ink)}
+.reset-dlg::backdrop{background:rgba(16,24,40,.45)}
+.reset-dlg h3{margin:0 0 8px;font-size:1.15rem;color:var(--no)}
+.reset-dlg p{margin:0 0 14px;font-size:.9rem;line-height:1.5}
+.reset-ack{display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:600;margin-bottom:16px}
+.reset-actions{display:flex;justify-content:flex-end;gap:10px}
+.reset-dlg .io-btn.danger:disabled{opacity:.55;cursor:not-allowed;background:#fff}
 .tp-ch .cnt{font-size:.78rem;font-weight:700;background:#eef2f7;color:var(--muted);border-radius:999px;padding:1px 9px;margin-left:6px}
 .tp-empty{color:var(--muted);font-size:.9rem;background:#f7faff;border:1px solid var(--line);border-radius:10px;padding:14px}
 .ghit-row{display:flex;align-items:center;gap:10px;padding-right:10px}

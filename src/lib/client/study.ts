@@ -63,12 +63,15 @@ function applyStudy(bar: HTMLElement): void {
   qel.classList.toggle("is-reviewed", Store.isReviewed(id));
 
   const d = Store.due(id);
-  if (Store.isReviewed(id) && d) {
+  if (d) {
     const overdue = d <= todayStr();
-    due.textContent = overdue ? "review due" : "next review " + d;
+    due.textContent = overdue ? "🔔 Review due — tap ✓" : "next review " + d;
     due.className = "srs-due" + (overdue ? " over" : "");
+    due.hidden = false;
+    due.title = "Mark as reviewed now";
   } else {
     due.textContent = "";
+    due.hidden = true;
   }
 }
 
@@ -89,10 +92,17 @@ export function initStudy(root: ParentNode = document): void {
     const noteArea = bar.querySelector(".note-area") as HTMLTextAreaElement;
     const noteCount = bar.querySelector(".note-count") as HTMLElement | null;
     const notePreview = bar.querySelector(".note-preview") as HTMLElement | null;
+    const due = bar.querySelector(".srs-due") as HTMLElement | null;
 
     applyStudy(bar);
     rev.addEventListener("change", () => {
       Store.setReviewed(id, rev.checked);
+      applyStudy(bar);
+    });
+    // one-tap "mark reviewed" on the due pill (handy when arriving from the review page)
+    due?.addEventListener("click", () => {
+      if (!Store.due(id)) return;
+      Store.setReviewed(id, true);
       applyStudy(bar);
     });
     wrongBtn.addEventListener("click", () => {
