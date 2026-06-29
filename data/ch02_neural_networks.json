@@ -579,7 +579,7 @@
           ],
           "q": "Binary classifier, FC $z=XW+b$ with $X=[1,2,0,1]$ (post-ReLU), $W=[1,-2,3,3]^\\top,b=0$, $\\hat y=\\sigma(z),L=\\text{BCE}(y,\\hat y),y=1$. Forward: $z=0,\\hat y=0.5,L=0.693$. (3.1) Compute $\\frac{\\partial L}{\\partial \\hat y},\\frac{\\partial L}{\\partial z},\\frac{\\partial L}{\\partial W},\\frac{\\partial L}{\\partial b}$. (3.2) What to cache? (3.3) Why is $\\frac{\\partial L}{\\partial W}$ always non-positive here?",
           "figure": {
-            "src": "ss24-p3-net.svg",
+            "src": "SS24-p3-F1.png",
             "alt": "SS24 Problem 3 network: Input → Conv1 → ReLU → ResBlock → ReLU → Flatten → Linear → Output z → Sigmoid → Label ŷ → BCE → Loss",
             "caption": "SS24 Problem 3 — the full network. ReLU is the hidden activation; the output uses Sigmoid + BCE."
           },
@@ -601,7 +601,7 @@
           ],
           "q": "A ResBlock has layers A,B,C (from {Conv1(k1,s1,p0), ReLU, Conv2(k3,s1)}) and a skip to the adder. (3.4) Assign A,B,C; which intermediate (F2/G1/G2) connects to the adder; and the padding of Conv2. (3.5) Write $\\frac{\\partial L}{\\partial F2}$ and explain the gradient 'highway'.",
           "figure": {
-            "src": "ss24-p3-resblock.svg",
+            "src": "SS24-p3-F2.png",
             "alt": "SS24 Problem 3 ResBlock: F₂ → A → G₁ → B → G₂ → C → adder → F₃, with a skip from F₂ into the adder",
             "caption": "SS24 Problem 3 — the ResBlock. The dashed skip carries F₂ into the adder (the gradient 'highway')."
           },
