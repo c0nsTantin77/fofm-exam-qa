@@ -118,12 +118,6 @@
           "tags": [
             "Convolution",
             "Parameter counting"
-          ],
-          "calc": [
-            {
-              "label": "(b) stride",
-              "value": 4
-            }
           ]
         },
         {
@@ -954,12 +948,6 @@
             "Receptive field",
             "Pooling",
             "Fully-connected"
-          ],
-          "calc": [
-            {
-              "label": "RF after pool1",
-              "value": 6
-            }
           ]
         }
       ]

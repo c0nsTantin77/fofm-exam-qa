@@ -1513,12 +1513,6 @@
           "extend": "$-\\log$ of a probability is a positive 'surprise' — small for confident-correct, large for confident-wrong. We minimize surprise.",
           "tags": [
             "Loss functions"
-          ],
-          "calc": [
-            {
-              "label": "(b) output neurons",
-              "value": 1
-            }
           ]
         },
         {
@@ -1768,13 +1762,31 @@
           ]
         },
         {
-          "type": "open",
+          "type": "mc",
           "freq": 1,
           "sources": [
             "SS21 1.8"
           ],
           "q": "Compared to the L1 loss, the L2 loss... (which statements hold?)",
-          "answer": "L2 (MSE) **has a different optimum** than L1 and is **more sensitive to outliers** (it is *not* robust to outliers). L2 is **not** sparser than L1 (L1 promotes sparsity) and is not especially costly to compute. So among the typical options, only “has a different optimum” is true.",
+          "options": [
+            {
+              "text": "is robust to outliers",
+              "correct": false
+            },
+            {
+              "text": "is costly to compute",
+              "correct": false
+            },
+            {
+              "text": "has a different optimum",
+              "correct": true
+            },
+            {
+              "text": "will lead to sparser solutions",
+              "correct": false
+            }
+          ],
+          "answer": "L2 (MSE) **has a different optimum** than L1 and is **more sensitive to outliers** (it is *not* robust to outliers). L2 is **not** sparser than L1 (L1 promotes sparsity) and is not especially costly to compute. So only **“has a different optimum”** is true.",
           "extend": "L2 optimum = mean of targets; L1 optimum = median (hence L1's robustness). L1 → sparser solutions in the regularization sense.",
           "tags": [
             "Regularization",

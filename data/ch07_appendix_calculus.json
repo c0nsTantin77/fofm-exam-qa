@@ -218,12 +218,6 @@
             "Activation functions",
             "Backpropagation",
             "Data leakage"
-          ],
-          "calc": [
-            {
-              "label": "5.3 loss",
-              "value": 2.5
-            }
           ]
         },
         {
