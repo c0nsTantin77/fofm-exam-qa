@@ -18,6 +18,7 @@ export const GET: APIRoute = async () => {
           ext: q.extend ?? "",
           t: q.type,
           opts: q.options ?? null,
+          calc: q.calc ?? null,
           src: q.sources[0],
           ct: ch.data.title,
           kp: kp.title,

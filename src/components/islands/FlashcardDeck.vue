@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { Store, sm2Next, type Rating } from "../../lib/client/store";
+import { highlightIn } from "../../lib/client/highlight";
+import { userWords, wordVariants } from "../../lib/client/answer-match";
 
+interface Calc { label?: string; value: number; tol?: number }
 interface Card {
   a: string;
   q: string;
@@ -9,6 +12,7 @@ interface Card {
   ext: string;
   t: string;
   opts: { text: string; correct: boolean }[] | null;
+  calc: Calc[] | null;
   src: string;
   ct: string;
   kp: string;
@@ -30,11 +34,19 @@ const renderer = ref<null | {
   inline: (s: string) => string;
 }>(null);
 
+// per-card attempt state
+const picked = ref<Set<number>>(new Set());
+const selfText = ref("");
+const calcVals = ref<string[]>([]);
+const answerEl = ref<HTMLElement | null>(null);
+
 const LETTERS = "ABCDEFGH";
 const total = computed(() => cards.value.length);
 const current = computed(() => cards.value[idx.value] || null);
 const finished = computed(() => !loading.value && total.value > 0 && idx.value >= total.value);
 const empty = computed(() => !loading.value && total.value === 0);
+const isMc = computed(() => !!current.value?.opts?.length);
+const isCalc = computed(() => !isMc.value && !!current.value?.calc?.length);
 
 const qHtml = computed(() => (current.value && renderer.value ? renderer.value.q(current.value.q) : ""));
 const ansHtml = computed(() => (current.value && renderer.value ? renderer.value.a(current.value.ans) : ""));
@@ -48,19 +60,48 @@ function ivlLabel(r: Rating): string {
   const d = sm2Next(Store.srsEntry(current.value.a), r).ivl;
   return d >= 1 ? `${d}d` : "<1d";
 }
+function toggle(i: number): void {
+  if (revealed.value) return;
+  const s = new Set(picked.value);
+  s.has(i) ? s.delete(i) : s.add(i);
+  picked.value = s;
+}
+function calcOk(i: number): boolean {
+  const c = current.value?.calc?.[i];
+  if (!c) return false;
+  const got = parseFloat((calcVals.value[i] ?? "").replace(/[, ]/g, ""));
+  return Number.isFinite(got) && Math.abs(got - c.value) <= Math.max(c.tol ?? 0, 1e-9);
+}
+
+function resetAttempt(): void {
+  picked.value = new Set();
+  selfText.value = "";
+  calcVals.value = (current.value?.calc ?? []).map(() => "");
+  revealed.value = false;
+}
+watch(idx, () => resetAttempt());
+
+async function reveal(): Promise<void> {
+  revealed.value = true;
+  await nextTick();
+  // green-highlight the student's overlapping words in the reference (open questions)
+  if (!isMc.value && !isCalc.value && selfText.value.trim() && answerEl.value) {
+    for (const w of userWords(selfText.value))
+      for (const v of wordVariants(w)) highlightIn([answerEl.value], v, "kw-hit", true);
+  }
+}
 function rate(r: Rating): void {
   if (!current.value || !revealed.value) return;
   Store.rate(current.value.a, r);
   reviewed.value += 1;
   idx.value += 1;
-  revealed.value = false;
 }
 function onKey(e: KeyboardEvent): void {
   if (e.key === "Escape") return emit("close");
   if (finished.value || empty.value || loading.value) return;
-  if (!revealed.value && (e.key === " " || e.key === "Enter")) {
+  if (!revealed.value && e.key === "Enter") {
     e.preventDefault();
-    revealed.value = true;
+    void reveal();
   } else if (revealed.value && ["1", "2", "3", "4"].includes(e.key)) {
     rate((["again", "hard", "good", "easy"] as Rating[])[Number(e.key) - 1]);
   }
@@ -75,6 +116,7 @@ onMounted(async () => {
     cards.value = props.queue.map((a) => byId[a]).filter(Boolean);
     const md = await import("../../lib/md");
     renderer.value = { q: md.renderQuestion, a: md.renderAnswer, inline: md.mdInline };
+    resetAttempt();
   } catch (e) {
     console.warn("flashcards load failed", e);
   } finally {
@@ -112,22 +154,56 @@ onUnmounted(() => window.removeEventListener("keydown", onKey));
           <figcaption v-if="current.fig.caption">{{ current.fig.caption }}</figcaption>
         </figure>
         <div class="fc-q" v-html="qHtml"></div>
-        <ul v-if="current.opts" class="fc-opts">
-          <li v-for="(o, i) in current.opts" :key="i" :class="{ hit: revealed && o.correct }">
+
+        <!-- attempt controls (try before revealing; optional) -->
+        <ul v-if="isMc" class="fc-opts" :class="{ done: revealed }">
+          <li
+            v-for="(o, i) in current.opts"
+            :key="i"
+            :class="{
+              picked: picked.has(i),
+              hit: revealed && o.correct,
+              bad: revealed && picked.has(i) && !o.correct,
+              missed: revealed && !picked.has(i) && o.correct,
+            }"
+            @click="toggle(i)">
+            <input type="checkbox" :checked="picked.has(i)" :disabled="revealed" tabindex="-1" />
             <span class="opt-letter">{{ LETTERS[i] }}</span>
             <span class="opt-text" v-html="optHtml(o.text)"></span>
-            <span v-if="revealed" class="opt-mark">{{ o.correct ? "✅" : "❌" }}</span>
+            <span v-if="revealed" class="opt-mark">{{ o.correct ? "✅" : picked.has(i) ? "❌" : "" }}</span>
           </li>
         </ul>
 
-        <button v-if="!revealed" class="fc-btn primary fc-show" @click="revealed = true">
-          Show answer <small>(space)</small>
+        <div v-else-if="isCalc" class="fc-calc">
+          <label v-for="(c, i) in current.calc" :key="i" class="calc-field">
+            <span v-if="c.label" class="calc-label">{{ c.label }}</span>
+            <input
+              class="calc-in"
+              :class="revealed ? (calcOk(i) ? 'ok' : calcVals[i] ? 'bad' : '') : ''"
+              v-model="calcVals[i]"
+              :readonly="revealed"
+              inputmode="text"
+              autocomplete="off" />
+            <span v-if="revealed" class="calc-mark">{{ calcVals[i] ? (calcOk(i) ? "✓" : "✗") : "" }}</span>
+          </label>
+        </div>
+
+        <textarea
+          v-else
+          class="self-area fc-self"
+          v-model="selfText"
+          :readonly="revealed"
+          rows="3"
+          placeholder="Write your answer (optional)…"></textarea>
+
+        <button v-if="!revealed" class="fc-btn primary fc-show" @click="reveal">
+          Show answer <small>(enter)</small>
         </button>
 
         <div v-else class="fc-back">
           <div class="answer">
             <div class="answer-label">Answer</div>
-            <div v-html="ansHtml"></div>
+            <div ref="answerEl" v-html="ansHtml"></div>
           </div>
           <div v-if="extHtml" class="extend">
             <div class="extend-label">💡 Extended memory</div>

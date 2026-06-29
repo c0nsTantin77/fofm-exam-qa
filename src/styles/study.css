@@ -181,10 +181,18 @@ details.q.has-note .note-btn{background:#fffaf0;border-color:#ffe2a8;color:#b886
 .fc-q p{margin:.3em 0}
 .fc-opts{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:7px}
 .fc-opts li{display:flex;gap:9px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);
-  border-radius:9px;font-size:.92rem}
+  border-radius:9px;font-size:.92rem;cursor:pointer}
+.fc-opts.done li{cursor:default}
+.fc-opts li input{margin:.15em 0 0;flex:none;width:15px;height:15px;accent-color:var(--tum)}
+.fc-opts li.picked{border-color:#bcd4f0;background:#f7faff}
 .fc-opts li.hit{background:#ebfbee;border-color:#b2f2bb}
+.fc-opts li.bad{background:#fff7f7;border-color:#ffd9d9}
+.fc-opts li.missed{box-shadow:0 0 0 2px #ffd43b inset}
 .fc-opts .opt-letter{font-weight:700;color:var(--muted)}
 .fc-opts .opt-text{flex:1}
+.fc-opts .opt-mark{margin-left:auto}
+.fc-calc{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.fc-self{margin-top:12px;width:100%}
 .fc-btn{border:1px solid var(--tum);background:#fff;color:var(--tum);border-radius:10px;padding:9px 18px;
   font-size:.88rem;font-weight:700;cursor:pointer}
 .fc-btn.primary{background:var(--tum);color:#fff}
