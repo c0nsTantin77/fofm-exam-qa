@@ -3,7 +3,6 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { Store, sm2Next, type Rating } from "../../lib/client/store";
 import { highlightIn } from "../../lib/client/highlight";
 import { userWords, wordVariants } from "../../lib/client/answer-match";
-import { renderQuestion, renderAnswer, mdInline } from "../../lib/md";
 
 interface Calc { label?: string; value: number; tol?: number }
 interface Card {
@@ -44,10 +43,11 @@ const empty = computed(() => !loading.value && total.value === 0);
 const isMc = computed(() => !!current.value?.opts?.length);
 const isCalc = computed(() => !isMc.value && !!current.value?.calc?.length);
 
-const qHtml = computed(() => (current.value ? renderQuestion(current.value.q) : ""));
-const ansHtml = computed(() => (current.value ? renderAnswer(current.value.ans) : ""));
-const extHtml = computed(() => (current.value?.ext ? renderAnswer(current.value.ext) : ""));
-const optHtml = (t: string): string => mdInline(t);
+// cards.json ships pre-rendered HTML, so these are used verbatim via v-html
+const qHtml = computed(() => current.value?.q ?? "");
+const ansHtml = computed(() => current.value?.ans ?? "");
+const extHtml = computed(() => current.value?.ext ?? "");
+const optHtml = (t: string): string => t;
 
 function ivlLabel(r: Rating): string {
   if (!current.value) return "";
