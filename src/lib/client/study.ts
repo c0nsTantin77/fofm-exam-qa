@@ -63,8 +63,9 @@ function applyStudy(bar: HTMLElement): void {
   qel.classList.toggle("is-reviewed", Store.isReviewed(id));
 
   const d = Store.due(id);
+  const overdue = !!d && d <= todayStr();
+  qel.classList.toggle("is-due", overdue);
   if (d) {
-    const overdue = d <= todayStr();
     due.textContent = overdue ? "🔔 Review due — tap ✓" : "next review " + d;
     due.className = "srs-due" + (overdue ? " over" : "");
     due.hidden = false;

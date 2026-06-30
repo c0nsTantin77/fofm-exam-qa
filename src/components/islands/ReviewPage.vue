@@ -140,20 +140,18 @@ onUnmounted(() => unsub());
     </p>
 
     <details class="rv-explain">
-      <summary>How “Review” and the “Wrong book” fit together</summary>
+      <summary>How review works</summary>
       <ul>
         <li>
-          <b>Mark “Reviewed”</b> on any question to start <b>spaced repetition</b> — it returns after
-          1 → 2 → 4 → 7 → 15 → 30 → 60 days, the gap growing each time you review it.
+          <b>🃏 Flashcards</b> — study a deck (today’s <b>due</b>, your <b>wrong book</b>, or
+          <b>all</b>) and rate each card <i>Again / Hard / Good / Easy</i>; spaced repetition (SM-2)
+          sets when it comes back.
         </li>
         <li>
-          <b>Due today</b> is everything whose scheduled date has arrived. Review it, hit
-          <b>✓ Reviewed</b>, and it’s pushed further out.
+          <b>Due today</b> = cards whose scheduled date has arrived. <b>Wrong book</b> = questions
+          you missed, kept until you remove them.
         </li>
-        <li>
-          <b>Wrong book</b> collects questions you got wrong (MC) or marked <b>Missed</b> (short
-          answer). They stay until you remove them and resurface in “Due today” the next day.
-        </li>
+        <li>On any question you can also tick <b>Reviewed</b> or tap its <b>due</b> pill to reschedule.</li>
       </ul>
     </details>
 

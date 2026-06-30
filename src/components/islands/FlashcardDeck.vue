@@ -88,8 +88,10 @@ function rate(r: Rating): void {
   if (!current.value || !revealed.value) return;
   Store.rate(current.value.a, r);
   if (r === "again") {
-    // "Again" = redo this card now: keep what was typed / selected, just hide
-    // the answer again so it can be re-attempted (idx unchanged → no reset).
+    // "Again" = redo this card now: keep the typed answer / numbers, but clear
+    // the selected multiple-choice options so they can be re-picked cleanly.
+    // (idx unchanged → selfText / calcVals are not reset.)
+    picked.value = new Set();
     revealed.value = false;
   } else {
     reviewed.value += 1;
