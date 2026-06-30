@@ -87,8 +87,14 @@ async function reveal(): Promise<void> {
 function rate(r: Rating): void {
   if (!current.value || !revealed.value) return;
   Store.rate(current.value.a, r);
-  reviewed.value += 1;
-  idx.value += 1;
+  if (r === "again") {
+    // "Again" = redo this card now: keep what was typed / selected, just hide
+    // the answer again so it can be re-attempted (idx unchanged → no reset).
+    revealed.value = false;
+  } else {
+    reviewed.value += 1;
+    idx.value += 1;
+  }
 }
 function onKey(e: KeyboardEvent): void {
   if (e.key === "Escape") return emit("close");
