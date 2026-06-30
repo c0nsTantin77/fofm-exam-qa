@@ -3,6 +3,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { Store, sm2Next, type Rating } from "../../lib/client/store";
 import { highlightIn } from "../../lib/client/highlight";
 import { userWords, wordVariants } from "../../lib/client/answer-match";
+import { renderQuestion, renderAnswer, mdInline } from "../../lib/md";
 
 interface Calc { label?: string; value: number; tol?: number }
 interface Card {
@@ -28,11 +29,6 @@ const idx = ref(0);
 const revealed = ref(false);
 const loading = ref(true);
 const reviewed = ref(0);
-const renderer = ref<null | {
-  q: (s: string) => string;
-  a: (s: string) => string;
-  inline: (s: string) => string;
-}>(null);
 
 // per-card attempt state
 const picked = ref<Set<number>>(new Set());
@@ -48,12 +44,10 @@ const empty = computed(() => !loading.value && total.value === 0);
 const isMc = computed(() => !!current.value?.opts?.length);
 const isCalc = computed(() => !isMc.value && !!current.value?.calc?.length);
 
-const qHtml = computed(() => (current.value && renderer.value ? renderer.value.q(current.value.q) : ""));
-const ansHtml = computed(() => (current.value && renderer.value ? renderer.value.a(current.value.ans) : ""));
-const extHtml = computed(() =>
-  current.value && current.value.ext && renderer.value ? renderer.value.a(current.value.ext) : "",
-);
-const optHtml = (t: string): string => (renderer.value ? renderer.value.inline(t) : t);
+const qHtml = computed(() => (current.value ? renderQuestion(current.value.q) : ""));
+const ansHtml = computed(() => (current.value ? renderAnswer(current.value.ans) : ""));
+const extHtml = computed(() => (current.value?.ext ? renderAnswer(current.value.ext) : ""));
+const optHtml = (t: string): string => mdInline(t);
 
 function ivlLabel(r: Rating): string {
   if (!current.value) return "";
@@ -114,8 +108,6 @@ onMounted(async () => {
     const byId: Record<string, Card> = {};
     all.forEach((c) => (byId[c.a] = c));
     cards.value = props.queue.map((a) => byId[a]).filter(Boolean);
-    const md = await import("../../lib/md");
-    renderer.value = { q: md.renderQuestion, a: md.renderAnswer, inline: md.mdInline };
     resetAttempt();
   } catch (e) {
     console.warn("flashcards load failed", e);
