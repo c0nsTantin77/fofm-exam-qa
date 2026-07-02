@@ -1,4 +1,5 @@
 [
+  {"date": "2026-07-02", "text": "🃏 Flashcard polish: jot a note right inside a card (it's the same note as that question's, so nothing to sync by hand), quick-jump pills at the top of the Review page (Flashcards / Due today / Wrong book), a clearer ‘How review works’ explainer, and the ‘Review due’ button no longer keeps pushing a card's date further out each time you tap it."},
   {"date": "2026-06-30", "text": "🃏 Anki-style flashcards on the Review page — study a deck and rate each card Again / Hard / Good / Easy; spaced repetition schedules the next showing."},
   {"date": "2026-06-30", "text": "🖼️ Questions can show exam figures; reviewed / due questions are colour-coded green/red; and there's a guarded ‘Reset progress’ button on the Review page."},
   {"date": "2026-06-22", "text": "🎯 Study your way — a new Review / Test toggle (top-right of every chapter). Review shows every answer for quick reading; Test hides them so you actively recall: pick the multiple-choice options, write a short answer, or type the number for a calculation, then check."},
