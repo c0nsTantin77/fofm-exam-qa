@@ -89,6 +89,7 @@ function removeWrong(id: string): void {
 // ---- flashcard launcher ----
 const fcQueue = ref<string[] | null>(null);
 const fcLabel = ref("");
+const allCount = computed(() => index.value.length);
 const dueIds = computed(() => {
   void version.value;
   return Store.dueList(Object.keys(byId.value));
@@ -167,7 +168,9 @@ onUnmounted(() => unsub());
         <button class="fc-start" :disabled="!wrongCount" @click="startFc('wrong')">
           Wrong book ({{ wrongCount }})
         </button>
-        <button class="fc-start ghost" @click="startFc('all')">All (shuffled)</button>
+        <button class="fc-start ghost" title="Every question, shuffled" @click="startFc('all')">
+          All {{ allCount }} questions
+        </button>
       </div>
     </section>
 
