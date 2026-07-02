@@ -23,8 +23,8 @@ Popular Architectures (65) · RNNs & Transformers (56) · Appendix: Matrix Calcu
 - KaTeX formulas, collapsible answers, mobile-optimized.
 
 ## Recent updates
-- **2026-06-30** — 🃏 **Anki-style flashcards** on the Review page: study today's due / your wrong book / all shuffled, flip each card, and rate it *Again / Hard / Good / Easy*; **SM-2** spaced repetition schedules the next showing. MC, short-answer and calculation cards are interactive, and *Again* re-does a card on the spot.
-- **2026-06-30** — 🖼️ Questions can carry **figures** (the SS24 backprop network & ResBlock diagrams are in); plus one-tap **mark-reviewed** on a question's *due* pill, **green/red colour-coding** for reviewed/due questions, and a guarded **Reset progress** button on the Review page.
+- **2026-06-30** — 🃏 **Anki-style flashcards** on the Review page: rate each card *Again / Hard / Good / Easy* and let **SM-2** spaced repetition schedule it.
+- **2026-06-30** — 🖼️ Questions can show **exam figures**; reviewed/due questions are **colour-coded** green/red; and there's a guarded **Reset progress** button.
 - **2026-06-22** — 🧹 Feedback cleanup: removed **20 duplicate questions** (512 → **492**) and migrated reviewed / wrong-book / notes / spaced-repetition data from removed question IDs to the kept copies.
 - **2026-06-22** — 🎯 New study flow: chapter pages now have **Review / Test** modes, short-answer self-checks highlight overlapping answer words in green, and **21 calculation questions** accept typed numeric answers.
 - **2026-06-22** — ✍️ Better answer matching: lightweight singular/plural matching now catches pairs like `parameter`/`parameters`, `weight`/`weights`, and `gradient`/`gradients` without adding client-side NLP dependencies.

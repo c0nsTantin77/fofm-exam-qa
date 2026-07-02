@@ -44,10 +44,12 @@
   border-radius:5px;padding:1px 5px;font-size:.86em}
 .note-preview a{color:var(--tum);text-decoration:underline}
 details.q.is-reviewed{border-color:#51cf66;box-shadow:inset 4px 0 0 #51cf66}
-details.q.is-reviewed>summary::after{content:"✓ reviewed";float:right;font-size:.7rem;font-weight:700;color:var(--ok)}
 /* due takes visual priority over reviewed — red accent so it stands out */
 details.q.is-due{border-color:#ff6b6b;box-shadow:inset 4px 0 0 #ff6b6b}
-details.q.is-due>summary::after{content:"🔔 due";float:right;font-size:.7rem;font-weight:700;color:var(--no)}
+details.q.is-reviewed>summary::after,details.q.is-due>summary::after{
+  float:right;font-size:.78rem;font-weight:700;margin:-3px 0 0 10px;letter-spacing:.01em}
+details.q.is-reviewed>summary::after{content:"✓ reviewed";color:var(--ok)}
+details.q.is-due>summary::after{content:"🔔 due";color:var(--no)}
 details.q.has-note .note-btn{background:#fffaf0;border-color:#ffe2a8;color:#b8860b}
 
 /* ---- progress dashboard (index) — collapsible ---- */
