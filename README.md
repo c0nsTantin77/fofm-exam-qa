@@ -17,7 +17,7 @@ Popular Architectures (65) · RNNs & Transformers (56) · Appendix: Matrix Calcu
 - **Interactive multiple-choice, short-answer** (matching words light up green, including common singular/plural forms) **& number-checked calculation questions**.
 - **Review / Test modes**: read answers immediately or hide them for active recall.
 - **🃏 Anki-style flashcards (SM-2)**: study a deck (due / wrong-book / all), rate each card *Again / Hard / Good / Easy*, and let spaced repetition schedule it; MC, short-answer and calculation cards are interactive, and you can jot a **note without leaving the card** (shared with that question's own note).
-- **Study tracking**: mark **Reviewed**, keep a **wrong book**, write per-question **notes (Markdown + $math$, live preview)**, and work a **spaced-repetition** review page grouped by chapter with progress rings — optionally **synced** across devices via Google sign-in.
+- **Study tracking**: mark **Reviewed**, keep a **wrong book**, write per-question **notes (Markdown + `$math$`, live preview)**, and work a **spaced-repetition** review page grouped by chapter with progress rings — optionally **synced** across devices via Google sign-in.
 - Selected questions carry the original **exam figures**.
 - **Frequency-first** ordering (🔥 badges); every question **source-tagged** like `SS22 3.1`.
 - KaTeX formulas, collapsible answers, mobile-optimized.
