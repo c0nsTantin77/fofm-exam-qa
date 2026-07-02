@@ -24,6 +24,8 @@
 .hero-cta-text b{font-weight:600;color:#fff}
 .hero-cta-pills{display:flex;flex-wrap:wrap;gap:10px}
 .hero-cta-pills .share-pill{margin:0}
+.hero-cta-pills .share-pill.doner{background:rgba(255,193,90,.2);border-color:rgba(255,193,90,.5)}
+.hero-cta-pills .share-pill.doner:hover{background:rgba(255,193,90,.32);border-color:rgba(255,193,90,.7)}
 @media(max-width:560px){.hero-cta{gap:16px}.hero-cta-text{font-size:1.06rem}}
 @media(max-width:680px){.hero-points{grid-template-columns:1fr;gap:10px}}
 .exams{display:flex;flex-wrap:wrap;gap:8px}
