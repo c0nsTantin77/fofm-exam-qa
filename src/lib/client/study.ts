@@ -69,7 +69,7 @@ function applyStudy(bar: HTMLElement): void {
     due.textContent = overdue ? "🔔 Review due — tap ✓" : "next review " + d;
     due.className = "srs-due" + (overdue ? " over" : "");
     due.hidden = false;
-    due.title = "Mark as reviewed now";
+    due.title = overdue ? "Mark as reviewed now" : "Scheduled — comes back for review when due";
   } else {
     due.textContent = "";
     due.hidden = true;
@@ -100,11 +100,15 @@ export function initStudy(root: ParentNode = document): void {
       Store.setReviewed(id, rev.checked);
       applyStudy(bar);
     });
-    // one-tap "mark reviewed" on the due pill (handy when arriving from the review page)
+    // one-tap "mark reviewed" on the due pill — ONLY when the card is actually
+    // due/overdue. A future "next review DATE" pill is just info; clicking it did
+    // nothing useful and repeatedly pushed the schedule further out with no undo.
     due?.addEventListener("click", () => {
-      if (!Store.due(id)) return;
-      Store.setReviewed(id, true);
-      applyStudy(bar);
+      const d = Store.due(id);
+      if (d && d <= todayStr()) {
+        Store.setReviewed(id, true);
+        applyStudy(bar);
+      }
     });
     wrongBtn.addEventListener("click", () => {
       Store.setWrong(id, !Store.isWrong(id));

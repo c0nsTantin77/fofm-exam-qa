@@ -168,8 +168,8 @@ onUnmounted(() => unsub());
         <button class="fc-start" :disabled="!wrongCount" @click="startFc('wrong')">
           Wrong book ({{ wrongCount }})
         </button>
-        <button class="fc-start ghost" title="Every question, shuffled" @click="startFc('all')">
-          All {{ allCount }} questions
+        <button class="fc-start ghost" @click="startFc('all')">
+          All {{ allCount }} questions (shuffled)
         </button>
       </div>
     </section>
