@@ -578,6 +578,11 @@
             "SS24 3.3"
           ],
           "q": "Binary classifier, FC $z=XW+b$ with $X=[1,2,0,1]$ (post-ReLU), $W=[1,-2,3,3]^\\top,b=0$, $\\hat y=\\sigma(z),L=\\text{BCE}(y,\\hat y),y=1$. Forward: $z=0,\\hat y=0.5,L=0.693$. (3.1) Compute $\\frac{\\partial L}{\\partial \\hat y},\\frac{\\partial L}{\\partial z},\\frac{\\partial L}{\\partial W},\\frac{\\partial L}{\\partial b}$. (3.2) What to cache? (3.3) Why is $\\frac{\\partial L}{\\partial W}$ always non-positive here?",
+          "figure": {
+            "src": "SS24-p3-F1.png",
+            "alt": "SS24 Problem 3 network: Input → Conv1 → ReLU → ResBlock → ReLU → Flatten → Linear → Output z → Sigmoid → Label ŷ → BCE → Loss",
+            "caption": "SS24 Problem 3 — the full network. ReLU is the hidden activation; the output uses Sigmoid + BCE."
+          },
           "answer": "**3.1** $\\frac{\\partial L}{\\partial \\hat y}=-\\tfrac1{\\hat y}=-2$; $\\frac{\\partial L}{\\partial z}=\\frac{\\partial L}{\\partial \\hat y}\\sigma(z)(1-\\sigma(z))=-2(0.25)=-0.5$; $\\frac{\\partial L}{\\partial W}=X^\\top\\frac{\\partial L}{\\partial z}=[-0.5,-1,0,-0.5]^\\top$; $\\frac{\\partial L}{\\partial b}=-0.5$. **3.2** Cache $\\hat y$ and $X$. **3.3** $\\frac{\\partial L}{\\partial W}=\\frac{\\partial L}{\\partial \\hat y}\\cdot\\sigma'\\cdot X^\\top$: $\\sigma'>0$, $X\\ge0$ (post-ReLU), and BCE's $\\frac{\\partial L}{\\partial \\hat y}\\le0$ for $y=1$ ⇒ the product is **always ≤0**.",
           "extend": "Sign analysis: positive sigmoid derivative × non-negative ReLU input × non-positive BCE gradient ⇒ non-positive.",
           "tags": [
@@ -595,6 +600,11 @@
             "SS24 3.5"
           ],
           "q": "A ResBlock has layers A,B,C (from {Conv1(k1,s1,p0), ReLU, Conv2(k3,s1)}) and a skip to the adder. (3.4) Assign A,B,C; which intermediate (F2/G1/G2) connects to the adder; and the padding of Conv2. (3.5) Write $\\frac{\\partial L}{\\partial F2}$ and explain the gradient 'highway'.",
+          "figure": {
+            "src": "SS24-p3-F2.png",
+            "alt": "SS24 Problem 3 ResBlock: F₂ → A → G₁ → B → G₂ → C → adder → F₃, with a skip from F₂ into the adder",
+            "caption": "SS24 Problem 3 — the ResBlock. The dashed skip carries F₂ into the adder (the gradient 'highway')."
+          },
           "answer": "**3.4** A=**Conv1**, B=**ReLU**, C=**Conv2**; the **block input (F2)** is what the skip adds; Conv2 padding **=1** (to keep $k{=}3$ size-preserving). **3.5** $\\frac{\\partial L}{\\partial F2}=\\frac{\\partial L}{\\partial F3}\\big(1+\\frac{\\partial\\text{Conv2}(G2)}{\\partial F2}\\big)$ — the **$+1$** from the skip path guarantees the upstream gradient passes through with full magnitude (the 'highway').",
           "extend": "Residual skip injects a $+1$ into the gradient → it never fully vanishes through the block.",
           "tags": [
@@ -1513,12 +1523,6 @@
           "extend": "$-\\log$ of a probability is a positive 'surprise' — small for confident-correct, large for confident-wrong. We minimize surprise.",
           "tags": [
             "Loss functions"
-          ],
-          "calc": [
-            {
-              "label": "(b) output neurons",
-              "value": 1
-            }
           ]
         },
         {
@@ -1768,13 +1772,31 @@
           ]
         },
         {
-          "type": "open",
+          "type": "mc",
           "freq": 1,
           "sources": [
             "SS21 1.8"
           ],
           "q": "Compared to the L1 loss, the L2 loss... (which statements hold?)",
-          "answer": "L2 (MSE) **has a different optimum** than L1 and is **more sensitive to outliers** (it is *not* robust to outliers). L2 is **not** sparser than L1 (L1 promotes sparsity) and is not especially costly to compute. So among the typical options, only “has a different optimum” is true.",
+          "options": [
+            {
+              "text": "is robust to outliers",
+              "correct": false
+            },
+            {
+              "text": "is costly to compute",
+              "correct": false
+            },
+            {
+              "text": "has a different optimum",
+              "correct": true
+            },
+            {
+              "text": "will lead to sparser solutions",
+              "correct": false
+            }
+          ],
+          "answer": "L2 (MSE) **has a different optimum** than L1 and is **more sensitive to outliers** (it is *not* robust to outliers). L2 is **not** sparser than L1 (L1 promotes sparsity) and is not especially costly to compute. So only **“has a different optimum”** is true.",
           "extend": "L2 optimum = mean of targets; L1 optimum = median (hence L1's robustness). L1 → sparser solutions in the regularization sense.",
           "tags": [
             "Regularization",

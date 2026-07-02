@@ -63,12 +63,16 @@ function applyStudy(bar: HTMLElement): void {
   qel.classList.toggle("is-reviewed", Store.isReviewed(id));
 
   const d = Store.due(id);
-  if (Store.isReviewed(id) && d) {
-    const overdue = d <= todayStr();
-    due.textContent = overdue ? "review due" : "next review " + d;
+  const overdue = !!d && d <= todayStr();
+  qel.classList.toggle("is-due", overdue);
+  if (d) {
+    due.textContent = overdue ? "🔔 Review due — tap ✓" : "next review " + d;
     due.className = "srs-due" + (overdue ? " over" : "");
+    due.hidden = false;
+    due.title = overdue ? "Mark as reviewed now" : "Scheduled — comes back for review when due";
   } else {
     due.textContent = "";
+    due.hidden = true;
   }
 }
 
@@ -89,11 +93,22 @@ export function initStudy(root: ParentNode = document): void {
     const noteArea = bar.querySelector(".note-area") as HTMLTextAreaElement;
     const noteCount = bar.querySelector(".note-count") as HTMLElement | null;
     const notePreview = bar.querySelector(".note-preview") as HTMLElement | null;
+    const due = bar.querySelector(".srs-due") as HTMLElement | null;
 
     applyStudy(bar);
     rev.addEventListener("change", () => {
       Store.setReviewed(id, rev.checked);
       applyStudy(bar);
+    });
+    // one-tap "mark reviewed" on the due pill — ONLY when the card is actually
+    // due/overdue. A future "next review DATE" pill is just info; clicking it did
+    // nothing useful and repeatedly pushed the schedule further out with no undo.
+    due?.addEventListener("click", () => {
+      const d = Store.due(id);
+      if (d && d <= todayStr()) {
+        Store.setReviewed(id, true);
+        applyStudy(bar);
+      }
     });
     wrongBtn.addEventListener("click", () => {
       Store.setWrong(id, !Store.isWrong(id));

@@ -74,6 +74,14 @@ const tags = q.tags ?? [];
   </summary>
   <div class="q-body">
     {
+      q.figure && (
+        <figure class="q-figure">
+          <img src={url(`/figures/${q.figure.src}`)} alt={q.figure.alt ?? ""} loading="lazy" />
+          {q.figure.caption && <figcaption set:html={mdInline(q.figure.caption)} />}
+        </figure>
+      )
+    }
+    {
       isMc ? (
         <div class="quiz">
           <p class="quiz-hint">
@@ -202,7 +210,7 @@ const tags = q.tags ?? [];
       <label class="study-rev"><input type="checkbox" class="rev-box" /> Reviewed</label>
       <button type="button" class="wrong-btn">★ Wrong book</button>
       <button type="button" class="note-btn">📝 Note</button>
-      <span class="srs-due"></span>
+      <button type="button" class="srs-due" hidden></button>
       <div class="note-wrap" hidden>
         <textarea
           class="note-area"

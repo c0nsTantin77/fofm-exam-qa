@@ -8,17 +8,27 @@ Every problem from 12 past exams + the official course summary, classified by
 🔗 **Live:** https://c0nsTantin77.github.io/i2dl-exam-qa/
 
 ## Contents
-**512 questions** across 7 chapters and 43 knowledge points (every point also has an AI practice question):
-Machine Learning Basics (80) · Neural Networks (96) · Convolutions (67) · Optimization (127) ·
-Popular Architectures (65) · RNNs & Transformers (57) · Appendix: Matrix Calculus (20).
+**492 questions** across 7 chapters and 43 knowledge points (every point also has an AI practice question):
+Machine Learning Basics (69) · Neural Networks (93) · Convolutions (63) · Optimization (126) ·
+Popular Architectures (65) · RNNs & Transformers (56) · Appendix: Matrix Calculus (20).
 
 ## Features
 - **Site-wide search** + per-question **concept tags** to review a theme across chapters.
-- **Interactive multiple-choice**: pick → check → reveal ✅/❌, an explicit "Correct: A, C" line, answer + analysis.
+- **Interactive multiple-choice, short-answer** (matching words light up green, including common singular/plural forms) **& number-checked calculation questions**.
+- **Review / Test modes**: read answers immediately or hide them for active recall.
+- **🃏 Anki-style flashcards (SM-2)**: study a deck (due / wrong-book / all), rate each card *Again / Hard / Good / Easy*, and let spaced repetition schedule it; MC, short-answer and calculation cards are interactive, and you can jot a **note without leaving the card** (shared with that question's own note).
+- **Study tracking**: mark **Reviewed**, keep a **wrong book**, write per-question **notes (Markdown + $math$, live preview)**, and work a **spaced-repetition** review page grouped by chapter with progress rings — optionally **synced** across devices via Google sign-in.
+- Selected questions carry the original **exam figures**.
 - **Frequency-first** ordering (🔥 badges); every question **source-tagged** like `SS22 3.1`.
 - KaTeX formulas, collapsible answers, mobile-optimized.
 
 ## Recent updates
+- **2026-07-02** — 🃏 Flashcard polish: **notes inside a card** (shared with that question's note), **quick-jump pills** (Flashcards / Due today / Wrong book) on the Review page, a clearer **"How review works"** explainer, and a **"Review due"** button that no longer creeps the schedule forward on repeat taps.
+- **2026-06-30** — 🃏 **Anki-style flashcards** on the Review page: rate each card *Again / Hard / Good / Easy* and let **SM-2** spaced repetition schedule it.
+- **2026-06-30** — 🖼️ Questions can show **exam figures**; reviewed/due questions are **colour-coded** green/red; and there's a guarded **Reset progress** button.
+- **2026-06-22** — 🧹 Feedback cleanup: removed **20 duplicate questions** (512 → **492**) and migrated reviewed / wrong-book / notes / spaced-repetition data from removed question IDs to the kept copies.
+- **2026-06-22** — 🎯 New study flow: chapter pages now have **Review / Test** modes, short-answer self-checks highlight overlapping answer words in green, and **21 calculation questions** accept typed numeric answers.
+- **2026-06-22** — ✍️ Better answer matching: lightweight singular/plural matching now catches pairs like `parameter`/`parameters`, `weight`/`weights`, and `gradient`/`gradients` without adding client-side NLP dependencies.
 - **2026-06-09** — 🔍 Search now **highlights your match**: the home-page search and each chapter's filter box light up the words you typed (bold + soft highlight) in the question & answer; formulas stay intact.
 - **2026-06-09** — ⚡ Under-the-hood glow-up: the whole site was **rebuilt with Astro + Vue**. Formulas now render **instantly** (no load-time flicker), pages are lighter and faster, and all your old bookmarks & links still work. 🚀
 - **2026-06-08** — Home-page polish: collapsible **Recent updates / How to use** panels, more **Popular tags**, the in-page **contents menu** restored on exam & tag pages, and tighter mobile spacing.

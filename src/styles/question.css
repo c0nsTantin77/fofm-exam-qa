@@ -33,6 +33,9 @@ details.q[open]{border-color:#bcd4f0}
 .freq-ai{background:var(--ai)}
 
 .q-body{padding:0 16px 16px;border-top:1px solid var(--line)}
+.q-figure{margin:14px 0 0;text-align:center}
+.q-figure img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:#fff;padding:6px}
+.q-figure figcaption{margin-top:6px;font-size:.78rem;color:var(--muted)}
 
 /* ---- interactive MC quiz ---- */
 .quiz{margin-top:14px}

@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import type { SearchEntry } from "../../lib/types";
 import { loadIndex, questionHref, TYPE_LABEL } from "../../lib/client/index-data";
 import { Store, onChange } from "../../lib/client/store";
+import FlashcardDeck from "./FlashcardDeck.vue";
 
 const index = ref<SearchEntry[]>([]);
 const loaded = ref(false);
@@ -85,6 +86,43 @@ function removeWrong(id: string): void {
   version.value++;
 }
 
+// ---- flashcard launcher ----
+const fcQueue = ref<string[] | null>(null);
+const fcLabel = ref("");
+const allCount = computed(() => index.value.length);
+const dueIds = computed(() => {
+  void version.value;
+  return Store.dueList(Object.keys(byId.value));
+});
+const wrongIds = computed(() => {
+  void version.value;
+  return Store.wrongIds().filter((id) => byId.value[id]);
+});
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function startFc(scope: "due" | "wrong" | "all"): void {
+  if (scope === "due") {
+    fcQueue.value = dueIds.value;
+    fcLabel.value = "Due flashcards";
+  } else if (scope === "wrong") {
+    fcQueue.value = wrongIds.value;
+    fcLabel.value = "Wrong-book flashcards";
+  } else {
+    fcQueue.value = shuffle(Object.keys(byId.value));
+    fcLabel.value = "All (shuffled)";
+  }
+}
+function closeFc(): void {
+  fcQueue.value = null;
+  version.value++;
+}
+
 let unsub = () => {};
 onMounted(async () => {
   index.value = await loadIndex();
@@ -102,25 +140,52 @@ onUnmounted(() => unsub());
       Your spaced-repetition queue and wrong book — saved in this browser (and synced if you sign in).
     </p>
 
+    <nav class="rv-jump" aria-label="Jump to section">
+      <a href="#rv-flashcards" class="rv-jump-pill">🃏 Flashcards</a>
+      <a href="#rv-due" class="rv-jump-pill">🧠 Due today</a>
+      <a href="#rv-wrong" class="rv-jump-pill">★ Wrong book</a>
+    </nav>
+
     <details class="rv-explain">
-      <summary>How “Review” and the “Wrong book” fit together</summary>
+      <summary><span class="rv-explain-ico">ⓘ</span> How review works</summary>
       <ul>
         <li>
-          <b>Mark “Reviewed”</b> on any question to start <b>spaced repetition</b> — it returns after
-          1 → 2 → 4 → 7 → 15 → 30 → 60 days, the gap growing each time you review it.
+          <b>🃏 Flashcards</b> — study a deck (today’s <b>due</b>, your <b>wrong book</b>, or
+          <b>all</b>) and rate each card <i>Again / Hard / Good / Easy</i>; spaced repetition (SM-2)
+          sets when it comes back.
         </li>
         <li>
-          <b>Due today</b> is everything whose scheduled date has arrived. Review it, hit
-          <b>✓ Reviewed</b>, and it’s pushed further out.
+          <b>Due today</b> = cards whose scheduled date has arrived. <b>Wrong book</b> = questions
+          you missed, kept until you remove them.
         </li>
         <li>
-          <b>Wrong book</b> collects questions you got wrong (MC) or marked <b>Missed</b> (short
-          answer). They stay until you remove them and resurface in “Due today” the next day.
+          On a question, tick <b>Reviewed</b> to schedule it, or tap its red <b>“Review due”</b> pill
+          <i>(only when it's actually due)</i> to mark it done — each review pushes the next date out
+          further: <b>1 → 2 → 4 → 7 → 15 → 30 → 60 days</b>. A future “next review …” pill is just info.
         </li>
+        <li>Pushed a card too far? <b>Untick Reviewed</b> to clear its schedule, then re-tick to start over.</li>
       </ul>
     </details>
 
-    <section class="rv-section">
+    <section class="fc-launch" id="rv-flashcards">
+      <div class="fc-launch-txt">
+        <b>🃏 Flashcards</b>
+        <span>Anki-style: rate each card <i>Again / Hard / Good / Easy</i> and it reschedules itself (SM-2).</span>
+      </div>
+      <div class="fc-launch-btns">
+        <button class="fc-start primary" :disabled="!dueCount" @click="startFc('due')">
+          Study due ({{ dueCount }})
+        </button>
+        <button class="fc-start" :disabled="!wrongCount" @click="startFc('wrong')">
+          Wrong book ({{ wrongCount }})
+        </button>
+        <button class="fc-start ghost" @click="startFc('all')">
+          All {{ allCount }} questions (shuffled)
+        </button>
+      </div>
+    </section>
+
+    <section class="rv-section" id="rv-due">
       <h2 class="rv-h rv-h-due">🧠 Due today <span class="rv-cnt">{{ dueCount }}</span></h2>
       <p v-if="!dueCount" class="tp-empty">Nothing due — mark questions “Reviewed” to schedule them.</p>
       <details v-for="g in dueGroups" :key="'d-' + g.c" class="rv-group" open>
@@ -151,7 +216,7 @@ onUnmounted(() => unsub());
       </details>
     </section>
 
-    <section class="rv-section">
+    <section class="rv-section" id="rv-wrong">
       <h2 class="rv-h rv-h-wrong">★ Wrong book <span class="rv-cnt">{{ wrongCount }}</span></h2>
       <p v-if="!wrongCount" class="tp-empty">
         Empty — multiple-choice you answer wrong, or “Missed” on a short answer, lands here automatically.
@@ -186,5 +251,7 @@ onUnmounted(() => unsub());
         </div>
       </details>
     </section>
+
+    <FlashcardDeck v-if="fcQueue" :queue="fcQueue" :label="fcLabel" @close="closeFc" />
   </div>
 </template>

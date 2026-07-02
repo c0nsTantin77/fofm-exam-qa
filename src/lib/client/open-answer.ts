@@ -1,6 +1,7 @@
 import { Store } from "./store";
 import { applyAllStudy } from "./study";
 import { highlightIn, clearHighlights } from "./highlight";
+import { userWords, wordVariants } from "./answer-match";
 
 // Self-test for open / AI short-answer questions: the reference answer is hidden
 // behind "Show answer" with an optional "write your answer" box, mirroring the
@@ -8,33 +9,6 @@ import { highlightIn, clearHighlights } from "./highlight";
 // appears in the reference answer is highlighted green (overlap). They then
 // self-assess (Got it → reviewed, Missed → wrong book) and can "Try again".
 // There is no single ground truth, so this stays a self-check (no auto-grading).
-
-const STOP = new Set([
-  "the", "a", "an", "of", "to", "is", "are", "and", "or", "in", "on", "for", "with",
-  "as", "it", "its", "by", "be", "that", "this", "which", "not", "no", "also", "can",
-  "used", "use", "using", "via", "your", "you", "we", "they", "their", "from", "at",
-  "any", "all", "one", "two", "each", "per", "must", "may", "only", "more", "less",
-  "but", "if", "so", "than", "then", "into", "over", "out", "up", "do", "does", "has",
-]);
-
-/** Distinct meaningful words the student typed (drop stop-words and very short). */
-function userWords(s: string): string[] {
-  return [
-    ...new Set(
-      s.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3 && !STOP.has(w)),
-    ),
-  ];
-}
-
-/** Light singular/plural variants so e.g. "parameter" also matches "parameters"
- *  (common in this domain: weights, gradients, layers, filters…). */
-function wordVariants(w: string): string[] {
-  const v = new Set([w]);
-  if (w.length >= 4 && w.endsWith("s")) v.add(w.slice(0, -1));
-  if (w.length >= 5 && w.endsWith("es")) v.add(w.slice(0, -2));
-  if (!w.endsWith("s")) v.add(w + "s");
-  return [...v].filter((x) => x.length >= 3);
-}
 
 export function initOpenAnswer(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>(".selftest").forEach((st) => {
