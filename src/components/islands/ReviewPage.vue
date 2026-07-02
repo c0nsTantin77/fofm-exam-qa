@@ -140,8 +140,14 @@ onUnmounted(() => unsub());
       Your spaced-repetition queue and wrong book — saved in this browser (and synced if you sign in).
     </p>
 
+    <nav class="rv-jump" aria-label="Jump to section">
+      <a href="#rv-flashcards" class="rv-jump-pill">🃏 Flashcards</a>
+      <a href="#rv-due" class="rv-jump-pill">🧠 Due today</a>
+      <a href="#rv-wrong" class="rv-jump-pill">★ Wrong book</a>
+    </nav>
+
     <details class="rv-explain">
-      <summary>How review works</summary>
+      <summary><span class="rv-explain-ico">ⓘ</span> How review works</summary>
       <ul>
         <li>
           <b>🃏 Flashcards</b> — study a deck (today’s <b>due</b>, your <b>wrong book</b>, or
@@ -152,11 +158,16 @@ onUnmounted(() => unsub());
           <b>Due today</b> = cards whose scheduled date has arrived. <b>Wrong book</b> = questions
           you missed, kept until you remove them.
         </li>
-        <li>On any question you can also tick <b>Reviewed</b> or tap its <b>due</b> pill to reschedule.</li>
+        <li>
+          On a question, tick <b>Reviewed</b> to schedule it, or tap its red <b>“Review due”</b> pill
+          <i>(only when it's actually due)</i> to mark it done — each review pushes the next date out
+          further: <b>1 → 2 → 4 → 7 → 15 → 30 → 60 days</b>. A future “next review …” pill is just info.
+        </li>
+        <li>Pushed a card too far? <b>Untick Reviewed</b> to clear its schedule, then re-tick to start over.</li>
       </ul>
     </details>
 
-    <section class="fc-launch">
+    <section class="fc-launch" id="rv-flashcards">
       <div class="fc-launch-txt">
         <b>🃏 Flashcards</b>
         <span>Anki-style: rate each card <i>Again / Hard / Good / Easy</i> and it reschedules itself (SM-2).</span>
@@ -174,7 +185,7 @@ onUnmounted(() => unsub());
       </div>
     </section>
 
-    <section class="rv-section">
+    <section class="rv-section" id="rv-due">
       <h2 class="rv-h rv-h-due">🧠 Due today <span class="rv-cnt">{{ dueCount }}</span></h2>
       <p v-if="!dueCount" class="tp-empty">Nothing due — mark questions “Reviewed” to schedule them.</p>
       <details v-for="g in dueGroups" :key="'d-' + g.c" class="rv-group" open>
@@ -205,7 +216,7 @@ onUnmounted(() => unsub());
       </details>
     </section>
 
-    <section class="rv-section">
+    <section class="rv-section" id="rv-wrong">
       <h2 class="rv-h rv-h-wrong">★ Wrong book <span class="rv-cnt">{{ wrongCount }}</span></h2>
       <p v-if="!wrongCount" class="tp-empty">
         Empty — multiple-choice you answer wrong, or “Missed” on a short answer, lands here automatically.

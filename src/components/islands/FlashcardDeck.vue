@@ -35,6 +35,30 @@ const selfText = ref("");
 const calcVals = ref<string[]>([]);
 const answerEl = ref<HTMLElement | null>(null);
 
+// per-card note — the SAME note as the question's own (Store), editable here
+const NOTE_MAX = 1000;
+const noteOpen = ref(false);
+const noteText = ref("");
+const notePreviewHtml = ref("");
+let renderNote: ((s: string) => string) | null = null;
+async function updateNotePreview(): Promise<void> {
+  if (!noteText.value.trim()) {
+    notePreviewHtml.value = "";
+    return;
+  }
+  try {
+    if (!renderNote) renderNote = (await import("../../lib/md-notes")).renderNote;
+    notePreviewHtml.value = renderNote(noteText.value);
+  } catch {
+    notePreviewHtml.value = ""; // preview is best-effort; the textarea still saves
+  }
+}
+function saveNote(): void {
+  if (noteText.value.length > NOTE_MAX) noteText.value = noteText.value.slice(0, NOTE_MAX);
+  if (current.value) Store.setNote(current.value.a, noteText.value.trim());
+  void updateNotePreview();
+}
+
 const LETTERS = "ABCDEFGH";
 const total = computed(() => cards.value.length);
 const current = computed(() => cards.value[idx.value] || null);
@@ -72,6 +96,9 @@ function resetAttempt(): void {
   selfText.value = "";
   calcVals.value = (current.value?.calc ?? []).map(() => "");
   revealed.value = false;
+  noteOpen.value = false;
+  noteText.value = current.value ? Store.note(current.value.a) : "";
+  void updateNotePreview();
 }
 watch(idx, () => resetAttempt());
 
@@ -216,6 +243,30 @@ onUnmounted(() => window.removeEventListener("keydown", onKey));
             <button class="fc-rate-btn easy" @click="rate('easy')">Easy<small>{{ ivlLabel("easy") }}</small></button>
           </div>
           <p class="fc-hint">Keys: 1 Again · 2 Hard · 3 Good · 4 Easy · Esc close</p>
+        </div>
+
+        <div class="fc-note">
+          <button
+            type="button"
+            class="fc-note-btn"
+            :class="{ has: noteText.trim() }"
+            @click="noteOpen = !noteOpen">
+            📝 {{ noteText.trim() ? "Note" : "Add note" }}
+          </button>
+          <div v-if="noteOpen" class="fc-note-wrap">
+            <textarea
+              class="self-area"
+              v-model="noteText"
+              maxlength="1000"
+              rows="3"
+              placeholder="Your note (Markdown & $math$) — shared with this question"
+              @input="saveNote"></textarea>
+            <div class="note-foot">
+              <span class="note-md-hint">Markdown &amp; <span class="mono">$math$</span></span>
+              <span class="note-count">{{ noteText.length }} / 1000</span>
+            </div>
+            <div v-if="notePreviewHtml" class="note-preview md-note" v-html="notePreviewHtml"></div>
+          </div>
         </div>
       </div>
     </div>

@@ -125,12 +125,18 @@ details.q.has-note .note-btn{background:#fffaf0;border-color:#ffe2a8;color:#b886
 .ghit-row .io-btn{flex:none}
 
 /* review page — explainer + grouped collapsible sections + per-chapter rings */
+/* quick-jump pills under the Review title */
+.rv-jump{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 18px}
+.rv-jump-pill{display:inline-flex;align-items:center;gap:5px;font-size:.85rem;font-weight:700;color:var(--tum);
+  background:#eef5ff;border:1px solid #d6e6ff;border-radius:999px;padding:7px 15px}
+.rv-jump-pill:hover{background:var(--tum);color:#fff;border-color:var(--tum);text-decoration:none}
+#rv-flashcards,#rv-due,#rv-wrong{scroll-margin-top:74px}
 .rv-explain{margin:0 0 22px;background:#f7faff;border:1px solid #d6e6ff;border-radius:12px;padding:0 16px}
-.rv-explain>summary{cursor:pointer;list-style:none;padding:13px 0;font-weight:700;font-size:.9rem;color:var(--tum)}
+.rv-explain>summary{cursor:pointer;list-style:none;padding:14px 0;font-weight:700;font-size:1.05rem;color:var(--tum)}
 .rv-explain>summary::-webkit-details-marker{display:none}
-.rv-explain>summary::before{content:"ⓘ  "}
+.rv-explain-ico{font-size:1.2em}
 .rv-explain[open]>summary{border-bottom:1px solid #e2edfb}
-.rv-explain ul{margin:12px 0 14px;padding-left:18px;display:grid;gap:8px;font-size:.87rem;color:var(--ink);line-height:1.5}
+.rv-explain ul{margin:12px 0 14px;padding-left:18px;display:grid;gap:8px;font-size:.9rem;color:var(--ink);line-height:1.55}
 .rv-section{margin:0 0 26px}
 .rv-h{font-size:1.15rem;margin:0 0 12px;display:flex;align-items:center;gap:9px}
 .rv-h-due{color:var(--tum)}
@@ -224,5 +230,11 @@ details.q.has-note .note-btn{background:#fffaf0;border-color:#ffe2a8;color:#b886
 .fc-rate-btn.easy{color:var(--tum)}
 .fc-rate-btn.easy:hover{background:#f0f6ff;border-color:var(--tum)}
 .fc-hint{margin-top:12px;font-size:.74rem;color:var(--muted);text-align:center}
+.fc-note{margin-top:16px;padding-top:12px;border-top:1px dashed var(--line)}
+.fc-note-btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;
+  font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer}
+.fc-note-btn:hover{border-color:var(--tum);color:var(--tum)}
+.fc-note-btn.has{background:#fffaf0;border-color:#ffe2a8;color:#b8860b}
+.fc-note-wrap{margin-top:10px}
 @media(max-width:560px){.fc-rate{grid-template-columns:repeat(2,1fr)}}
 
