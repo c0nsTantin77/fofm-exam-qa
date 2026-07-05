@@ -5,7 +5,7 @@
 // An inline script in Layout.astro sets data-mode before paint (no flash).
 
 type Mode = "review" | "test";
-const KEY = "i2dl_mode";
+const KEY = "fofm_mode";
 
 function setMode(mode: Mode): void {
   document.documentElement.dataset.mode = mode;

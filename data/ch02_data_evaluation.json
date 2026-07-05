@@ -1,0 +1,98 @@
+{
+  "id": "ch02",
+  "roman": "II",
+  "title": "W2: Data for LLMs and Evaluation",
+  "blurb": "High priority. The exams repeatedly ask how to curate web-scale data and how perplexity relates to log-likelihood.",
+  "knowledge_points": [
+    {
+      "id": "data-curation",
+      "title": "Pretraining Data Curation",
+      "recap": "Common Crawl is raw and noisy. The course emphasizes heuristic filters, deduplication, source mixing/weighting, ML-based quality filters, and rewriting low-quality data.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS25 P3.1",
+            "WS26 P3.1"
+          ],
+          "q": "Name common strategies for curating large-scale pretraining data.",
+          "answer": "Valid strategies include heuristic-based filtering, deduplication, mixing and weighting data sources, machine-learning-based quality filtering, and rewriting low-quality data with LLMs.",
+          "extend": "For 3-point questions, give three distinct strategies and one short phrase explaining each.",
+          "tags": [
+            "Data curation",
+            "Common Crawl",
+            "Deduplication"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS26 P3.1"
+          ],
+          "q": "You have Common Crawl and 100k representative scientific Q&A pairs. How would you filter for scientific Q&A pretraining?",
+          "answer": "Use the scientific Q&A pairs as positive high-quality/domain-relevant examples and sample Common Crawl documents as negative examples. Balance the positive and negative training set, train a binary classifier for quality/domain relevance, and keep Common Crawl documents classified as suitable for scientific Q&A.",
+          "extend": "The scoring points are: positives from the target domain, sampled negatives from Common Crawl, balanced classifier training, then filtering.",
+          "tags": [
+            "Data filtering",
+            "Scientific QA",
+            "Classifier"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perplexity",
+      "title": "Perplexity and Evaluation",
+      "recap": "Perplexity is the exponentiated average negative log-probability. Lower perplexity means the model assigns higher probability to the observed sequence.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS24 P3.1",
+            "SS25 P3.2",
+            "WS26 P3.2"
+          ],
+          "q": "Define perplexity for an autoregressive LM and explain why minimizing it maximizes sequence log-probability.",
+          "answer": "For tokens $t_1,\\ldots,t_N$, perplexity = $\\exp\\left(-\\frac{1}{N}\\sum_i \\log p_\\theta(t_i\\mid t_{<i})\\right)$. By the chain rule, $\\log p_\\theta(t_1,\\ldots,t_N)=\\sum_i \\log p_\\theta(t_i\\mid t_{<i})$. Since exp is monotone and the factor $-1/N$ reverses the sign, minimizing perplexity is equivalent to maximizing sequence log-probability.",
+          "extend": "This is a near-guaranteed formula question; keep the chain-rule line on your sheet.",
+          "tags": [
+            "Perplexity",
+            "Evaluation",
+            "Log likelihood"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS26 P3.2"
+          ],
+          "q": "What is the maximum possible perplexity for a vocabulary of size 10, and when is it attained?",
+          "answer": "The maximum is 10, attained by the uniform distribution over the 10 tokens, where each token has probability $1/10$ and perplexity becomes $\\exp(\\log 10)=10$.",
+          "extend": "More generally, for a vocabulary of size v, uniform uncertainty gives perplexity v.",
+          "tags": [
+            "Perplexity",
+            "Vocabulary"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 P3.1"
+          ],
+          "q": "Name two ways to evaluate a pretrained LLM without fine-tuning.",
+          "answer": "Two accepted methods are perplexity on held-out text and benchmark evaluation using few-shot prompting. Human evaluation is also valid but expensive and subjective.",
+          "extend": "Do not describe supervised fine-tuning here; the question asks about evaluation without changing weights.",
+          "tags": [
+            "Evaluation",
+            "Few-shot prompting"
+          ]
+        }
+      ]
+    }
+  ]
+}

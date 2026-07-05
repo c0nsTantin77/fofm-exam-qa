@@ -1,0 +1,78 @@
+{
+  "id": "ch07",
+  "roman": "VII",
+  "title": "W7: Introduction to Distributed Computing",
+  "blurb": "Medium-high priority. Earlier exams ask conceptual parallelism; recent exams add memory calculations.",
+  "knowledge_points": [
+    {
+      "id": "parallelism",
+      "title": "Data Parallelism and Model Parallelism",
+      "recap": "Distributed training is used either because training is too slow on one GPU or because the model does not fit on one GPU.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS24 P6.1",
+            "WS26 P7.2"
+          ],
+          "q": "Explain data parallelism and model parallelism, and what problem each addresses.",
+          "answer": "Data parallelism replicates the model on multiple devices and gives each device different data batches; it mainly speeds up training throughput. Model parallelism splits the model itself across devices; it enables training models that do not fit in one device memory.",
+          "tags": [
+            "Distributed training",
+            "Data parallelism",
+            "Model parallelism"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS26 P7.2"
+          ],
+          "q": "What is the difference between pipeline parallelism and tensor parallelism?",
+          "answer": "Pipeline parallelism splits the model by layers, so each GPU owns consecutive layers and passes activations forward and gradients backward. Tensor parallelism splits tensors within a layer, for example attention heads or matrix shards, so GPUs compute partial results for the same layer and combine them.",
+          "tags": [
+            "Pipeline parallelism",
+            "Tensor parallelism"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "memory-accounting",
+      "title": "Memory Accounting for Large Models",
+      "recap": "Memory questions require bytes per parameter and clear knowledge of what is replicated or sharded.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "WS26 P7.1"
+          ],
+          "q": "A 10B parameter model is trained with Adam mixed precision on 40 GB GPUs using ZeRO-2. What is the minimum number of GPUs?",
+          "answer": "In ZeRO-2, forward/backward weights are replicated, while gradients and optimizer states are sharded. Per parameter per GPU: 2 bytes for bf16 weights plus $(2+4+4+4)/G=14/G$ bytes for sharded gradients and Adam states. For $N=10^{10}$ and 40 GB, require $10^{10}(2+14/G) \\le 40\\cdot 10^9$, so $2+14/G \\le 4$, hence $G\\ge 7$. Minimum is 7 GPUs.",
+          "extend": "Remember that GB is treated as $10^9$ bytes in the exam statement.",
+          "tags": [
+            "ZeRO-2",
+            "Memory",
+            "Adam"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Why does mixed precision reduce memory pressure?",
+          "answer": "It stores forward/backward weights and gradients in lower precision such as bf16/fp16 while often keeping optimizer update states in fp32. This reduces the replicated training footprint without abandoning stable optimizer updates.",
+          "tags": [
+            "Mixed precision",
+            "Memory"
+          ]
+        }
+      ]
+    }
+  ]
+}

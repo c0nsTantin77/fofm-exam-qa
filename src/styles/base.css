@@ -1,6 +1,6 @@
 /* base.css — Resets, design tokens, base typography, TUM logo.
    Extracted verbatim from the original style.css; load order preserved. */
-/* ---- I2DL Exam Q&A · styles ------------------------------------------ */
+/* ---- FoFM Exam Q&A · styles ------------------------------------------ */
 :root{
   --tum:#0065bd;            /* TUM blue */
   --tum-dark:#003359;

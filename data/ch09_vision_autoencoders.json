@@ -1,0 +1,79 @@
+{
+  "id": "ch09",
+  "roman": "IX",
+  "title": "W9: Vision Foundation Models: Autoencoders and Manifolds",
+  "blurb": "High priority. The vision section appears every year, often starting from autoencoders and the manifold hypothesis.",
+  "knowledge_points": [
+    {
+      "id": "autoencoders",
+      "title": "Autoencoders for Representation Learning",
+      "recap": "Autoencoders train on unlabeled images by reconstructing inputs. The encoder can then be reused as a feature extractor for a classifier.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS24 P8.2",
+            "WS26 P8.3"
+          ],
+          "q": "How can you use a large unlabeled image dataset and a small labeled dataset to train an image classifier?",
+          "answer": "Train an autoencoder on the large unlabeled dataset to reconstruct images. Discard the decoder, attach a classification head to the pretrained encoder, and fine-tune the encoder plus classifier on the small labeled dataset.",
+          "extend": "The three scoring points are unsupervised reconstruction, discard decoder/add head, and supervised fine-tuning.",
+          "tags": [
+            "Autoencoder",
+            "Classifier",
+            "Unlabeled data"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS24 P8.1",
+            "SS25 P8.2"
+          ],
+          "q": "Why is the latent dimension of an autoencoder usually smaller than the input dimension?",
+          "answer": "The latent representation should capture essential factors of variation in a compact form. Under the manifold hypothesis, natural data lies near a lower-dimensional manifold inside high-dimensional pixel space.",
+          "tags": [
+            "Autoencoder",
+            "Latent space",
+            "Manifold"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manifold",
+      "title": "Latent Space and Natural Images",
+      "recap": "Latent spaces are intended to parameterize meaningful image variations; raw pixel interpolation can leave the natural-image manifold.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "WS26 P8.1"
+          ],
+          "q": "Which is more likely to produce a natural image: pixel-space interpolation or latent-space interpolation?",
+          "answer": "Latent-space interpolation is more likely to look natural. Pixel-space interpolation can pass through off-manifold regions in high-dimensional pixel space, while a learned latent space is designed to parameterize semantic variations on or near the data manifold.",
+          "tags": [
+            "Manifold",
+            "Latent interpolation"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS25 P8.2"
+          ],
+          "q": "Under the manifold hypothesis, should a cartoon-dog autoencoder need a smaller or larger latent dimension than a natural-photo dog autoencoder?",
+          "answer": "It should likely need a smaller latent dimension. Cartoon images are usually simpler and more uniform, while natural photographs contain more texture, lighting, and high-frequency variation.",
+          "tags": [
+            "Manifold",
+            "Latent dimension"
+          ]
+        }
+      ]
+    }
+  ]
+}

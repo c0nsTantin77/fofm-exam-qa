@@ -1,0 +1,108 @@
+{
+  "id": "ch03",
+  "roman": "III",
+  "title": "W3: Tokenizers",
+  "blurb": "Highest priority. BPE hand-computation appears in 2024 and 2026, and tokenizer-model coupling appears in 2025.",
+  "knowledge_points": [
+    {
+      "id": "bpe",
+      "title": "Byte Pair Encoding by Hand",
+      "recap": "Be able to run two BPE iterations manually: count adjacent symbol pairs, merge the most frequent pair, update the vocabulary, and apply merges in learned order.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS24 P2.1",
+            "WS26 P2.1"
+          ],
+          "q": "How do you perform two BPE training iterations?",
+          "answer": "Start from base symbols, count all adjacent pairs weighted by their word/string frequencies, merge the most frequent pair, add the merged symbol to the vocabulary, and repeat on the updated sequence. In the WS26 word-frequency example, e+c is merged first, then p+e. In the SS24 string example, aa is merged first, then Xb.",
+          "extend": "Tie-breaking should follow the convention given in the problem if any. Show intermediate sequences for full credit.",
+          "tags": [
+            "BPE",
+            "Tokenization"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS26 P2.2"
+          ],
+          "q": "Why does applying learned BPE merge rules in the wrong order give a wrong tokenization?",
+          "answer": "BPE tokenization applies merges in the order learned during training. In the WS26 example, $e+c \\to ec$ is applied before $p+e \\to pe$; after the first merge, p and e may no longer be adjacent, so p+e must be skipped. Reversing the order changes the segmentation.",
+          "extend": "This is a common trap: learned merge priority matters, not just final vocabulary membership.",
+          "tags": [
+            "BPE",
+            "Merge order"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "SS24 P2.2"
+          ],
+          "q": "How is the number of BPE training iterations chosen in practice?",
+          "answer": "You choose a target vocabulary size, then keep merging until that size is reached or no useful pair remains.",
+          "tags": [
+            "Vocabulary size",
+            "BPE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tokenizer-effects",
+      "title": "Pretokenization, Vocabulary Size, and Model Coupling",
+      "recap": "Tokenizers affect both sequence length and model parameters. A pretrained model embedding matrix is tied to the tokenizer that created its token IDs.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS25 P1.1"
+          ],
+          "q": "Why can using a different tokenizer at inference time than during pretraining cause poor performance?",
+          "answer": "The embedding matrix was learned for the original token IDs. A different tokenizer maps text to different IDs, so rows of the embedding matrix no longer correspond to the intended symbols/subwords. To change tokenizers, one must retrain or adapt the embedding/output layers.",
+          "tags": [
+            "Tokenizer",
+            "Embeddings",
+            "Inference"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS24 P2.3",
+            "SS25 P1.2"
+          ],
+          "q": "What is pre-tokenization and how does it affect BPE vocabulary?",
+          "answer": "Pre-tokenization splits raw text into units, often by regex or whitespace/punctuation rules, before BPE. It restricts merges to within pre-token boundaries. Without pre-tokenization, BPE can merge across punctuation or word boundaries, often creating a larger and less controlled vocabulary.",
+          "tags": [
+            "Pretokenization",
+            "BPE",
+            "Vocabulary"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS24 P2.4",
+            "WS26 P2.3"
+          ],
+          "q": "How do tokenizer domain and vocabulary size affect sequence length and compute?",
+          "answer": "A tokenizer trained on the same domain, such as code for code, usually produces shorter sequences because frequent domain patterns become single tokens. A smaller vocabulary often makes longer sequences, increasing quadratic attention cost. A larger vocabulary increases embedding/output layer size, but the longer-sequence attention cost often dominates.",
+          "tags": [
+            "Tokenizer",
+            "Compute",
+            "Sequence length"
+          ]
+        }
+      ]
+    }
+  ]
+}

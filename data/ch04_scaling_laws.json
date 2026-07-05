@@ -1,0 +1,96 @@
+{
+  "id": "ch04",
+  "roman": "IV",
+  "title": "W4: Scaling Laws",
+  "blurb": "Highest priority. Scaling laws appear in all three exams and usually require a short derivation under a compute constraint.",
+  "knowledge_points": [
+    {
+      "id": "parametric-laws",
+      "title": "Parametric Scaling Laws",
+      "recap": "The standard form is $L(N,D)=E+A/N^\\alpha+B/D^\\beta$ with compute $C\\approx 6ND$. You must know how to substitute the compute constraint and optimize.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "WS26 P4.1"
+          ],
+          "q": "For $\\alpha=\\beta=1$, minimize $L(N,D)+\\lambda N$ subject to $C=6ND$. What happens to $N^*$ as lambda increases?",
+          "answer": "Substitute $D=C/(6N)$. The objective becomes $E+A/N+6BN/C+\\lambda N$. Setting the derivative to zero gives $-A/N^2+6B/C+\\lambda=0$, so $N^*=\\sqrt{A/(6B/C+\\lambda)}$. As lambda increases, $N^*$ decreases; the optimum uses a smaller model trained on more tokens to reduce inference cost.",
+          "extend": "This is the cleanest derivation to memorize for inference-cost-aware scaling.",
+          "tags": [
+            "Scaling laws",
+            "Compute",
+            "Overtraining"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS24 P7.1"
+          ],
+          "q": "How can you predict perplexity at 200B tokens from measurements at 5B, 10B, and 20B tokens?",
+          "answer": "Assume a parametric relation such as $P(D)=E+A D^{-\\alpha}$. Fit $E$, $A$, and $\\alpha$ to the observed perplexities by minimizing a loss over the known measurements, then evaluate the fitted model at $D=200B$.",
+          "extend": "The exam wants a computable procedure: model form, loss, optimizer, then extrapolation.",
+          "tags": [
+            "Scaling laws",
+            "Extrapolation",
+            "Perplexity"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "compute-optimal",
+      "title": "Compute-Optimal Scaling and Overtraining",
+      "recap": "Compute-optimal training balances model size and data size for training loss. Practice often overtrains smaller models because inference is expensive.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS25 P7.1"
+          ],
+          "q": "If compute doubles and you assume $D^*=20N^*$, how should $N^*$ and D* scale?",
+          "answer": "With $C=6N^*D^*$ and $D^*=20N^*$, $C=120(N^*)^2$. Doubling compute gives $N^*$ multiplied by $\\sqrt{2}$, and because $D^*=20N^*$, $D^*$ is also multiplied by $\\sqrt{2}$.",
+          "extend": "If using the general $\\alpha,\\beta$ derivation, N scales as $C^{\\alpha/(\\alpha+\\beta)}$ and D as $C^{\\beta/(\\alpha+\\beta)}$.",
+          "tags": [
+            "Compute optimal",
+            "Chinchilla",
+            "Scaling laws"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS25 P7.2",
+            "WS26 P4.1"
+          ],
+          "q": "Why are compute-optimal models often not trained in practice?",
+          "answer": "Because deployment/inference cost matters. A smaller model trained on more data can be cheaper to serve while retaining strong quality. This is called overtraining relative to the pure training-compute optimum.",
+          "tags": [
+            "Overtraining",
+            "Inference cost"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P4.2",
+            "SS24 P7.2"
+          ],
+          "q": "When can small-scale experiments identify the best dataset for larger-scale training?",
+          "answer": "If loss curves across datasets are approximately parallel in log-log plots, the scaling exponent is similar across datasets and the ranking is preserved with scale. Then a small model can often identify the best training dataset for a target evaluation.",
+          "extend": "Data repetition up to a few epochs may still be close to fresh data, but excessive repetition eventually gives diminishing returns.",
+          "tags": [
+            "Dataset selection",
+            "Scaling laws"
+          ]
+        }
+      ]
+    }
+  ]
+}

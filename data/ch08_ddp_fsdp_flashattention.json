@@ -1,0 +1,79 @@
+{
+  "id": "ch08",
+  "roman": "VIII",
+  "title": "W8: DDP, FSDP, and Efficient Attention",
+  "blurb": "High priority for calculation-heavy computing questions. Summer 2025 asks DDP communication and FlashAttention directly.",
+  "knowledge_points": [
+    {
+      "id": "ddp-collectives",
+      "title": "DDP Gradient Synchronization",
+      "recap": "DDP synchronizes gradients after backward, commonly via reduce-scatter plus all-gather. Be able to reason about chunks, ranks, and communication cost.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS25 P6.1"
+          ],
+          "q": "For $r^2$ GPUs in a 2D mesh and N=$r^2$ m parameters, derive the reduce-scatter communication time using the two-phase ring algorithm.",
+          "answer": "Do a column-wise reduce-scatter across r ranks, then a row-wise reduce-scatter across r ranks. Phase 1 communicates $rm$ elements per rank for $r-1$ iterations: ($r-1$)($T_s$ + $rm$ $T_m$). Phase 2 communicates m elements per rank for $r-1$ iterations: ($r-1$)($T_s$ + m $T_m$). Total: ($r-1$)(2$T_s$ + (r+1)m $T_m$).",
+          "extend": "The exam also accepted a less efficient flat ring formula only if the path or partners were explicit.",
+          "tags": [
+            "DDP",
+            "Reduce-scatter",
+            "Communication cost"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Why does DDP need gradient synchronization?",
+          "answer": "Each replica sees a different mini-batch, so its local gradient is only a partial estimate. Synchronizing, usually by summing or averaging gradients across replicas, makes all model copies apply the same update.",
+          "tags": [
+            "DDP",
+            "Gradients"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fsdp-flash",
+      "title": "FSDP/ZeRO and FlashAttention",
+      "recap": "FSDP and ZeRO reduce memory by sharding states. FlashAttention speeds attention by reducing memory traffic rather than changing the mathematical result.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS25 P5.1"
+          ],
+          "q": "What are the two main techniques used by FlashAttention?",
+          "answer": "Tiling partitions Q, K, and V into blocks that fit in fast on-chip SRAM. Operator fusion combines score computation, softmax, and multiplication by V in one kernel, avoiding materializing large intermediate attention matrices in slow HBM.",
+          "extend": "The key idea is IO-awareness: same attention result, less memory traffic.",
+          "tags": [
+            "FlashAttention",
+            "Tiling",
+            "Operator fusion"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS26 P7.1"
+          ],
+          "q": "What does ZeRO-2 shard and what does it keep replicated?",
+          "answer": "ZeRO-2 shards gradients and optimizer states across GPUs, but each GPU still stores the full forward/backward model weights. This is why the memory formula includes a replicated 2-byte weight te$rm$ plus sharded gradient/optimizer te$rm$s.",
+          "tags": [
+            "ZeRO-2",
+            "FSDP",
+            "Memory"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -98,7 +98,7 @@ onMounted(async () => {
     return;
   }
   loaded.value = true;
-  document.title = activeExam.value + " · Browse by exam · I2DL";
+  document.title = activeExam.value + " · Browse by exam · FoFM";
   await nextTick();
   buildContents(groups.value);
 });

@@ -57,17 +57,17 @@ const recentUpdates = (updates as { date: string; text: string }[]).slice(0, 3);
 // UTM tags so friend-shared visits show up in GA4 as source/medium
 // "share / referral" (campaign "friend"), instead of blending into Direct.
 const shareText =
-  "Hey! Just found the best I2DL exam-prep tool — check it out: https://c0nsTantin77.github.io/i2dl-exam-qa/?utm_source=share&utm_medium=referral&utm_campaign=friend";
+  "Hey! Just found a FoFM exam-prep deck: https://c0nsTantin77.github.io/fofm-exam-qa/?utm_source=share&utm_medium=referral&utm_campaign=friend";
 ---
 
-<Layout title="I2DL Exam Q&A · TUM IN2346">
+<Layout title="FoFM Exam Q&A">
   <header class="hero">
     <div class="hero-inner">
       <div class="hero-top">
         <TumLogo />
-        <span class="kicker">Technische Universität München · IN2346</span>
+        <span class="kicker">Technische Universität München · Fundamentals of Foundation Models</span>
       </div>
-      <h1>Introduction to Deep Learning</h1>
+      <h1>Fundamentals of Foundation Models</h1>
       <ul class="hero-points">
         <li>
           <div class="hp-head"><span class="hp-ic">🔎</span><span class="hp-t">Search by concept</span></div>
@@ -84,14 +84,14 @@ const shareText =
       </ul>
       <div class="hero-cta">
         <p class="hero-cta-text">
-          <b>Free, for every TUM student.</b> Built to help you master I2DL. If it helps — pass it on.
+          <b>Free, for every TUM student.</b> Built to help you master FoFM exam patterns. If it helps — pass it on.
         </p>
         <div class="hero-cta-pills">
           <button class="share-pill" type="button" data-share={shareText}>
             <span class="share-ic" aria-hidden="true">🔗</span><span class="share-txt">Share with a friend</span>
           </button>
-          <a class="share-pill" href="https://github.com/c0nsTantin77/i2dl-exam-qa" target="_blank" rel="noopener">
-            <span class="share-ic" aria-hidden="true">⭐</span><span>Star on GitHub</span>
+          <a class="share-pill" href="https://github.com/c0nsTantin77/fofm-exam-qa" target="_blank" rel="noopener">
+            <span class="share-ic" aria-hidden="true">⭐</span><span>Source project</span>
           </a>
           <a class="share-pill doner" href="https://buymeacoffee.com/c0ns77" target="_blank" rel="noopener">
             <span class="share-ic" aria-hidden="true">🥙</span><span>Buy me a Döner</span>
@@ -196,8 +196,8 @@ const shareText =
         <div class="how-col">
           <h3>🔎 Find</h3>
           <ul>
-            <li>Search any keyword or concept <b>tag</b> (e.g. <i>dropout</i>, <i>Adam</i>).</li>
-            <li>Jump to an exact question by code — type <span class="src">SS23 6.1</span>.</li>
+            <li>Search any keyword or concept <b>tag</b> (e.g. <i>attention</i>, <i>GRPO</i>).</li>
+            <li>Jump to an exact question by code — type <span class="src">WS26 P6.1</span>.</li>
             <li>Browse <b>by exam</b> (tap a paper above) or <b>by tag</b> across all chapters.</li>
           </ul>
         </div>
@@ -227,13 +227,13 @@ const shareText =
       </div>
       <div class="feedback-actions">
         <a class="feedback-link" id="feedback-link" target="_blank" rel="noopener">Open the feedback form →</a>
-        <a class="feedback-issue" href="https://github.com/c0nsTantin77/i2dl-exam-qa/issues" target="_blank" rel="noopener">Open an issue →</a>
+        <a class="feedback-issue" href="https://github.com/c0nsTantin77/fofm-exam-qa/issues" target="_blank" rel="noopener">Open an issue →</a>
       </div>
     </section>
 
     <p class="hubnote">
-      All 7 chapters complete — {totalQ} questions across {totalTopics} knowledge points, from 12
-      past exams + the course summary.
+      All 11 FoFM syllabus chapters complete — {totalQ} questions across {totalTopics} knowledge points,
+      mapped from SS24, SS25, WS26 and the W1-W11 lecture plan.
     </p>
   </main>
 

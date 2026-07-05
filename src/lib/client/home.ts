@@ -7,7 +7,7 @@ export function initHomeView(): void {
   const vChapters = document.getElementById("view-chapters");
   const vExams = document.getElementById("view-exams");
   if (!toggle || !vChapters || !vExams) return;
-  const KEY = "i2dl_homeview";
+  const KEY = "fofm_homeview";
 
   const setView = (v: string) => {
     const exams = v === "exams";

@@ -1,0 +1,115 @@
+{
+  "id": "ch01",
+  "roman": "I",
+  "title": "W1: Introduction, Transformers and GPTs",
+  "blurb": "Highest priority. Every available FoFM exam asks about transformer dimensions, attention FLOPs, autoregressive inference, or the $\\sqrt{d}$ scaling. Treat this as a must-master chapter.",
+  "knowledge_points": [
+    {
+      "id": "attention-compute",
+      "title": "Scaled Dot-Product Attention and FLOPs",
+      "recap": "Know the single-head attention formula, the shapes of Q, K, V, and why attention cost grows quadratically with context length. For $Q,K \\in \\mathbb{R}^{c \\times d}$, $QK^\\top$ creates a c x c matrix; the dot products dominate compute.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS24 P1.3",
+            "WS26 P1.1",
+            "SS25 P2.2"
+          ],
+          "q": "Write the single-head attention mechanism and explain how its FLOPs scale with context length c.",
+          "answer": "Single-head attention is $\\operatorname{softmax}(QK^\\top/\\sqrt{d})V$, with $Q,K,V \\in \\mathbb{R}^{c \\times d}$. Computing $QK^\\top$ produces $c^2$ scores, each using O(d) arithmetic, so the dominant cost scales as $O(c^2 d)$. The key exam phrase is: attention is quadratic in context length.",
+          "extend": "If the question asks for exact FLOPs for $QK^\\top$ with $Q,K \\in \\mathbb{R}^{C \\times D}$, use about $2C^2D$ FLOPs when counting one multiplication and one addition separately.",
+          "tags": [
+            "Attention",
+            "FLOPs",
+            "Transformer"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS24 P1.4",
+            "WS26 P1.2"
+          ],
+          "q": "Why is the attention score divided by $\\sqrt{d}$? Derive the variance argument for $q^\\top k$ when $q_i,k_i$ are i.i.d. $N(0,1)$.",
+          "answer": "$q^\\top k$ = $\\sum_i q_i k_i$. Each product has mean 0 and variance 1, so $\\operatorname{Var}(q^\\top k)=d$. Without scaling, large d makes logits large, the softmax saturates, and gradients become small. Dividing by $\\sqrt{d}$ gives $\\operatorname{Var}(q^\\top k/\\sqrt{d})=1$, keeping the softmax numerically well behaved.",
+          "extend": "This exact reasoning appears in both the 2024 and 2026 exams. Put the variance derivation on your A4 sheet.",
+          "tags": [
+            "Attention",
+            "Softmax",
+            "Variance"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS26 P1.3"
+          ],
+          "q": "Does a causal mask require more, the same, or fewer FLOPs than unmasked attention?",
+          "answer": "Both answers can be correct depending on implementation. A standard implementation computes the full c x c score matrix and then masks the upper triangle, so FLOPs are essentially the same. An optimized implementation can skip masked entries and save roughly half the score computation.",
+          "extend": "State your assumption explicitly. The exam gives partial credit for explaining the implementation model.",
+          "tags": [
+            "Causal mask",
+            "FLOPs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gpt-inference",
+      "title": "Decoder-Only GPT Inference",
+      "recap": "GPT-style models are autoregressive: they predict next-token logits and then append one generated token at a time. Inference questions focus on logits shape, KV cache, and padding.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS25 P2.1"
+          ],
+          "q": "For a decoder-only transformer with vocabulary size v and sequence length L, what is the shape of the logits tensor for one input sequence?",
+          "answer": "The final linear layer maps each of the L hidden states to v vocabulary logits, so the logits tensor has shape L x v.",
+          "extend": "At generation time we often only sample from the last real token position, but the model still produces logits for positions it processes.",
+          "tags": [
+            "GPT",
+            "Logits",
+            "Inference"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS25 P2.2"
+          ],
+          "q": "With KV caching, how many FLOPs are needed to compute q_n and k_n for one attention head, and how many for all n attention scores?",
+          "answer": "For $W_Q x_n$ and $W_K x_n$ with $W_Q,W_K \\in \\mathbb{R}^{d \\times d}$, each matrix-vector product costs about $2d^2-d$ FLOPs. Both together cost $4d^2-2d$, often accepted as $4d^2$. Each dot product $q_n^\\top k_i$ costs $2d-1$ FLOPs, so n attention scores cost $n(2d-1)$, often accepted as $2dn$.",
+          "extend": "The caching benefit is avoiding recomputation of old keys and values for previous tokens.",
+          "tags": [
+            "KV cache",
+            "Inference",
+            "FLOPs"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS25 P2.3",
+            "SS25 P2.4"
+          ],
+          "q": "What memory is needed to cache key matrices, and should batched prompts be left-padded or right-padded?",
+          "answer": "For n_layers layers, batch size b, context length c, embedding/head dimension d, and 16-bit storage, key-cache memory is $2 n_{layers} d c b$ bytes. For ordinary generation code that samples from the last position, left-padding is preferred: the final position is the last real prompt token. Right-padding would put PAD at the last position unless the implementation explicitly gathers logits from the last non-PAD token.",
+          "extend": "The exam accepts right-padding only if you also explain the corrected logits indexing.",
+          "tags": [
+            "KV cache",
+            "Padding",
+            "Memory"
+          ]
+        }
+      ]
+    }
+  ]
+}

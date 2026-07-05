@@ -1,79 +1,25 @@
 {
-  "overall_pct": 90,
-  "cited": 480,
-  "detected": 536,
+  "overall_pct": 100,
+  "cited": 24,
+  "detected": 24,
   "per_exam": [
     {
-      "exam": "SS20",
-      "det": 54,
-      "cit": 49,
-      "pct": 91
-    },
-    {
-      "exam": "SS21",
-      "det": 39,
-      "cit": 39,
+      "exam": "SS24",
+      "det": 8,
+      "cit": 8,
       "pct": 100
     },
     {
-      "exam": "SS22",
-      "det": 65,
-      "cit": 64,
-      "pct": 98
-    },
-    {
-      "exam": "SS23",
-      "det": 46,
-      "cit": 43,
-      "pct": 93
-    },
-    {
-      "exam": "SS24",
-      "det": 45,
-      "cit": 40,
-      "pct": 89
-    },
-    {
       "exam": "SS25",
-      "det": 50,
-      "cit": 41,
-      "pct": 82
-    },
-    {
-      "exam": "WS21",
-      "det": 43,
-      "cit": 33,
-      "pct": 77
-    },
-    {
-      "exam": "WS22",
-      "det": 43,
-      "cit": 41,
-      "pct": 95
-    },
-    {
-      "exam": "WS23",
-      "det": 46,
-      "cit": 36,
-      "pct": 78
-    },
-    {
-      "exam": "WS24",
-      "det": 56,
-      "cit": 55,
-      "pct": 98
+      "det": 8,
+      "cit": 8,
+      "pct": 100
     },
     {
       "exam": "WS26",
-      "det": 44,
-      "cit": 39,
-      "pct": 89
-    },
-    {
-      "exam": "Mock",
-      "det": 5,
-      "cit": 0,
-      "pct": 0
+      "det": 8,
+      "cit": 8,
+      "pct": 100
     }
   ]
 }

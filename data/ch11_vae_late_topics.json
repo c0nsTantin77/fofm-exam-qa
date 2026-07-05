@@ -1,0 +1,93 @@
+{
+  "id": "ch11",
+  "roman": "XI",
+  "title": "W11: VAEs, Generative Vision Models, and Late Topics",
+  "blurb": "High priority inside the vision block. VAE likelihood, ELBO, and reparameterization appear in 2024, 2025, and 2026.",
+  "knowledge_points": [
+    {
+      "id": "vae-likelihood",
+      "title": "VAE Likelihood and Intractability",
+      "recap": "VAEs introduce a latent random variable z with a prior $p(z)$ and decoder likelihood $p_\\theta(x\\mid z)$. Direct marginal likelihood requires an integral over latent space.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS24 P8.3",
+            "WS26 P8.4"
+          ],
+          "q": "Write the VAE data likelihood $p_\\theta(x)$ and explain why it cannot be optimized directly.",
+          "answer": "$p_\\theta(x)=\\int p(z)p_\\theta(x\\mid z)\\,dz$. Here $p(z)$ is the latent prior, often $N(0,I)$, and $p_\\theta(x\\mid z)$ is the decoder likelihood. The integral over all latent vectors is generally intractable in high-dimensional latent space, so direct maximum likelihood is not feasible.",
+          "tags": [
+            "VAE",
+            "Likelihood",
+            "Intractable integral"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS24 P8.3"
+          ],
+          "q": "Why are standard deterministic autoencoders not used directly for image generation?",
+          "answer": "A standard autoencoder learns deterministic mappings for reconstruction but does not define a known, well-structured latent distribution to sample from. A VAE imposes a prior $p(z)$, samples z from that prior, and decodes through $p_\\theta(x\\mid z)$ to generate images.",
+          "tags": [
+            "Autoencoder",
+            "VAE",
+            "Generation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "elbo-reparameterization",
+      "title": "ELBO and Reparameterization Trick",
+      "recap": "Training VAEs uses the ELBO: a reconstruction te$rm$ minus a KL te$rm$. Reparameterization makes sampling differentiable with respect to encoder parameters.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS25 P8.3"
+          ],
+          "q": "In the VAE ELBO, why is the expectation intractable and how is it approximated?",
+          "answer": "The expectation over z requires marginalizing over the latent space and evaluating the decoder for possible latent vectors. During training it is approximated by Monte Carlo sampling z from $q_\\phi(z\\mid x)$.",
+          "tags": [
+            "ELBO",
+            "Monte Carlo",
+            "VAE"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS25 P8.3"
+          ],
+          "q": "How does the reparameterization trick allow backpropagation through the encoder?",
+          "answer": "The encoder outputs Gaussian parameters $\\mu_\\phi(x)$ and $\\sigma_\\phi(x)$. Instead of sampling z directly from $N(\\mu,\\sigma^2 I)$, sample $\\epsilon$ from $N(0,I)$ and compute $z=\\mu_\\phi(x)+\\sigma_\\phi(x)\\epsilon$. The randomness is isolated in $\\epsilon$, so gradients can flow through $\\mu_\\phi$ and $\\sigma_\\phi$.",
+          "extend": "This exact explanation is required for full credit in the 2025 vision question.",
+          "tags": [
+            "Reparameterization",
+            "VAE",
+            "Backpropagation"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "WS26 P8.2"
+          ],
+          "q": "For a transposed convolution with input size 2 x 2, kernel size 3, stride 2, and padding 1, what is the output spatial size?",
+          "answer": "The output is 4 x 4, using the convention from the exam statement/solution.",
+          "tags": [
+            "Transposed convolution",
+            "Vision"
+          ]
+        }
+      ]
+    }
+  ]
+}

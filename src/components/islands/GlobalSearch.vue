@@ -52,7 +52,7 @@ const words = computed(() => term.value.split(/\s+/).filter(Boolean));
         id="gsearch"
         v-model="query"
         type="search"
-        :placeholder="`Search all ${props.totalQ} questions — try “dropout”, “Adam”, or “SS23 6.1”`"
+        :placeholder="`Search all ${props.totalQ} questions — try “attention”, “GRPO”, or “WS26 P6.1”`"
         autocomplete="off"
         aria-label="Search all questions"
       />

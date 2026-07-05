@@ -10,7 +10,7 @@ export function initReviewIO(): void {
       const blob = new Blob([Store.exportBlob()], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "i2dl-progress.json";
+      a.download = "fofm-progress.json";
       a.click();
       URL.revokeObjectURL(a.href);
     });

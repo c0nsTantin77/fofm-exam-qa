@@ -12,41 +12,40 @@ const rows = [...coverage.per_exam].sort((a, b) => b.pct - a.pct);
       <div>
         <h4>Sources</h4>
         <p class="src-line">
-          <span class="src">SS25</span> SoSe 2025 endterm, <span class="src">WS24</span> WiSe
-          2024/25 endterm, … — all 12 TUM IN2346 endterms (SS20–SS25, WS21–WS26, Mock)
-          plus the <span class="src">Summary</span> course summary.
+          <span class="src">SS24</span> SoSe 2024 final, <span class="src">SS25</span> SoSe
+          2025 final, and <span class="src">WS26</span> Winter 2026 retake, plus the W1-W11
+          FoFM lecture plan.
         </p>
         <div class="coverage">
           <h4>Coverage</h4>
           <p>
             <b>{coverage.overall_pct}%</b> of past-exam questions are cited directly ({
               coverage.cited
-            }/{coverage.detected}); the remainder are covered through the course summary
-            (the backbone) or folded into merged cards.
+            }/{coverage.detected}); merged cards combine repeated scoring points across papers.
           </p>
           <div class="cov-chips">
             {rows.map((r) => <span class="cov-chip">{r.exam} {r.pct}%</span>)}
-            <span class="cov-chip cov-chip-full">Summary · backbone</span>
+            <span class="cov-chip cov-chip-full">W1-W11 syllabus map</span>
           </div>
         </div>
       </div>
       <div>
         <h4>About</h4>
         <p>
-          Revision deck for <b>Introduction to Deep Learning (IN2346)</b>, TU&nbsp;München.
+          Revision deck for <b>Fundamentals of Foundation Models</b>, TU&nbsp;München.
           Answers follow the <b>official sample solutions</b>; for variant phrasings the
           scoring points are merged. Items tagged <span class="src-ai">AI-generated</span> are
           model-written practice and are not from past exams.
         </p>
         <p>
           Formulas rendered with <a href="https://katex.org/" rel="noopener">KaTeX</a> at build
-          time. Built from the official I2DL materials for personal study.
+          time. Built from the available FoFM exam papers for personal study.
         </p>
       </div>
     </div>
   </div>
   <div class="sources-bar">
-    TUM IN2346 · I2DL Exam Q&amp;A · for educational use only — not affiliated with or endorsed
+    FoFM Exam Q&amp;A · for educational use only — not affiliated with or endorsed
     by TUM.
   </div>
 </footer>

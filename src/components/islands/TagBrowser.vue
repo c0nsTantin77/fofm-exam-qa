@@ -18,10 +18,10 @@ onMounted(async () => {
   loaded.value = true;
   await nextTick();
   if (activeTag.value) {
-    document.title = activeTag.value + " · Concept tags · I2DL";
+    document.title = activeTag.value + " · Concept tags · FoFM";
     buildContents(groups.value);
   } else {
-    document.title = "Concept tags · I2DL Exam Q&A";
+    document.title = "Concept tags · FoFM Exam Q&A";
   }
 });
 

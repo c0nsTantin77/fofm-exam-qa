@@ -39,7 +39,7 @@ const { title } = Astro.props;
     <script is:inline>
       try {
         document.documentElement.dataset.mode =
-          localStorage.getItem("i2dl_mode") === "test" ? "test" : "review";
+          localStorage.getItem("fofm_mode") === "test" ? "test" : "review";
       } catch (e) {
         document.documentElement.dataset.mode = "review";
       }

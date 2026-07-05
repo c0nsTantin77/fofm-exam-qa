@@ -2,7 +2,7 @@
 // site so existing users keep their reviewed / wrong book / notes / SRS data.
 // The cloud sync layer (cloud.ts) batch-pushes this same object, one doc/user.
 
-const KEY = "i2dl_progress_v1";
+const KEY = "fofm_progress_v1";
 const SRS_DAYS = [1, 2, 4, 7, 15, 30, 60]; // Ebbinghaus-style intervals
 const DAY = 86400000;
 

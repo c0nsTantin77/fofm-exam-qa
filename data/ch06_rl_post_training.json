@@ -1,0 +1,107 @@
+{
+  "id": "ch06",
+  "roman": "VI",
+  "title": "W6: Post-Training with Reinforcement Learning",
+  "blurb": "Highest priority for post-training. RLHF, reward models, KL regularization, GRPO, and inference-time compute are all represented in recent exams.",
+  "knowledge_points": [
+    {
+      "id": "rlhf",
+      "title": "RLHF and Reward Models",
+      "recap": "RLHF pipeline: SFT model, collect human preference comparisons, train a reward model, optimize policy against the reward model with KL regularization.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "SS24 P4.1",
+            "WS26 P5.2"
+          ],
+          "q": "What are the three main RLHF steps?",
+          "answer": "First, supervised fine-tune a pretrained model on high-quality instruction data. Second, collect human preference comparisons and train a reward model. Third, optimize the policy against the reward model with reinforcement learning, commonly PPO-style optimization.",
+          "extend": "All three steps must be present for full credit.",
+          "tags": [
+            "RLHF",
+            "Reward model",
+            "Post-training"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "WS26 P5.2"
+          ],
+          "q": "What are the reward model inputs and labels, and why is a reward model needed?",
+          "answer": "The reward model is trained on a prompt plus two candidate responses, with a human preference label such as y1 preferred to y2. It is needed because RL generates many candidate outputs; having humans rate every generated response would be too expensive and not scalable.",
+          "tags": [
+            "Reward model",
+            "Preference data"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS25 P4.2"
+          ],
+          "q": "What is the purpose of the KL te$rm$ in the RLHF objective?",
+          "answer": "It regularizes the learned policy so it does not move too far from a reference model, usually the SFT model. This helps preserve coherent behavior and reduces reward hacking.",
+          "tags": [
+            "KL regularization",
+            "RLHF"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "grpo-inference",
+      "title": "GRPO and Inference-Time Compute",
+      "recap": "Reasoning RL often uses group-relative advantages. Inference-time compute can also improve answers without changing weights.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 3,
+          "sources": [
+            "WS26 P6.1"
+          ],
+          "q": "In GRPO, one prompt has $G=8$ completions: seven rewards are 1 and one reward is 0. What are the no$rm$alized advantages?",
+          "answer": "The mean reward is $7/8$ and the standard deviation is $\\sqrt{7}/8$. The seven successful completions get advantage (1-$7/8$)/($\\sqrt{7}/8$)=$1/\\sqrt{7}$. The failed completion gets advantage (0-$7/8$)/($\\sqrt{7}/8$)=$-\\sqrt{7}$. The update increases probability of successful completions and decreases probability of the failed one.",
+          "extend": "This is the main numeric GRPO calculation in the available exams.",
+          "tags": [
+            "GRPO",
+            "Advantage",
+            "Reasoning"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "WS26 P6.2"
+          ],
+          "q": "If every completion initially receives zero reward, does GRPO training progress?",
+          "answer": "No. All group-no$rm$alized advantages are zero, so the policy gradient is zero. A practical fix is to first supervised-fine-tune the base model so it can sometimes obtain nonzero rewards, then apply RL.",
+          "tags": [
+            "GRPO",
+            "Sparse rewards",
+            "SFT"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 2,
+          "sources": [
+            "SS25 P4.4"
+          ],
+          "q": "Name one way to improve a language model by increasing inference-time compute.",
+          "answer": "Accepted examples include majority voting over multiple sampled answers, search over reasoning paths such as Tree of Thoughts, or chain-of-thought generation that spends more tokens on intermediate reasoning.",
+          "extend": "The key distinction is that inference-time compute does not require changing the model weights.",
+          "tags": [
+            "Inference-time compute",
+            "Reasoning"
+          ]
+        }
+      ]
+    }
+  ]
+}

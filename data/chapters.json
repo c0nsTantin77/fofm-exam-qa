@@ -1,14 +1,88 @@
 {
-  "course": "Introduction to Deep Learning (IN2346)",
-  "subtitle": "TUM · Exam Q&A Review",
-  "exams": ["SS20", "SS21", "WS21", "SS22", "WS22", "SS23", "WS23", "SS24", "WS24", "SS25", "WS26", "Mock"],
+  "course": "Fundamentals of Foundation Models",
+  "subtitle": "FoFM Exam Q&A Review",
+  "exams": [
+    "SS24",
+    "SS25",
+    "WS26"
+  ],
   "chapters": [
-    {"id": "ch01", "roman": "I",   "title": "Machine Learning Basics",      "file": "ch01_ml_basics.json", "status": "ready"},
-    {"id": "ch02", "roman": "II",  "title": "Neural Networks",              "file": "ch02_neural_networks.json", "status": "ready"},
-    {"id": "ch03", "roman": "III", "title": "Convolutions",                 "file": "ch03_convolutions.json", "status": "ready"},
-    {"id": "ch04", "roman": "IV",  "title": "Optimization",                 "file": "ch04_optimization.json", "status": "ready"},
-    {"id": "ch05", "roman": "V",   "title": "Popular Architectures",        "file": "ch05_architectures.json", "status": "ready"},
-    {"id": "ch06", "roman": "VI",  "title": "RNNs & Transformers",          "file": "ch06_rnn_transformers.json", "status": "ready"},
-    {"id": "ch07", "roman": "VII", "title": "Appendix: Matrix Calculus",    "file": "ch07_appendix_calculus.json", "status": "ready"}
+    {
+      "id": "ch01",
+      "roman": "I",
+      "title": "W1: Introduction, Transformers and GPTs",
+      "file": "ch01_transformers_gpts.json",
+      "status": "ready"
+    },
+    {
+      "id": "ch02",
+      "roman": "II",
+      "title": "W2: Data for LLMs and Evaluation",
+      "file": "ch02_data_evaluation.json",
+      "status": "ready"
+    },
+    {
+      "id": "ch03",
+      "roman": "III",
+      "title": "W3: Tokenizers",
+      "file": "ch03_tokenizers.json",
+      "status": "ready"
+    },
+    {
+      "id": "ch04",
+      "roman": "IV",
+      "title": "W4: Scaling Laws",
+      "file": "ch04_scaling_laws.json",
+      "status": "ready"
+    },
+    {
+      "id": "ch05",
+      "roman": "V",
+      "title": "W5: Supervised and Instruction Fine-Tuning",
+      "file": "ch05_sft_instruction.json",
+      "status": "ready"
+    },
+    {
+      "id": "ch06",
+      "roman": "VI",
+      "title": "W6: Post-Training with Reinforcement Learning",
+      "file": "ch06_rl_post_training.json",
+      "status": "ready"
+    },
+    {
+      "id": "ch07",
+      "roman": "VII",
+      "title": "W7: Introduction to Distributed Computing",
+      "file": "ch07_distributed_intro.json",
+      "status": "ready"
+    },
+    {
+      "id": "ch08",
+      "roman": "VIII",
+      "title": "W8: DDP, FSDP, and Efficient Attention",
+      "file": "ch08_ddp_fsdp_flashattention.json",
+      "status": "ready"
+    },
+    {
+      "id": "ch09",
+      "roman": "IX",
+      "title": "W9: Vision Foundation Models: Autoencoders and Manifolds",
+      "file": "ch09_vision_autoencoders.json",
+      "status": "ready"
+    },
+    {
+      "id": "ch10",
+      "roman": "X",
+      "title": "W10: Vision-Language and Diffusion Models",
+      "file": "ch10_vlm_diffusion.json",
+      "status": "ready"
+    },
+    {
+      "id": "ch11",
+      "roman": "XI",
+      "title": "W11: VAEs, Generative Vision Models, and Late Topics",
+      "file": "ch11_vae_late_topics.json",
+      "status": "ready"
+    }
   ]
 }
