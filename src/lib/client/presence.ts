@@ -1,6 +1,7 @@
 // Live "people online now" banner via Firebase Realtime Database. Each open tab
-// pushes a child under /sites/{siteId}/presence and removes it on disconnect,
-// so FoFM does not count users from the original I2DL site.
+// pushes a child under /presence/{siteId} and removes it on disconnect. The
+// original database rules allow this nested path, while /sites/{siteId}/presence
+// is denied, so this keeps FoFM counts separate without hiding the banner.
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare const firebase: any;
@@ -26,13 +27,13 @@ function safeSiteId(siteId: string): string {
 export function startPresence(siteId: string): void {
   try {
     const dbRT = firebase.database();
-    const listRef = dbRT.ref("sites/" + safeSiteId(siteId) + "/presence");
+    const listRef = dbRT.ref("presence/" + safeSiteId(siteId));
     const connRef = dbRT.ref(".info/connected");
     connRef.on("value", (snap: any) => {
       if (snap.val() !== true) return;
       const myRef = listRef.push();
       myRef.onDisconnect().remove();
-      myRef.set({ t: firebase.database.ServerValue.TIMESTAMP });
+      myRef.set({ siteId: safeSiteId(siteId), t: firebase.database.ServerValue.TIMESTAMP });
     });
     listRef.on("value", (snap: any) => render(snap.numChildren()));
   } catch (e) {
