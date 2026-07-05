@@ -59,7 +59,7 @@ chapters = [
                         3,
                         ["SS24 P1.3", "WS26 P1.1", "SS25 P2.2"],
                         "Write the single-head attention mechanism and explain how its FLOPs scale with context length c.",
-                        "Single-head attention is $\operatorname{softmax}(QK^\top/\sqrt{d})V$, with $Q,K,V \in \mathbb{R}^{c \times d}$. Computing $QK^\top$ produces $c^2$ scores, each using O(d) arithmetic, so the dominant cost scales as $O(c^2 d)$. The key exam phrase is: attention is quadratic in context length.",
+                        "Single-head attention is\n\n$$\\operatorname{Attention}(Q,K,V)=\\operatorname{softmax}\\!\\left(\\frac{QK^\\top}{\\sqrt{d}}\\right)V$$\n\nwith $Q,K,V \\in \\mathbb{R}^{c \\times d}$. Computing $QK^\\top$ produces $c^2$ scores, each using O(d) arithmetic, so the dominant cost scales as $O(c^2 d)$. The key exam phrase is: attention is quadratic in context length.",
                         "If the question asks for exact FLOPs for $QK^\top$ with $Q,K \in \mathbb{R}^{C \times D}$, use about $2C^2D$ FLOPs when counting one multiplication and one addition separately.",
                         ["Attention", "FLOPs", "Transfo$rm$er"],
                     ),
