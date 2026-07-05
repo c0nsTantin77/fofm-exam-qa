@@ -1,6 +1,6 @@
 // Live "people online now" banner via Firebase Realtime Database. Each open tab
-// pushes a child under /presence and removes it on disconnect (server-side
-// onDisconnect), so the count tracks real concurrent visitors with no backend.
+// pushes a child under /sites/{siteId}/presence and removes it on disconnect,
+// so FoFM does not count users from the original I2DL site.
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare const firebase: any;
@@ -19,10 +19,14 @@ function render(n: number): void {
   el.classList.add("show");
 }
 
-export function startPresence(): void {
+function safeSiteId(siteId: string): string {
+  return siteId.replace(/[^a-zA-Z0-9_-]/g, "-");
+}
+
+export function startPresence(siteId: string): void {
   try {
     const dbRT = firebase.database();
-    const listRef = dbRT.ref("presence");
+    const listRef = dbRT.ref("sites/" + safeSiteId(siteId) + "/presence");
     const connRef = dbRT.ref(".info/connected");
     connRef.on("value", (snap: any) => {
       if (snap.val() !== true) return;

@@ -29,6 +29,15 @@ let db: any = null;
 let uid: string | null = null;
 let ready = false;
 let dirty = false;
+let siteId = "fofm-exam-qa";
+
+function safeSiteId(value: string): string {
+  return value.replace(/[^a-zA-Z0-9_-]/g, "-");
+}
+
+function userDoc(): any {
+  return db.collection("sites").doc(safeSiteId(siteId)).collection("users").doc(uid);
+}
 
 function mergeProgress(local: Progress, cloud: Partial<Progress>): Progress {
   const out: any = {};
@@ -41,21 +50,20 @@ function mergeProgress(local: Progress, cloud: Partial<Progress>): Progress {
 function pushNow(): void {
   if (!ready || !uid) return;
   dirty = false;
-  db.collection("users")
-    .doc(uid)
+  userDoc()
     .set({ progress: Store.data(), updated: Date.now() }, { merge: true })
     .catch((e: unknown) => console.warn("cloud push failed", e));
 }
 
 async function pullMergePush(): Promise<void> {
   try {
-    const doc = await db.collection("users").doc(uid).get();
+    const doc = await userDoc().get();
     const cloud = doc.exists ? doc.data().progress || {} : {};
     const merged = mergeProgress(Store.data(), cloud);
     Store.importBlob(JSON.stringify(merged));
     // a cloud doc from another device may still carry pre-dedup ids
     runMigrations();
-    await db.collection("users").doc(uid).set({ progress: Store.data(), updated: Date.now() }, { merge: true });
+    await userDoc().set({ progress: Store.data(), updated: Date.now() }, { merge: true });
     applyAllStudy();
     renderProgressUI();
   } catch (e) {
@@ -107,7 +115,7 @@ async function init(cfg: FirebaseConfig): Promise<void> {
     await Promise.all(extra);
     firebase.initializeApp(cfg);
     db = firebase.firestore();
-    if (cfg.databaseURL) startPresence();
+    if (cfg.databaseURL) startPresence(siteId);
     firebase.auth().onAuthStateChanged(async (user: any) => {
       if (user) {
         uid = user.uid;
@@ -138,7 +146,8 @@ if (typeof window !== "undefined") {
 }
 
 /** Wire the Store -> cloud "dirty" hook and kick off Firebase. */
-export function initCloud(cfg: FirebaseConfig): void {
+export function initCloud(cfg: FirebaseConfig, configuredSiteId = "fofm-exam-qa"): void {
+  siteId = configuredSiteId;
   setCloudSchedule(() => {
     dirty = true;
   });

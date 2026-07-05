@@ -38,7 +38,8 @@ initReviewIO();
 // progress dashboard + rings + sidebar bars (fetches the search index)
 void initProgress();
 
-// cloud sync + presence (only if Firebase is configured)
+// Cloud sync + presence are namespaced by siteId, so FoFM never shares I2DL
+// user docs or live presence counts.
 if (APP_CONFIG.firebase && APP_CONFIG.firebase.apiKey) {
-  initCloud(APP_CONFIG.firebase);
+  initCloud(APP_CONFIG.firebase, APP_CONFIG.siteId);
 }

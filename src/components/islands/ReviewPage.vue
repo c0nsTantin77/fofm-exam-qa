@@ -137,7 +137,7 @@ onUnmounted(() => unsub());
   <div v-else>
     <h1 class="tp-title">Review</h1>
     <p class="tp-sub">
-      Your spaced-repetition queue and wrong book — saved in this browser (and synced if you sign in).
+      Your spaced-repetition queue and wrong book — saved in this browser and synced to the FoFM namespace if you sign in.
     </p>
 
     <nav class="rv-jump" aria-label="Jump to section">

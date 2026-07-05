@@ -1,6 +1,6 @@
 // Progress store — one JSON blob in localStorage, key-compatible with the old
 // site so existing users keep their reviewed / wrong book / notes / SRS data.
-// The cloud sync layer (cloud.ts) batch-pushes this same object, one doc/user.
+// The cloud sync layer stores this under the FoFM site namespace, one doc/user.
 
 const KEY = "fofm_progress_v1";
 const SRS_DAYS = [1, 2, 4, 7, 15, 30, 60]; // Ebbinghaus-style intervals

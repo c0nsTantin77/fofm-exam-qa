@@ -1,6 +1,6 @@
-// Public app configuration — safe to ship (Firestore/RTDB security is enforced
-// by server-side rules, not by hiding these values). Mirrors the old
-// assets/config.js window.APP_CONFIG.
+// Public app configuration. Firebase access is namespaced by siteId in the
+// client code, so FoFM progress/presence stays separate from the original I2DL
+// site even while using the same Firebase project.
 
 export interface FirebaseConfig {
   apiKey: string;
@@ -13,9 +13,11 @@ export interface FirebaseConfig {
 }
 
 export const APP_CONFIG: {
+  siteId: string;
   firebase: FirebaseConfig;
   feedbackFormUrl: string;
 } = {
+  siteId: "fofm-exam-qa",
   firebase: {
     apiKey: "AIzaSyAoT0ncUPEMNT6bCP8iiNCq4m2GrZUuvas",
     authDomain: "i2dl-c79f8.firebaseapp.com",
@@ -26,7 +28,5 @@ export const APP_CONFIG: {
     // Realtime Database URL — powers the live "online now" banner.
     databaseURL: "https://i2dl-c79f8-default-rtdb.europe-west1.firebasedatabase.app",
   },
-  // Google Form "embed" URL (Send -> <> -> copy the iframe src).
-  feedbackFormUrl:
-    "https://docs.google.com/forms/d/e/1FAIpQLSdmu4CYVZkC1PczoYpyDDUbVNmuRYJuUQnzI4bEGAGYI_UhWQ/viewform?embedded=true",
+  feedbackFormUrl: "",
 };

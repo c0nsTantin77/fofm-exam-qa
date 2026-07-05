@@ -1,8 +1,8 @@
 import { Store } from "./store";
 
 // Per-question study controls: Reviewed / wrong book / notes, all persisted via
-// the Store (localStorage, optionally cloud-synced). Re-runnable so the UI can
-// reflect synced state after a cloud merge.
+// the Store (localStorage, optionally FoFM-namespaced cloud sync). Re-runnable
+// so the UI can reflect imported or synced state.
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
