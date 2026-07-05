@@ -1,6 +1,5 @@
-// Public app configuration. Firebase access is namespaced by siteId in the
-// client code, so FoFM progress/presence stays separate from the original I2DL
-// site even while using the same Firebase project.
+// Public app configuration. FoFM uses its own Firebase project, so progress,
+// auth, and live presence are fully separated from the original I2DL site.
 
 export interface FirebaseConfig {
   apiKey: string;
@@ -9,6 +8,7 @@ export interface FirebaseConfig {
   storageBucket: string;
   messagingSenderId: string;
   appId: string;
+  measurementId?: string;
   databaseURL?: string;
 }
 
@@ -19,14 +19,15 @@ export const APP_CONFIG: {
 } = {
   siteId: "fofm-exam-qa",
   firebase: {
-    apiKey: "AIzaSyAoT0ncUPEMNT6bCP8iiNCq4m2GrZUuvas",
-    authDomain: "i2dl-c79f8.firebaseapp.com",
-    projectId: "i2dl-c79f8",
-    storageBucket: "i2dl-c79f8.firebasestorage.app",
-    messagingSenderId: "556393668021",
-    appId: "1:556393668021:web:70ad506d30691180880dfc",
+    apiKey: "AIzaSyDoS-QHVsvecFqJVT2ezI7vIWWqge0txgQ",
+    authDomain: "fofm-79893.firebaseapp.com",
+    projectId: "fofm-79893",
+    storageBucket: "fofm-79893.firebasestorage.app",
+    messagingSenderId: "269059832394",
+    appId: "1:269059832394:web:00b8963ee3103c9514c4b3",
+    measurementId: "G-RBCEYMT4YV",
     // Realtime Database URL — powers the live "online now" banner.
-    databaseURL: "https://i2dl-c79f8-default-rtdb.europe-west1.firebasedatabase.app",
+    databaseURL: "https://fofm-79893-default-rtdb.europe-west1.firebasedatabase.app",
   },
   feedbackFormUrl: "",
 };
