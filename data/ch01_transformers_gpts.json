@@ -55,6 +55,36 @@
             "Causal mask",
             "FLOPs"
           ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): For $Q,K,V\\in\\mathbb{R}^{c\\times d}$, what are the shapes of $QK^\\top$, the softmax output, and the final attention output? Explain why these shapes are consistent.",
+          "answer": "$QK^\\top$ has shape **$c\\times c$** because it compares every query position with every key position. The row-wise softmax also has shape **$c\\times c$**. Multiplying by $V\\in\\mathbb{R}^{c\\times d}$ gives **$c\\times d$**, matching the sequence length and embedding dimension of the input representation.",
+          "extend": "Memory: attention first builds token-token scores ($c\\times c$), then mixes value vectors back into token embeddings ($c\\times d$).",
+          "tags": [
+            "Attention",
+            "Shapes",
+            "Transformer"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): In scaled dot-product attention, why is the softmax applied separately for each query position instead of once over the entire $c\\times c$ score matrix?",
+          "answer": "Each query position needs its own distribution over all key/value positions. Therefore each row of $QK^\\top$ is normalized separately, so the weights for one query sum to **1 over keys**. A global softmax would couple unrelated query positions and would no longer represent a separate attention distribution for each token.",
+          "extend": "Memory: one query row gives one attention distribution over keys.",
+          "tags": [
+            "Attention",
+            "Softmax",
+            "Transformer"
+          ]
         }
       ]
     },
@@ -108,6 +138,36 @@
             "Padding",
             "Memory"
           ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): During autoregressive generation with a KV cache, which tensors are cached and which tensor must still be recomputed for the newest token at every layer?",
+          "answer": "The model caches the **keys and values** from previous tokens for each layer. For the newest token, it still computes the new hidden state and the new **query**, and it also appends the newest key/value to the cache. The cache avoids recomputing old keys and values, but it does not remove the need to attend from the current query to all cached positions.",
+          "extend": "Memory: KV cache stores old K,V; the current token still produces Q,K,V.",
+          "tags": [
+            "KV cache",
+            "Inference",
+            "GPT"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): Suppose greedy decoding and temperature sampling are both applied to the same next-token logits. What changes, and what stays the same?",
+          "answer": "The logits produced by the model stay the same. **Greedy decoding** chooses the token with the largest logit/probability. **Temperature sampling** rescales the logits before sampling, so lower temperature makes the distribution sharper and higher temperature makes it flatter. The decoding rule changes; the trained model parameters do not.",
+          "extend": "Memory: decoding strategy is an inference-time choice applied after logits.",
+          "tags": [
+            "GPT",
+            "Inference",
+            "Decoding"
+          ]
         }
       ]
     },
@@ -149,6 +209,36 @@
             "GPT",
             "Parameter count",
             "FLOPs"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): In the GPT parameter-count formula, why does the number of attention heads usually not change the total number of Q/K/V projection parameters when $d_{embd}$ is fixed?",
+          "answer": "Splitting into more heads divides the embedding dimension across heads. The combined Q/K/V projections are still matrices from $d_{embd}$ to $d_{embd}$ for Q, K, and V. Therefore the total Q/K/V parameter count remains **$3d_{embd}^2$ per layer** when $d_{embd}$ is fixed.",
+          "extend": "Memory: heads change how channels are partitioned, not the full projection size.",
+          "tags": [
+            "GPT",
+            "Parameter count",
+            "Attention heads"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): If the vocabulary size doubles while $d_{embd}$, $n_{layers}$, and $d_{ff}$ stay fixed, which parameter terms change and which non-embedding terms stay unchanged?",
+          "answer": "The **embedding/unembedding-related parameters** change because they scale with vocabulary size. The non-embedding transformer block parameters, namely Q/K/V projections, attention projection, and MLP weights, stay unchanged. Thus $N=2n_{layers}d_{embd}(2d_{embd}+d_{ff})$ is unaffected if $N$ is defined as non-embedding parameters.",
+          "extend": "Memory: vocabulary size affects token tables and output logits, not the internal block count $N$.",
+          "tags": [
+            "GPT",
+            "Parameter count",
+            "Embeddings"
           ]
         }
       ]

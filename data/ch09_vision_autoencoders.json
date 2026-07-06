@@ -40,6 +40,36 @@
             "Manifold"
           ],
           "extend": "Memory: latent bottleneck forces compression of essential factors, not pixel-level copying."
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): Why can an autoencoder trained only with reconstruction loss learn features that are not optimal for classification?",
+          "answer": "Reconstruction loss rewards preserving all information needed to reproduce the input, including background, texture, or nuisance variation. Classification may need invariance to those details and focus on semantic class information. Therefore good reconstruction does not automatically imply a linearly separable or task-optimal representation.",
+          "extend": "Memory: reconstruction features and discriminative features are related but not identical.",
+          "tags": [
+            "Autoencoder",
+            "Representation learning",
+            "Classifier"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): What happens if an autoencoder bottleneck is too large and the decoder is very powerful?",
+          "answer": "The model may learn an almost identity-like mapping and copy low-level details through the latent code. Reconstruction error can be low, but the latent representation may be less compressed and less semantically useful. A bottleneck or regularization is needed to encourage meaningful structure.",
+          "extend": "Memory: too much capacity can make reconstruction easy without learning useful compression.",
+          "tags": [
+            "Autoencoder",
+            "Latent space",
+            "Bottleneck"
+          ]
         }
       ]
     },
@@ -75,6 +105,36 @@
             "Latent dimension"
           ],
           "extend": "Memory: simpler data manifold -> lower latent dimension for comparable reconstruction quality."
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): What does it mean to say natural images lie near a low-dimensional manifold in pixel space?",
+          "answer": "Although an image has many pixels, valid natural images occupy only a tiny structured subset of all possible pixel arrays. The underlying factors such as object identity, pose, lighting, and texture have lower intrinsic dimension than the raw pixel space. A latent model tries to parameterize this structured subset.",
+          "extend": "Memory: pixel dimension is huge; natural-image degrees of freedom are structured and lower-dimensional.",
+          "tags": [
+            "Manifold",
+            "Natural images",
+            "Latent space"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): Why can linear interpolation in pixel space look worse than interpolation in a learned latent space?",
+          "answer": "Pixel-space interpolation averages raw intensities and may pass through blurry images that are not natural. A learned latent space can organize semantic factors so interpolation stays closer to the data manifold, producing smoother changes in identity, pose, or style.",
+          "extend": "Memory: latent interpolation can follow the manifold; pixel interpolation often cuts through off-manifold averages.",
+          "tags": [
+            "Latent interpolation",
+            "Manifold",
+            "Vision"
+          ]
         }
       ]
     }

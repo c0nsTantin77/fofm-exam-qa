@@ -109,6 +109,36 @@
             "REINFORCE",
             "Variance"
           ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): In RLHF, why is a KL penalty to the reference policy often added during policy optimization?",
+          "answer": "The KL penalty discourages the updated policy from moving too far from the reference/SFT policy. This helps prevent reward hacking, language-quality collapse, and overly large updates that exploit imperfections in the reward model. It trades off reward maximization against staying close to a known-good policy.",
+          "extend": "Memory: KL keeps RL optimization anchored to the SFT model.",
+          "tags": [
+            "RLHF",
+            "KL regularization",
+            "Reward model"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): Why can optimizing a learned reward model produce behavior that humans do not actually prefer?",
+          "answer": "The reward model is only an imperfect proxy for human preferences. The policy may find outputs that score highly according to reward-model artifacts but are unhelpful, verbose, unsafe, or misleading. This is a form of **reward hacking** or over-optimization of the proxy.",
+          "extend": "Memory: reward model score is not identical to true human preference.",
+          "tags": [
+            "RLHF",
+            "Reward hacking",
+            "Reward model"
+          ]
         }
       ]
     },
@@ -159,6 +189,36 @@
           "tags": [
             "Inference-time compute",
             "Reasoning"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): What is the intuition behind using group-relative advantages in GRPO-style training?",
+          "answer": "Instead of needing a separate value model, multiple completions for the same prompt can be compared against their group average. A completion that scores above the group mean gets positive advantage, and one below the group mean gets negative advantage. This gives a relative learning signal for the prompt.",
+          "extend": "Memory: GRPO compares samples within the same prompt group.",
+          "tags": [
+            "GRPO",
+            "Advantage",
+            "Reasoning"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): Why might inference-time compute improve reasoning performance even without changing model weights?",
+          "answer": "Extra inference-time compute can sample multiple candidate solutions, allow longer reasoning traces, or use verification/reranking. Even if the model weights stay fixed, searching over more attempts can increase the chance of finding a correct solution, especially for sparse-reward reasoning tasks.",
+          "extend": "Memory: inference-time scaling uses more search or samples, not more training.",
+          "tags": [
+            "Inference-time compute",
+            "Reasoning",
+            "Sparse rewards"
           ]
         }
       ]

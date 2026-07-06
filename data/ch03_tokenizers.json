@@ -51,6 +51,36 @@
             "BPE"
           ],
           "extend": "Memory: target vocab size determines number of BPE merges."
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): In BPE training, why are pair counts weighted by word frequency instead of counting each unique word type once?",
+          "answer": "BPE is trained to reduce tokenization cost on the actual corpus distribution. A pair that appears in a frequent word affects many corpus occurrences, so it should count more than the same pair in a rare word. Weighting by word frequency optimizes **token savings on the corpus**, not just on the list of unique word types.",
+          "extend": "Memory: BPE pair frequency is corpus frequency, not vocabulary-list frequency.",
+          "tags": [
+            "BPE",
+            "Merge order",
+            "Word frequency"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): If two adjacent pairs have the same maximum frequency during BPE training, what should you state in an exam answer?",
+          "answer": "You should state the tie and apply a clear tie-breaking rule, for example lexicographic order or the rule specified in the problem. The important part is to keep the merge sequence consistent after the tie is resolved. Without a specified rule, **multiple vocabularies may be valid** after the tied iteration.",
+          "extend": "Memory: tie-breaking affects later merges, so declare the rule.",
+          "tags": [
+            "BPE",
+            "Merge order",
+            "Tokenization"
+          ]
         }
       ]
     },
@@ -105,6 +135,37 @@
             "Sequence length"
           ],
           "extend": "Memory: domain-matched tokenizer -> shorter token sequence. WS26 vocabulary-size variant: smaller vocab gives longer sequences, and attention FLOPs scale quadratically in length."
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): Why can increasing vocabulary size reduce attention compute but increase embedding-related memory or parameters?",
+          "answer": "A larger vocabulary often represents text with fewer tokens, which can reduce sequence length and therefore attention cost. But the embedding and output tables scale with vocabulary size, roughly as **$vocab\\_size\\times d_{embd}$**. Thus larger vocabularies trade shorter sequences for larger token tables.",
+          "extend": "Memory: larger vocab means fewer tokens but bigger embedding/unembedding matrices.",
+          "tags": [
+            "Tokenizer",
+            "Vocabulary",
+            "Compute",
+            "Embeddings"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): Why can a tokenizer trained mainly on English be inefficient for code or non-English text?",
+          "answer": "The learned merges reflect the training corpus. If code or another language is underrepresented, common substrings in that domain may not become tokens, so the tokenizer breaks them into many small pieces. This increases sequence length and can hurt both **compute efficiency** and representation quality.",
+          "extend": "Memory: tokenizer quality is domain-dependent.",
+          "tags": [
+            "Tokenizer",
+            "Domain shift",
+            "Sequence length"
+          ]
         }
       ]
     },
@@ -140,6 +201,36 @@
             "BPE",
             "Special tokens",
             "Encode/decode"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): In a tokenizer implementation, why should special tokens such as `<eos>` be protected from ordinary BPE merging?",
+          "answer": "Special tokens have semantic control functions and should remain atomic. If ordinary BPE merges split or merge through them, the decoder may lose the boundary between text and control symbols. Implementations therefore reserve special token IDs and handle them separately from normal text merges.",
+          "extend": "Memory: special tokens are not just strings; they are control symbols with fixed IDs.",
+          "tags": [
+            "Tokenizer implementation",
+            "Special tokens",
+            "BPE"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): What invariant should an encode/decode unit test check for ordinary text, and why can whitespace make this test subtle?",
+          "answer": "A basic invariant is **decode(encode(text)) = text** for supported ordinary text. Whitespace is subtle because tokenizers may pretokenize spaces, newlines, or leading spaces specially; losing or normalizing whitespace can change the reconstructed string even if the visible words look correct.",
+          "extend": "Memory: round-trip tests must include spaces, newlines, and punctuation.",
+          "tags": [
+            "Tokenizer implementation",
+            "Encode/decode",
+            "Pretokenization"
           ]
         }
       ]

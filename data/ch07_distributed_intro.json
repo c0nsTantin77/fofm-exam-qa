@@ -38,6 +38,36 @@
             "Tensor parallelism"
           ],
           "extend": "Memory: pipeline = split by layers; tensor = split inside a layer/tensor."
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): Contrast data parallelism and tensor parallelism in terms of what is replicated and what is split across devices.",
+          "answer": "In data parallelism, each device usually has a full copy of the model and processes different data examples; gradients are synchronized across devices. In tensor parallelism, individual large tensor operations or weight matrices are split across devices, so each device holds and computes only part of a layer.",
+          "extend": "Memory: data parallel splits batch; tensor parallel splits layer tensors.",
+          "tags": [
+            "Distributed training",
+            "Data parallelism",
+            "Tensor parallelism"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): Why can pipeline parallelism suffer from pipeline bubbles, and what does increasing microbatch count do?",
+          "answer": "Pipeline bubbles occur when some stages are idle while the pipeline is filling or draining. Splitting a batch into more microbatches keeps stages busy for a larger fraction of time, reducing idle bubbles. However, more microbatches can add scheduling overhead and may affect memory/latency tradeoffs.",
+          "extend": "Memory: pipeline parallelism improves utilization when enough microbatches fill the pipeline.",
+          "tags": [
+            "Pipeline parallelism",
+            "Distributed training",
+            "Microbatching"
+          ]
         }
       ]
     },
@@ -87,6 +117,36 @@
           "tags": [
             "ZeRO",
             "Memory accounting"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): In mixed-precision Adam training, why can optimizer states consume more memory than the model parameters themselves?",
+          "answer": "Adam keeps extra state such as first and second moment estimates, often in higher precision. Training may also keep master weights and gradients. Therefore each parameter can require several stored values, so optimizer state memory can exceed the memory of the model weights alone.",
+          "extend": "Memory: Adam is expensive because it stores moments, not just weights.",
+          "tags": [
+            "Adam",
+            "Memory accounting",
+            "Mixed precision"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): What is the main memory-saving idea of ZeRO compared with ordinary data parallel training?",
+          "answer": "Ordinary data parallel training replicates parameters, gradients, and optimizer states on every device. ZeRO partitions some of these states across devices, so each device stores only a shard. The stage determines whether optimizer states, gradients, and/or parameters are sharded.",
+          "extend": "Memory: ZeRO saves memory by sharding training states across data-parallel workers.",
+          "tags": [
+            "ZeRO",
+            "Memory",
+            "Distributed training"
           ]
         }
       ]
@@ -179,6 +239,36 @@
             "MoE",
             "Compute",
             "Memory"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): Why does an MoE model distinguish total parameters from active parameters per token?",
+          "answer": "An MoE model may contain many experts, so the total parameter count can be very large. But each token is routed to only a small number of experts, so the active parameters and compute per token are much smaller than using all experts. This is the main sparsity advantage of MoE.",
+          "extend": "Memory: total parameters affect storage; active parameters affect per-token compute.",
+          "tags": [
+            "MoE",
+            "Active parameters",
+            "Compute"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): Why is load balancing important in top-k expert routing?",
+          "answer": "If many tokens route to the same expert, that expert becomes a compute and communication bottleneck while other experts are underused. Load balancing encourages tokens to spread across experts, improving device utilization and preventing expert collapse.",
+          "extend": "Memory: routing quality includes both specialization and balanced utilization.",
+          "tags": [
+            "MoE",
+            "Load balancing",
+            "Routing"
           ]
         }
       ]

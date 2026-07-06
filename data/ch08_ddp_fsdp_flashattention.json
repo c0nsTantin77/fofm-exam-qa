@@ -66,6 +66,36 @@
             "All-gather",
             "Ring"
           ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): Why does DDP average or sum gradients across workers instead of averaging model parameters after each step?",
+          "answer": "Workers compute gradients on different mini-batches for the same model parameters. Synchronizing gradients gives the same update as using the combined global batch, assuming the optimizer step is then applied consistently. Averaging parameters after independent optimizer steps can differ, especially for optimizers with momentum or adaptive state.",
+          "extend": "Memory: DDP synchronizes the update direction before the optimizer step.",
+          "tags": [
+            "DDP",
+            "Gradients",
+            "All-reduce"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): What is the conceptual difference between all-reduce and reduce-scatter followed by all-gather?",
+          "answer": "All-reduce leaves every worker with the full reduced tensor. Reduce-scatter first reduces and distributes shards of the result, so each worker gets only one shard; all-gather can later collect all shards back to every worker. This decomposition is useful in memory-saving distributed optimizers such as ZeRO/FSDP.",
+          "extend": "Memory: all-reduce means reduce plus everyone gets full result; reduce-scatter means reduce plus shard result.",
+          "tags": [
+            "All-reduce",
+            "Reduce-scatter",
+            "All-gather"
+          ]
         }
       ]
     },
@@ -159,6 +189,36 @@
             "CUDA",
             "Shared memory",
             "Tiling"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): Why does FSDP need all-gather before computing a layer and then free or reshard parameters afterward?",
+          "answer": "FSDP stores only parameter shards on each worker to save memory. To compute a layer, workers need the full parameters for that layer, so they all-gather the shards temporarily. After the layer computation, parameters can be freed or resharded so memory stays low for the rest of the model.",
+          "extend": "Memory: FSDP trades communication for lower parameter memory.",
+          "tags": [
+            "FSDP",
+            "All-gather",
+            "Memory"
+          ]
+        },
+        {
+          "type": "ai",
+          "freq": 1,
+          "sources": [
+            "AI-generated"
+          ],
+          "q": "Supplemental practice (not a direct exam question): What memory problem does FlashAttention solve compared with materializing the full attention matrix?",
+          "answer": "Standard attention may materialize the full $c\\times c$ score/probability matrix, which is expensive for long contexts. FlashAttention computes attention in tiles and uses online softmax-style accumulation, avoiding storage of the full attention matrix in high-bandwidth memory while producing the same exact attention result up to numerical precision.",
+          "extend": "Memory: FlashAttention reduces memory I/O by tiling attention instead of storing the whole $c\\times c$ matrix.",
+          "tags": [
+            "FlashAttention",
+            "Tiling",
+            "Online softmax"
           ]
         }
       ]
