@@ -37,6 +37,35 @@
             "Gradients"
           ],
           "extend": "Memory: DDP replicates parameters but splits data; gradients must be synchronized so replicas stay identical."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Distributed Q1"
+          ],
+          "q": "Tutorial 9. In recursive halving with $P=2^d$ GPUs, each iteration flips one bit of the rank. In iteration 2, where do rank 0 and rank $P/2$ send data? What are broadcast and all-reduce costs for gradient length $N$ with latency $T_s$ and per-element time $T_g$?",
+          "answer": "In iteration 2, rank 0 sends to **$P/4$**, and rank $P/2$ sends to **$3P/4$**.\n\nBroadcast takes $\\log_2P$ rounds, each sending $N$ elements:\n\n$$T_{broad}=\\log_2P(T_s+NT_g).$$\n\nAll-reduce is reduce plus broadcast, so\n\n$$T_{allreduce}=2\\log_2P(T_s+NT_g).$$",
+          "extend": "Memory: recursive halving is logarithmic rounds with full-size messages.",
+          "tags": [
+            "All-reduce",
+            "Recursive halving"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Distributed Q2"
+          ],
+          "q": "Tutorial 9. Compare ring all-reduce with ring reduce-scatter plus all-gather. Derive costs in terms of $P,N,T_s,T_g$, and give the speedup when $T_s\\approx0$.",
+          "answer": "Ring all-reduce uses $P-1$ iterations with full gradient messages:\n\n$$T_{ring}=(P-1)(T_s+NT_g).$$\n\nReduce-scatter plus all-gather has two phases of $P-1$ iterations, but messages are size $N/P$:\n\n$$T_{RS+AG}=2(P-1)\\left(T_s+\\frac{N}{P}T_g\\right).$$\n\nWhen $T_s\\approx0$, the speedup is\n\n$$\\frac{T_{ring}}{T_{RS+AG}}=\\frac{P}{2}.$$",
+          "extend": "Memory: reduce-scatter/all-gather reduces bandwidth by sending chunks.",
+          "tags": [
+            "Reduce-scatter",
+            "All-gather",
+            "Ring"
+          ]
         }
       ]
     },
@@ -74,6 +103,63 @@
             "Memory"
           ],
           "extend": "Memory: ZeRO-1 shards optimizer states; ZeRO-2 shards optimizer states + gradients; parameters remain replicated."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: FlashAttention Q1"
+          ],
+          "q": "FlashAttention tiling problem. Let $A\\in\\mathbb{R}^{M\\times K}$, $B\\in\\mathbb{R}^{K\\times N}$, and $C=AB$, partitioned into $2\\times2$ blocks. Starting from $[C]_{pq}=\\sum_{k=1}^K a_{pk}b_{kq}$, show $C_{ij}=\\sum_{l=1}^2 A_{il}B_{lj}$.",
+          "answer": "Split the inner dimension $K=K_1+K_2$. For any entry in block $C_{ij}$,\n\n$$[C]_{pq}=\\sum_{k=1}^{K_1}a_{pk}b_{kq}+\\sum_{k=K_1+1}^{K}a_{pk}b_{kq}.$$\n\nThe first sum is the entry of **$A_{i1}B_{1j}$**, and the second is the entry of **$A_{i2}B_{2j}$**. Therefore\n\n$$C_{ij}=A_{i1}B_{1j}+A_{i2}B_{2j}=\\sum_{l=1}^{2}A_{il}B_{lj}.$$",
+          "extend": "Memory: tiling just splits the scalar inner sum by block boundary.",
+          "tags": [
+            "FlashAttention",
+            "Tiling"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: FlashAttention Q2"
+          ],
+          "q": "FlashAttention exactness problem. Prove by induction that the online recurrence\n\n$$O_i^{(j)}=\\frac{d_{j-1}e^{m_{j-1}-m_j}}{d_j}O_i^{(j-1)}+\\frac{e^{s_{ij}-m_j}}{d_j}v_j$$\n\ncomputes $O_i^{(j)}=\\frac{\\sum_{k=1}^{j}e^{s_{ik}-m_j}v_k}{d_j}$ and hence exact attention.",
+          "answer": "Base case $j=1$: $m_1=s_{i1}$ and $d_1=1$, so $O_i^{(1)}=v_1$.\n\nInductive step: substitute\n\n$$O_i^{(j-1)}=\\frac{\\sum_{k=1}^{j-1}e^{s_{ik}-m_{j-1}}v_k}{d_{j-1}}$$\n\ninto the recurrence. The rescaling factor $e^{m_{j-1}-m_j}$ converts old terms to the new maximum $m_j$, giving\n\n$$O_i^{(j)}=\\frac{\\sum_{k=1}^{j}e^{s_{ik}-m_j}v_k}{d_j}.$$\n\nAt $j=N$, $m_N$ and $d_N$ are the exact softmax max and denominator, so the result is **exact attention**.",
+          "extend": "Memory: online softmax is exact because old accumulators are rescaled when the running max changes.",
+          "tags": [
+            "FlashAttention",
+            "Online softmax"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: CUDA Kernels Q1"
+          ],
+          "q": "Homework 8 code-understanding. The naive CUDA matrix multiplication kernel uses a 2D grid. Each thread computes one output element. What should the kernel do?",
+          "answer": "Each thread computes global `(row, col)` from block and thread indices, checks bounds, and computes\n\n$$C[row,col]=\\sum_k A[row,k]B[k,col].$$\n\nThe key points are **2D indexing**, **bounds checks**, and a loop over the inner dimension. It is correct but slow because all values are repeatedly read from global memory.",
+          "extend": "Memory: naive CUDA matmul = one thread per output element.",
+          "tags": [
+            "CUDA",
+            "Matrix multiplication"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: CUDA Kernels Q2"
+          ],
+          "q": "Homework 8 code-understanding. The optimized CUDA matrix multiplication uses shared memory. Why does shared memory help, and what must the tiled kernel do?",
+          "answer": "Shared memory helps because threads in a block reuse the same tiles of $A$ and $B$. Instead of repeatedly loading from global memory, threads cooperatively load tiles into **on-chip shared memory**, synchronize, multiply-accumulate from the tiles, and repeat over the inner dimension.\n\nThe kernel must allocate shared tiles, load valid elements with boundary checks, call synchronization before use, accumulate partial dot products, and handle edge tiles.",
+          "extend": "Memory: shared-memory matmul reduces global memory traffic by tile reuse.",
+          "tags": [
+            "CUDA",
+            "Shared memory",
+            "Tiling"
+          ]
         }
       ]
     }

@@ -52,6 +52,63 @@
             "RLHF"
           ],
           "extend": "Memory: KL keeps the RL policy close to the SFT/reference model."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Week7 Homework Q1"
+          ],
+          "q": "Problem 1 (Computing the policy gradient for RLHF). For\n\n$$L(\\theta)=\\mathbb{E}_{x\\sim D,y\\sim\\pi_\\theta}\\left[r(x,y)-\\beta(\\log\\pi_\\theta(y|x)-\\log\\pi_{ref}(y|x))\\right],$$\n\nshow using the log-derivative trick why the gradient contains\n\n$$r(x,y)-\\beta(1+\\log\\pi_\\theta(y|x)-\\log\\pi_{ref}(y|x)).$$",
+          "answer": "Let $p_\\theta(x,y)=D(x)\\pi_\\theta(y|x)$ and $f_\\theta=r-\\beta(\\log\\pi_\\theta-\\log\\pi_{ref})$. By the product rule,\n\n$$\\nabla(p_\\theta f_\\theta)=(\\nabla p_\\theta)f_\\theta+p_\\theta\\nabla f_\\theta.$$\n\nThe log-derivative trick gives **$\\nabla p_\\theta=p_\\theta\\nabla\\log\\pi_\\theta$**. Also **$\\nabla f_\\theta=-\\beta\\nabla\\log\\pi_\\theta$**. Factoring $\\nabla\\log\\pi_\\theta$ gives the extra **$1$** in the KL term.",
+          "extend": "Memory: the extra 1 comes from differentiating the explicit $\\log\\pi_\\theta$ term.",
+          "tags": [
+            "RLHF",
+            "Policy gradient"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Week7 Homework Q2"
+          ],
+          "q": "Problem 2 (Reducing policy-gradient variance). For\n\n$$g=\\nabla_\\theta\\log\\pi_\\theta(y|x)(r(x,y)-b(x)),$$\n\nshow the variance-minimizing baseline and explain when it becomes the average reward.",
+          "answer": "Minimize\n\n$$\\mathbb{E}[\\|\\nabla_\\theta\\log\\pi_\\theta(y|x)\\|^2(r(x,y)-b(x))^2].$$\n\nDifferentiating with respect to $b(x)$ gives\n\n$$b^*=\\frac{\\mathbb{E}[r(x,y)\\|\\nabla_\\theta\\log\\pi_\\theta(y|x)\\|^2]}{\\mathbb{E}[\\|\\nabla_\\theta\\log\\pi_\\theta(y|x)\\|^2]}.$$\n\nIf the gradient norm is approximately constant, it cancels, so **$b^*\\approx\\mathbb{E}[r(x,y)]$**.",
+          "extend": "Memory: optimal baseline is a gradient-norm weighted reward average.",
+          "tags": [
+            "Policy gradient",
+            "Variance reduction"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: RLHF Q1"
+          ],
+          "q": "Tutorial 7: RLHF. What is the time complexity of computing\n\n$$J(\\theta)=\\mathbb{E}_{y\\sim\\pi_\\theta(\\cdot|x)}[r(x,y)]$$\n\nfor sequences of length $T$ if only the final output has reward? How does this change with token-level rewards?",
+          "answer": "With only final reward, exact computation sums over all length-$T$ sequences, so complexity is **$O(|V|^T)$**.\n\nWith token-level rewards, one sums over all prefixes at each time step:\n\n$$\\sum_{t=1}^T |V|^t=O(|V|^{T+1}).$$\n\nThis is still exponential, so realistic RLHF uses **Monte Carlo estimators such as REINFORCE**.",
+          "extend": "Memory: exact text RL expectations are exponentially large.",
+          "tags": [
+            "RLHF",
+            "REINFORCE",
+            "Complexity"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: RLHF Q2"
+          ],
+          "q": "Tutorial 7: RLHF. Let $\\pi_\\theta(a)=N(\\theta,1)$ and $r(a)=a+C$. The score function is $\\nabla_\\theta\\log\\pi_\\theta(a)=a-\\theta$, so $g=(a-\\theta)(a+C)$. With $a=\\theta+x$, $x\\sim N(0,1)$, derive $\\operatorname{Var}[g]$ and the minimizing $C^*$.",
+          "answer": "With $a=\\theta+x$,\n\n$$g=x(\\theta+x+C)=x^2+x(\\theta+C).$$\n\nUsing $E[x^2]=1$, $E[x^3]=0$, $E[x^4]=3$, we get **$E[g]=1$** and\n\n$$E[g^2]=3+(\\theta+C)^2.$$\n\nThus\n\n$$\\operatorname{Var}[g]=2+(\\theta+C)^2.$$\n\nThis is minimized by **$C^*=-\\theta$**.",
+          "extend": "Memory: reward shifts can strongly change REINFORCE variance.",
+          "tags": [
+            "REINFORCE",
+            "Variance"
+          ]
         }
       ]
     },

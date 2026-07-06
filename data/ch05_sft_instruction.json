@@ -76,6 +76,49 @@
             "PEFT"
           ],
           "extend": "Memory: LoRA is parameter-efficient adaptation: freeze base weights, train low-rank adapters."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: LoRA Q1"
+          ],
+          "q": "Problem 1 (Parameter efficiency). LoRA writes\n\n$$W'=W+\\Delta W,\\qquad \\Delta W=AB,$$\n\nwhere $W\\in\\mathbb{R}^{d\\times k}$ is frozen, $A\\in\\mathbb{R}^{d\\times r}$, and $B\\in\\mathbb{R}^{r\\times k}$. For which $r$ does LoRA use fewer parameters than full fine-tuning? For $d=4096$, $k=1024$, $r=8$, compute the reduction factor.",
+          "answer": "Full fine-tuning trains **$dk$** parameters. LoRA trains\n\n$$dr+rk=r(d+k).$$\n\nLoRA saves parameters when **$r(d+k)<dk$**, i.e.\n\n$$r<\\frac{dk}{d+k}.$$\n\nFor $d=4096$, $k=1024$, full fine-tuning has **4,194,304** parameters. LoRA has\n\n$$8(4096+1024)=40,960,$$\n\nso the reduction is **about $102\\times$**.",
+          "extend": "Memory: LoRA parameter count for a $d\\times k$ matrix is $r(d+k)$.",
+          "tags": [
+            "LoRA",
+            "Parameter efficiency"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: LoRA Q2"
+          ],
+          "q": "Problem 2 (Compute efficiency). For $W\\in\\mathbb{R}^{d\\times d}$ and $y=Wx$, full fine-tuning computes forward, input gradient $\\nabla_xL=W^\\top\\nabla_yL$, and weight gradient $\\nabla_WL=(\\nabla_yL)x^\\top$. Compare full fine-tuning FLOPs with LoRA $W+AB$ for $r\\ll d$.",
+          "answer": "Full fine-tuning has three $d\\times d$ operations, each $2d^2$ FLOPs, for **$6d^2$** total.\n\nLoRA forward costs $2d^2+4dr$, input-gradient also costs $2d^2+4dr$, and adapter gradients cost $4dr$. Total:\n\n$$(2d^2+4dr)+(2d^2+4dr)+4dr=4d^2+12dr.$$\n\nThe ratio is\n\n$$\\frac{4d^2+12dr}{6d^2}=\\frac23+\\frac{2r}{d},$$\n\nwhich approaches **$2/3$** when $r\\ll d$.",
+          "extend": "Memory: LoRA keeps the dense frozen path but avoids full weight-gradient/update cost.",
+          "tags": [
+            "LoRA",
+            "FLOPs"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Instruction Fine-Tuning Code Q3"
+          ],
+          "q": "Homework 6 code-understanding question. The notebook fine-tunes a Llama model on 500 grade-school-math instruction examples using LoRA and recommends `SFTTrainer`.\n\nWhat are the important components of the SFT + LoRA setup, and why is LoRA appropriate?",
+          "answer": "The setup needs **instruction-response data**, tokenizer/model loading, a LoRA configuration choosing target modules and rank, and an SFT loop such as `SFTTrainer` with learning rate, batch size, sequence length, and roughly one epoch.\n\nLoRA is appropriate because the dataset is small and the base model is large. It **freezes pretrained weights** and trains low-rank adapters, reducing memory, optimizer state, and overfitting risk while improving the model on the math-instruction format.",
+          "extend": "Memory: SFT teaches the response format; LoRA makes the update cheap.",
+          "tags": [
+            "SFT",
+            "LoRA",
+            "Code understanding"
+          ]
         }
       ]
     }

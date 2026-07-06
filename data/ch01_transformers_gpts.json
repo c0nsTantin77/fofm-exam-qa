@@ -110,6 +110,28 @@
           ]
         }
       ]
+    },
+    {
+      "id": "gpt-parameter-compute",
+      "title": "GPT Parameter Count and Training Compute",
+      "recap": "Tutorial Week 1 asks for non-embedding parameter counts and FLOPs per token. The core result is $N=12n_{layers}d_{embd}^2$ when $d_{ff}=4d_{embd}$, and training compute is about $6N$ in the usual large-embedding regime.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Week1 Homework Q1"
+          ],
+          "q": "Problem 1 (Number of parameters and compute of the GPT model). Consider the decoder-only transformer considered in class. Omit sub-leading terms such as non-linearities, biases, and normalization. Parameters are `vocab size`, `dim embd`, `n heads`, `n layers`, and `context length`.\n\n1. Compute the total number of non-embedding trainable parameters $N$.\n2. Compute the non-embedding FLOPs per token for a forward pass, using $2ijk$ FLOPs for multiplying an $i\\times j$ matrix by a $j\\times k$ matrix.\n3. If backward costs roughly two forward passes and $d_{embd}\\gg \\text{context length}/12$, justify that training compute per token is roughly $6N$.",
+          "answer": "**Parameter count:** per layer, Q/K/V projections contribute $3d_{embd}^2$, attention output projection contributes $d_{embd}^2$, and the MLP contributes $2d_{embd}d_{ff}$. Thus\n\n$$N=n_{layers}(4d_{embd}^2+2d_{embd}d_{ff}).$$\n\nWith $d_{ff}=4d_{embd}$, **$N=12n_{layers}d_{embd}^2$**.\n\n**Forward FLOPs:** the dense projections and MLP give $2N$, and attention adds $2n_{layers}\\cdot2\\,\\text{context length}\\cdot d_{embd}$. In the stated regime this attention term is negligible.\n\n**Training compute:** forward is about $2N$ and backward is about $4N$, so training is **about $6N$ FLOPs per token**.",
+          "extend": "Memory: $6N$ = forward $2N$ plus backward about $4N$.",
+          "tags": [
+            "GPT",
+            "Parameter count",
+            "FLOPs"
+          ]
+        }
+      ]
     }
   ]
 }

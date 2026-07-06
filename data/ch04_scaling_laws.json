@@ -92,6 +92,55 @@
           ]
         }
       ]
+    },
+    {
+      "id": "tutorial-scaling-overtraining",
+      "title": "Tutorial Scaling Laws and Overtraining",
+      "recap": "Scaling tutorials cover reparameterizing loss by compute and token multiplier, parallel log-log lines, and code-level compute estimates.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Scaling Laws Q1"
+          ],
+          "q": "Problem 1 (Scaling laws in the over-trained regime). The lecture risk model is\n\n$$L(N,D)=E+\\frac{A}{N^\\alpha}+\\frac{B}{D^\\beta}.$$\n\nDefine compute $C=6ND$ and token multiplier $M=D/N$. Under $\\alpha=\\beta$, reparameterize the risk in terms of $C$ and $M$, and explain the parallel-lines phenomenon in a log-log plot.",
+          "answer": "From $M=D/N$, $D=NM$. With $C=6ND$,\n\n$$N=\\sqrt{\\frac{C}{6M}},\\qquad D=\\sqrt{\\frac{CM}{6}}.$$\n\nSubstituting and using $\\alpha=\\beta$ gives\n\n$$L(C,M)=E+\\left(aM^{\\alpha/2}+bM^{-\\alpha/2}\\right)C^{-\\alpha/2}.$$\n\nThe exponent of $C$ is **the same for all $M$**, so the log-log slope is shared. The $M$ term changes only the intercept, producing **parallel lines**.",
+          "extend": "Memory: $M$ changes intercept, not compute slope.",
+          "tags": [
+            "Scaling laws",
+            "Overtraining"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Scaling Laws Q2"
+          ],
+          "q": "Problem 1 continuation. How would you test whether larger over-trained model performance can be predicted from the reparameterized scaling law?",
+          "answer": "Run small-scale sweeps over $N$ and $D$, convert results to **$(C,M,L)$**, and identify the compute-optimal multiplier $M^*$. Fit the scaling-law parameters **$E,a,b,\\alpha_C$** using runs across multiple token multipliers.\n\nThen predict losses for larger models with **$M>M^*$**, train those larger over-trained models, and compare actual validation/test loss to the prediction.",
+          "extend": "Memory: fit on small runs across multiple token multipliers, validate on larger over-trained runs.",
+          "tags": [
+            "Scaling laws",
+            "Experimental design"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Scaling Homework Code Q3"
+          ],
+          "q": "Scaling homework code uses `num_params = model.get_num_params()` and estimates compute as\n\n$$C\\approx6ND,$$\n\nwhere $D=S\\cdot B\\cdot C_L$ for steps, batch size, and context length. What do $N$ and $D$ mean, and why is the constant 6?",
+          "answer": "$N$ is the model parameter count. $D$ is the total number of training tokens, computed as **steps times batch size times context length**, $D=SBC_L$.\n\nThe constant 6 comes from **forward compute about $2N$ FLOPs/token** plus backward compute about twice the forward pass. Training is therefore about **$6N$ FLOPs/token**, so $C\\approx6ND$.",
+          "extend": "Memory: $C=6ND$ means 6 FLOPs per parameter per token.",
+          "tags": [
+            "Scaling laws",
+            "Compute estimate"
+          ]
+        }
+      ]
     }
   ]
 }

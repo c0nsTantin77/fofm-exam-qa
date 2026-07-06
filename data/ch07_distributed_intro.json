@@ -74,6 +74,112 @@
             "Memory"
           ],
           "extend": "Memory: in the WS26 accounting table, BF16 weights and gradients are 2 bytes, FP32 optimizer states are 4 bytes each."
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Week9 Homework Q1"
+          ],
+          "q": "Homework 9. Train an $N$-parameter model with Adam in mixed precision on 4 GPUs, each with 80 GB. Per parameter: weights 2 bytes, gradients 2 bytes, optimizer state has update weights, Adam $m$, Adam $v$, each 4 bytes. Compute maximum $N$ without ZeRO, with ZeRO-1, ZeRO-2, and ZeRO-3.",
+          "answer": "**No ZeRO:** $2+2+4+4+4=16$ bytes/parameter, so $N\\le80\\times10^9/16=\\mathbf{5.0\\times10^9}$.\n\n**ZeRO-1:** shard optimizer state only: $2+2+12/4=7$ bytes/parameter, so **$N\\approx1.14\\times10^{10}$**.\n\n**ZeRO-2:** shard gradients and optimizer state: $2+2/4+12/4=5.5$ bytes/parameter, so **$N\\approx1.45\\times10^{10}$**.\n\n**ZeRO-3:** shard weights, gradients, and optimizer state: $2/4+2/4+12/4=4$ bytes/parameter, so **$N=2.0\\times10^{10}$**.",
+          "extend": "Memory: ZeRO-1 shards optimizer, ZeRO-2 also gradients, ZeRO-3 also parameters.",
+          "tags": [
+            "ZeRO",
+            "Memory accounting"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "moe-routing-balance",
+      "title": "MoE Routing, Load Balance, and Memory",
+      "recap": "Tutorial MoE focuses on auxiliary load-balancing losses, device-level expert balance, bias-based routing correction, and memory/active-parameter accounting for sparse MoE layers.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: MoE Q1"
+          ],
+          "q": "MoE auxiliary load-balancing loss is\n\n$$L_{balance}=N\\sum_i f_iP_i.$$\n\nFor $N=4$, expert token fractions are $0.70,0.20,0.10,0$ and average router probabilities are $0.6,0.25,0.10,0.05$. Compute the loss, the perfectly balanced value, and identify which expert receives the largest balance-loss update.",
+          "answer": "The loss is\n\n$$4(0.70\\cdot0.60+0.20\\cdot0.25+0.10\\cdot0.10+0\\cdot0.05)=\\mathbf{1.92}.$$\n\nPerfect balance has $f_i=P_i=1/4$, so **$L_{balance}=1$**.\n\nIgnoring the non-differentiable top-$K$ path through $f_i$, $\\partial L/\\partial P_i=Nf_i$. The largest update is therefore for **expert 1**, because $f_1=0.70$ is largest.",
+          "extend": "Memory: $L_{balance}=1$ under perfect balance; overloaded experts get larger updates.",
+          "tags": [
+            "MoE",
+            "Load balancing"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: MoE Q2"
+          ],
+          "q": "MoE experts are partitioned across $D$ devices. Let $E_d$ be the experts on device $d$. Define a device-level load-balancing loss and compare it to DeepSeek-V2.",
+          "answer": "Aggregate per device:\n\n$$f_d^*=\\sum_{i\\in E_d}f_i,\\qquad P_d^*=\\sum_{i\\in E_d}P_i.$$\n\nA direct loss is\n\n$$L_{device}=D\\sum_d f_d^*P_d^*,$$\n\nwhich equals **1** under perfect device balance.\n\nDeepSeek-V2 instead uses average per-expert utilization,\n\n$$f_d'=\\frac{1}{|E_d|}\\sum_{i\\in E_d}f_i,$$\n\nwith $P_d'$ summed over device experts. The distinction is **total device load versus average expert load on the device**.",
+          "extend": "Memory: DeepSeek-V2 normalizes device load by number of experts.",
+          "tags": [
+            "MoE",
+            "Device balance"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: MoE Q3"
+          ],
+          "q": "DeepSeek-V3 auxiliary-loss-free balancing adds online expert biases. With top-1 routing, $\\gamma=0.01$, initial $b_i=0$, and scores $s_1=0.9,s_2=0.85,s_3=0.40,s_4=0.30$, expert 1 is overloaded and expert 4 underloaded for 10 steps. Which expert is selected after 10 updates?",
+          "answer": "At step 0, **expert 1** is selected. After 10 updates,\n\n$$b_1=-0.10,\\quad b_4=+0.10,\\quad b_2=b_3=0.$$\n\nBiased scores are\n\n$$0.80,\\quad0.85,\\quad0.40,\\quad0.40.$$\n\nThe selected expert is **expert 2**. The bias changes expert selection but **does not change the gate weights used in the forward pass**.",
+          "extend": "Memory: routing bias is an online steering signal, not a gradient-learned gate weight.",
+          "tags": [
+            "MoE",
+            "DeepSeek-V3"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: MoE Q4"
+          ],
+          "q": "GLM-4.5 MoE layer: $d_{model}=5120$, 160 routed experts plus 1 shared expert, top-$K=8$, fine-grained ratio $1/4$. Each expert has two matrices and parameter count $2d_{model}d_{ff}^{expert}$. With bf16, compute one-layer memory and active parameter fraction.",
+          "answer": "The expert hidden size is\n\n$$d_{ff}^{expert}=\\frac14\\cdot4d_{model}=5120.$$\n\nEach expert has $2\\cdot5120\\cdot5120\\approx52.4$M parameters. With 161 experts, total parameters are **about 8.4B**, requiring **about 16.9 GB** in bf16.\n\nOnly $K+1=9$ experts are active per token, so the active fraction is **$9/161\\approx5.6\\%$**.",
+          "extend": "Memory: MoE stores all experts but activates only top-$K$ plus shared experts.",
+          "tags": [
+            "MoE",
+            "Memory"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: MoE Homework Q1"
+          ],
+          "q": "MoE homework. A dense transformer has 7B parameters. Replacing every feedforward layer by an MoE layer with 8 experts gives a 49B-parameter model. With top-$K=2$, compute active parameters.",
+          "answer": "Let $x$ be non-feedforward parameters and $y$ feedforward parameters. Then\n\n$$x+y=7,\\qquad x+8y=49.$$\n\nSolving gives **$x=1$**, **$y=6$**. With top-$K=2$, active parameters are\n\n$$x+2y=1+12=\\mathbf{13B}.$$",
+          "extend": "Memory: active MoE parameters use top-$K$ expert copies, not all experts.",
+          "tags": [
+            "MoE",
+            "Active parameters"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: MoE Homework Q2"
+          ],
+          "q": "MoE homework. Compare a dense 49B model with the previous 49B MoE model that has 13B active parameters. Assume compute scales linearly with active parameters. How do compute and memory compare?",
+          "answer": "Both models require **roughly the same parameter memory**, because all 49B MoE parameters must be loaded.\n\nThe MoE model uses only 13B active parameters per forward pass, so it is faster by approximately\n\n$$\\frac{49}{13}\\approx\\mathbf{3.8}.$$\n\nMoE saves compute but not total parameter storage.",
+          "extend": "Memory: MoE decouples active compute from loaded parameters.",
+          "tags": [
+            "MoE",
+            "Compute",
+            "Memory"
+          ]
         }
       ]
     }

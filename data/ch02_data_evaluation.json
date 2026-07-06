@@ -93,6 +93,73 @@
           ]
         }
       ]
+    },
+    {
+      "id": "tutorial-evaluation-prompting",
+      "title": "Tutorial Evaluation, Prompting, and Rubrics",
+      "recap": "Week 2 notebooks cover MMLU prompting, shortcut learning, answer-letter baselines, and rubric-based free-form evaluation.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Week2 Shortcut Learning Q1"
+          ],
+          "q": "The shortcut-learning tutorial evaluates MMLU with two prompts: `with_question`, which contains the question and four choices, and `without_question`, which removes the question but keeps the choices and `Answer:`. The model is evaluated by the logits of the next tokens `A`, `B`, `C`, `D`.\n\nAgainst what baseline should accuracy be compared, and why can the model score below that baseline?",
+          "answer": "The natural baseline is **uniform random guessing**. With four choices, this is **25% expected accuracy**.\n\nA model can score below 25% if it does not guess uniformly. If it has a strong prior for one letter, such as always predicting `A`, and that letter is not correct often in the sampled subset, it can be **systematically worse than random**.",
+          "extend": "Memory: multiple-choice evaluation can measure answer-letter priors instead of knowledge.",
+          "tags": [
+            "Evaluation",
+            "MMLU",
+            "Shortcut learning"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Week2 Shortcut Learning Q2"
+          ],
+          "q": "After fine-tuning on full MMLU prompts, the tutorial compares accuracy with the question present and with the question removed. If the two accuracies are almost the same, what does this imply? Does higher fine-tuned accuracy prove the model learned MMLU? How could evaluation be improved?",
+          "answer": "If with-question and without-question accuracies are almost the same, the model is **not using the question content much**. It is exploiting shortcuts such as answer-letter distribution or formatting.\n\nA higher fine-tuned score **does not prove subject understanding**. Fine-tuning may simply shift the model's favorite answer letter to a letter that is more common in the sample.\n\nA better evaluation is **free-form answer generation or answer matching** without exposing multiple-choice letters, reducing direct letter-prior shortcuts.",
+          "extend": "Memory: remove-question ablation checks whether the question matters.",
+          "tags": [
+            "Evaluation",
+            "Ablation",
+            "MMLU"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Week2 Rubric Evaluation Q3"
+          ],
+          "q": "The rubric exercise asks you to write medical-advice grading rubrics and compare them with physician-written HealthBench rubrics. One physician rubric has many concrete criteria with point values; another has only two broad criteria about effectiveness and accuracy.\n\nWhat does this show about free-form evaluation?",
+          "answer": "It shows that free-form evaluation **does not eliminate evaluation problems**. It trades multiple-choice shortcuts for rubric design, subjectivity, and grader consistency.\n\nConcrete criteria are easier to apply consistently. Broad criteria such as **effective**, **accurate**, or **appropriate** require judgment, so different graders may disagree. Reliable free-form evaluation needs **operational rubrics and grader calibration**.",
+          "extend": "Memory: rubric specificity controls reliability in free-form evaluation.",
+          "tags": [
+            "Evaluation",
+            "Rubrics",
+            "HealthBench"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Week2 Homework Code Q4"
+          ],
+          "q": "The MMLU prompting homework asks for `helm_prompt` and `harness_prompt`: each prompt contains five training questions with answers and one test question without the answer.\n\nWhat must these prompt functions do, and why does evaluation generate only one extra token?",
+          "answer": "The prompt builders must **format five few-shot examples with their correct answer letters**, then append **one unanswered test example ending at `Answer:`**.\n\nEvaluation generates one extra token because the target is a **single answer letter**. The next generated token is interpreted as `A`, `B`, `C`, or `D` and compared to the ground truth.",
+          "extend": "Memory: five-shot MMLU = answered demonstrations plus one unanswered query.",
+          "tags": [
+            "Prompting",
+            "MMLU",
+            "Code understanding"
+          ]
+        }
+      ]
     }
   ]
 }

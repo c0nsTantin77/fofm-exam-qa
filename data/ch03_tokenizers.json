@@ -107,6 +107,42 @@
           "extend": "Memory: domain-matched tokenizer -> shorter token sequence. WS26 vocabulary-size variant: smaller vocab gives longer sequences, and attention FLOPs scale quadratically in length."
         }
       ]
+    },
+    {
+      "id": "tutorial-tokenizer-code",
+      "title": "Tokenizer Implementation from Notebook",
+      "recap": "Week 3 tutorial/homework implements a byte-level BPE tokenizer with GPT-2 pre-tokenization and special-token handling.",
+      "questions": [
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Week3 BPE Code Q1"
+          ],
+          "q": "Tokenizer homework. Implement `train(text, vocab_size)` for a byte-level BPE tokenizer. It starts with 256 byte tokens, stores merge rules in `self.merges`, stores token-id-to-bytes in `self.vocab`, and uses GPT-2 pre-tokenization.\n\nWhat are the key steps of the training loop?",
+          "answer": "The training loop should **pre-tokenize with `GPT2_SPLIT_PATTERN`**, encode each pre-token to UTF-8 bytes, and represent each byte as its integer id. It then repeatedly **counts adjacent pair frequencies**, chooses the most frequent pair, assigns the next token id, and **merges that pair in all token sequences**.\n\nIt must update **`self.merges[(p0,p1)] = new_id`** and **`self.vocab[new_id] = self.vocab[p0] + self.vocab[p1]`**.",
+          "extend": "Memory: BPE training = pre-tokenize, count pairs, merge most frequent pair, store merge and vocab bytes.",
+          "tags": [
+            "BPE",
+            "Tokenizer implementation"
+          ]
+        },
+        {
+          "type": "open",
+          "freq": 1,
+          "sources": [
+            "Tutorial: Week3 BPE Code Q2"
+          ],
+          "q": "Tokenizer homework. Implement `encode(text)` and `decode(ids)`. The special token `<|endoftext|>` must be treated as one token outside the BPE algorithm.\n\nWhat should encode/decode do, and how are special tokens handled?",
+          "answer": "`encode` should **split around allowed special tokens**, encode ordinary segments as UTF-8 byte ids, then apply learned BPE merges in merge-rank order. `<|endoftext|>` is emitted as **one dedicated id**, not decomposed or merged.\n\n`decode` should **look up token ids in `self.vocab`**, concatenate byte strings, and UTF-8 decode the result. Special-token ids map back to their literal special-token bytes.",
+          "extend": "Memory: special tokens bypass BPE; ordinary text uses bytes plus learned merges.",
+          "tags": [
+            "BPE",
+            "Special tokens",
+            "Encode/decode"
+          ]
+        }
+      ]
     }
   ]
 }
