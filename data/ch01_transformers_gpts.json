@@ -17,9 +17,9 @@
             "WS26 P1.1",
             "SS25 P2.2"
           ],
-          "q": "Write the single-head attention mechanism and explain how its FLOPs scale with context length c.",
-          "answer": "Single-head attention is\n\n$$\\operatorname{Attention}(Q,K,V)=\\operatorname{softmax}\\!\\left(\\frac{QK^\\top}{\\sqrt{d}}\\right)V$$\n\nwith $Q,K,V \\in \\mathbb{R}^{c \\times d}$. Computing $QK^\\top$ produces $c^2$ scores, each using O(d) arithmetic, so the dominant cost scales as $O(c^2 d)$. The key exam phrase is: attention is quadratic in context length.",
-          "extend": "If the question asks for exact FLOPs for $QK^\\top$ with $Q,K \\in \\mathbb{R}^{C \\times D}$, use about $2C^2D$ FLOPs when counting one multiplication and one addition separately.",
+          "q": "Problem 1 (Transformers, 7 points). Consider a single-head attention layer with input $X \\in \\mathbb{R}^{c \\times d}$, where $c$ is the context length and $d$ is the embedding dimension.\n\n1. (2 points) Write down the single-head attention mechanism and, given your equation, explain how the number of floating point operations (FLOPs) scales with context length $c$.",
+          "answer": "**Single-head attention is defined as (1 point):**\n\n$$\\operatorname{Attention}(Q,K,V)=\\operatorname{softmax}\\!\\left(\\frac{QK^\\top}{\\sqrt d}\\right)V$$\n\nwhere $Q,K,V \\in \\mathbb{R}^{c\\times d}$. **The compute cost is dominated by $QK^\\top$**, which gives a $c\\times c$ matrix, and hence **the number of FLOPs scales quadratically with context length $c$ (1 point)**.",
+          "extend": "Memory: write the formula first, then immediately say \"$QK^\\top$ is $c\\times c$\". For the SS24 FLOP-counting variant, each of the $C^2$ entries costs about $2D$ FLOPs, so the total is $2C^2D$.",
           "tags": [
             "Attention",
             "FLOPs",
@@ -33,9 +33,9 @@
             "SS24 P1.4",
             "WS26 P1.2"
           ],
-          "q": "Why is the attention score divided by $\\sqrt{d}$? Derive the variance argument for $q^\\top k$ when $q_i,k_i$ are i.i.d. $N(0,1)$.",
-          "answer": "$q^\\top k$ = $\\sum_i q_i k_i$. Each product has mean 0 and variance 1, so $\\operatorname{Var}(q^\\top k)=d$. Without scaling, large d makes logits large, the softmax saturates, and gradients become small. Dividing by $\\sqrt{d}$ gives $\\operatorname{Var}(q^\\top k/\\sqrt{d})=1$, keeping the softmax numerically well behaved.",
-          "extend": "This exact reasoning appears in both the 2024 and 2026 exams. Put the variance derivation on your A4 sheet.",
+          "q": "Problem 1 (Transformers, 7 points). Consider a key and query vector $q,k\\in\\mathbb{R}^d$ whose entries are i.i.d. $\\sim N(0,1)$.\n\n2. (4 points) What is the variance of $q^\\top k$, and how does this motivate the $1/\\sqrt d$ scaling factor in attention?",
+          "answer": "**The variance of $q^\\top k$ is (2 points):**\n\n$$\\operatorname{Var}[q^\\top k]=\\sum_{i=1}^d \\operatorname{Var}[q_i k_i]=\\sum_{i=1}^d\\left(E[q_i^2]E[k_i^2]-E[q_i]^2E[k_i]^2\\right)=\\sum_{i=1}^d(1\\cdot1-0\\cdot0)=d.$$\n\n**The variance scales with the embedding dimension $d$**, meaning that for large $d$ the dot products can become very large, **causing vanishing gradients of the softmax (1 point)**. Scaling by $1/\\sqrt d$ gives\n\n$$\\operatorname{Var}\\!\\left[\\frac{1}{\\sqrt d}q^\\top k\\right]=\\frac{1}{d}\\cdot d=1,$$\n\n**keeping the variance constant regardless of $d$ (1 point)**.",
+          "extend": "Memory: full credit needs the variance derivation and the conclusion \"variance independent of $d$\". Only saying \"softmax is more stable\" is usually partial credit.",
           "tags": [
             "Attention",
             "Softmax",
@@ -48,9 +48,9 @@
           "sources": [
             "WS26 P1.3"
           ],
-          "q": "Does a causal mask require more, the same, or fewer FLOPs than unmasked attention?",
-          "answer": "Both answers can be correct depending on implementation. A standard implementation computes the full c x c score matrix and then masks the upper triangle, so FLOPs are essentially the same. An optimized implementation can skip masked entries and save roughly half the score computation.",
-          "extend": "State your assumption explicitly. The exam gives partial credit for explaining the implementation model.",
+          "q": "Problem 1 (Transformers, 7 points).\n\n3. (1 point) Does training a single-head attention layer with a causal mask require more, the same, or fewer FLOPs than training without a causal mask? Explain your answer and state any assumptions made.",
+          "answer": "**Depending on the implementation:**\n\n**Same FLOPs:** The full $c\\times c$ attention matrix $QK^\\top$ is computed first, and the causal mask is applied by adding $-\\infty$ to the upper triangle before softmax. The total FLOPs are still dominated by the matrix multiplications, so the masking adds negligible FLOPs compared to the dominant $O(c^2d)$ term.\n\n**Fewer FLOPs:** In optimized implementations such as FlashAttention, the upper triangular entries are never computed. Since roughly half the attention matrix is masked, **the number of FLOPs for the attention computation is roughly halved**.",
+          "extend": "Memory: state your assumption. \"Same\" is correct for standard dense attention; \"fewer\" is correct for optimized kernels that skip masked entries.",
           "tags": [
             "Causal mask",
             "FLOPs"
@@ -69,9 +69,9 @@
           "sources": [
             "SS25 P2.1"
           ],
-          "q": "For a decoder-only transformer with vocabulary size v and sequence length L, what is the shape of the logits tensor for one input sequence?",
-          "answer": "The final linear layer maps each of the L hidden states to v vocabulary logits, so the logits tensor has shape L x v.",
-          "extend": "At generation time we often only sample from the last real token position, but the model still produces logits for positions it processes.",
+          "q": "Problem 2 (Transformers, 8 points). Consider a decoder-only autoregressive transformer model with embedding dimension $d$. Assume all questions are about inference time, where the model generates output tokens one by one in an autoregressive manner.\n\n1. (1 point) Given a vocabulary size $v$ and a sequence length $L$, what are the dimensions of the logits tensor, i.e. the output of the transformer's final linear layer before the softmax, for a single input sequence?",
+          "answer": "At inference time, the transformer processes a sequence of length $L$ and computes a hidden state at each position. The final linear layer maps these hidden states, shape $L\\times d$, to logits over the vocabulary, resulting in **a logits tensor of shape $L\\times v$ (1 point)**.",
+          "extend": "Memory: one row per sequence position, one column per vocabulary item.",
           "tags": [
             "GPT",
             "Logits",
@@ -84,9 +84,9 @@
           "sources": [
             "SS25 P2.2"
           ],
-          "q": "With KV caching, how many FLOPs are needed to compute q_n and k_n for one attention head, and how many for all n attention scores?",
-          "answer": "For $W_Q x_n$ and $W_K x_n$ with $W_Q,W_K \\in \\mathbb{R}^{d \\times d}$, each matrix-vector product costs about $2d^2-d$ FLOPs. Both together cost $4d^2-2d$, often accepted as $4d^2$. Each dot product $q_n^\\top k_i$ costs $2d-1$ FLOPs, so n attention scores cost $n(2d-1)$, often accepted as $2dn$.",
-          "extend": "The caching benefit is avoiding recomputation of old keys and values for previous tokens.",
+          "q": "Problem 2 (Transformers, 8 points). Key-value caching is often used to speed up inference by avoiding recomputing keys and values for previous tokens. Consider a single attention head and assume that the key vectors $k_1,\\ldots,k_{n-1}$ for the first $n-1$ tokens are cached. To generate the $(n+1)$th token, the attention layer computes a query vector $q_n\\in\\mathbb{R}^d$ and a key vector $k_n\\in\\mathbb{R}^d$ from the embedding of the last generated token $x_n\\in\\mathbb{R}^d$. It then computes attention scores as $s_i=q_n^\\top k_i$ for $i=1,\\ldots,n$.\n\n(a) (2 points) For a single attention head, how many FLOPs are required to compute the query and key vectors needed for the attention scores of the $(n+1)$th token?\n\n(b) (2 points) For a single attention head, how many FLOPs are required to compute all $n$ attention scores for the $(n+1)$th token?",
+          "answer": "**(a)** Each layer computes\n\n$$q_n=W_Qx_n,\\quad k_n=W_Kx_n,\\quad W_Q,W_K\\in\\mathbb{R}^{d\\times d}.$$\n\nEach matrix-vector multiplication requires $d^2$ multiplications and $d(d-1)$ additions, totaling $2d^2-d$ FLOPs. So computing both $q_n$ and $k_n$ costs\n\n$$2\\cdot(2d^2-d)=4d^2-2d\\text{ FLOPs}.$$\n\n**$4d^2$ also gives full points.**\n\n**(b)** Each dot product $q_n^\\top k_i$ requires $d$ multiplications and $d-1$ additions, totaling $2d-1$ FLOPs. To compute all $n$ attention scores:\n\n$$n(2d-1)\\text{ FLOPs}.$$\n\n**$2dn$ also gives full points.**",
+          "extend": "Memory: caching avoids recomputing old keys; you still compute the new $q_n,k_n$ and then $n$ dot products against cached/current keys.",
           "tags": [
             "KV cache",
             "Inference",
@@ -100,9 +100,9 @@
             "SS25 P2.3",
             "SS25 P2.4"
           ],
-          "q": "What memory is needed to cache key matrices, and should batched prompts be left-padded or right-padded?",
-          "answer": "For n_layers layers, batch size b, context length c, embedding/head dimension d, and 16-bit storage, key-cache memory is $2 n_{layers} d c b$ bytes. For ordinary generation code that samples from the last position, left-padding is preferred: the final position is the last real prompt token. Right-padding would put PAD at the last position unless the implementation explicitly gathers logits from the last non-PAD token.",
-          "extend": "The exam accepts right-padding only if you also explain the corrected logits indexing.",
+          "q": "Problem 2 (Transformers, 8 points).\n\n3. (1 point) What is the memory requirement in bytes for caching the key matrices during inference, assuming a transformer with $n_{layers}$ layers, a batch size of $b$, a context length of $c$, and that each entry is stored in 16-bit precision? Assume key matrices are cached for all layers.\n\n4. (2 points) In practice, inference is often performed in batches to speed up computation by processing multiple sequences in parallel. Sequences in a batch are padded with a special PAD token to match the maximum length $L_{max}$. Should sequences be padded on the left or right so that the output logits match those from processing each sequence without batching? Briefly explain your answer.",
+          "answer": "**3.** Since the output sequence can be up to the maximum context length $c$, the worst-case memory usage for caching the key matrix is\n\n$$\\mathbf{2\\cdot n_{layers}\\cdot d\\cdot c\\cdot b}\\text{ bytes.}$$\n\nThe factor 2 is for 16-bit precision.\n\n**4.** **We left-pad each sequence to length $L_{max}$ (1 point).** Left-padding ensures that the final position corresponds to the final real token of the prompt. If we used right-padding, the last position would contain a PAD token, so even with masking, the model would sample the next token based on logits of a padding token, which it was not trained for. **Correct justification gives the second point.**",
+          "extend": "Memory: default decoder generation takes logits from the last position. Left padding keeps the last position real; right padding needs custom \"last non-PAD\" indexing.",
           "tags": [
             "KV cache",
             "Padding",

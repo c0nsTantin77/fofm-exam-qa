@@ -15,9 +15,9 @@
           "sources": [
             "SS25 P8.1"
           ],
-          "q": "Describe the forward and reverse processes in a denoising diffusion model.",
-          "answer": "The forward process gradually adds noise to the data. The reverse process learns to generate data by iteratively denoising, moving from noise back toward a data sample.",
-          "extend": "This is short but very likely to be asked as a concept definition.",
+          "q": "Problem 8 (Foundation Models in Computer Vision, 8 points).\n\n1. (2 points) Denoising diffusion models consist of a forward process and a reverse process. Describe what each process does in one sentence.",
+          "answer": "**The forward diffusion process gradually adds noise to the input (1 point).**\n\n**The reverse denoising process learns to generate data by denoising (1 point).**",
+          "extend": "Memory: forward = add noise; reverse = learned denoising/generation.",
           "tags": [
             "Diffusion",
             "Generation"
@@ -29,12 +29,13 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Why does diffusion generation require multiple inference steps?",
-          "answer": "The model usually removes noise gradually over a sequence of denoising steps. More steps increase inference-time compute but can improve sample quality, depending on the sampler.",
+          "q": "Supplemental practice (not a direct exam question): Why does diffusion generation require multiple inference steps?",
+          "answer": "Diffusion generation usually removes noise gradually over a sequence of denoising steps. **More denoising steps mean more inference-time compute**, but they can improve sample quality because generation follows a learned reverse process rather than producing the final image in one pass.",
           "tags": [
             "Diffusion",
             "Inference compute"
-          ]
+          ],
+          "extend": "Memory: diffusion is iterative denoising; quality/compute tradeoff depends on number of sampling steps."
         }
       ]
     },
@@ -49,9 +50,9 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "What is the core training idea behind CLIP-style vision-language models?",
-          "answer": "CLIP trains an image encoder and a text encoder so matching image-text pairs have similar embeddings and mismatched pairs are far apart. At inference, labels or prompts can be embedded as text and compared to image embeddings for zero-shot classification.",
-          "extend": "This is syllabus-driven practice, not extracted from the three provided FoFM exams.",
+          "q": "Supplemental practice (not a direct exam question): What is the core training idea behind CLIP-style vision-language models?",
+          "answer": "CLIP-style models train an image encoder and a text encoder so that **matching image-text pairs have similar embeddings** and **mismatched pairs are far apart**, typically with a contrastive objective.",
+          "extend": "Memory: image and text are embedded into the same space; matching pairs close, nonmatching pairs separated.",
           "tags": [
             "CLIP",
             "Vision-language",
@@ -64,12 +65,13 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Why are CLIP-style models useful for zero-shot recognition?",
-          "answer": "Because class names or natural-language prompts can be represented in the same embedding space as images. The model can compare an image embedding to text prompt embeddings even for categories not used as fixed classifier heads during supervised training.",
+          "q": "Supplemental practice (not a direct exam question): Why are CLIP-style models useful for zero-shot recognition?",
+          "answer": "Because class names or prompts can be encoded in the same embedding space as images. A model can classify an image by comparing its image embedding to text embeddings such as \"a photo of a dog\" or \"a photo of a cat\", **without training a new classifier head for those classes**.",
           "tags": [
             "CLIP",
             "Zero-shot"
-          ]
+          ],
+          "extend": "Memory: zero-shot = compare image embedding to prompt/class-text embeddings."
         }
       ]
     }

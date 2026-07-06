@@ -15,9 +15,9 @@
           "sources": [
             "SS25 P6.1"
           ],
-          "q": "For $r^2$ GPUs in a 2D mesh and N=$r^2$ m parameters, derive the reduce-scatter communication time using the two-phase ring algorithm.",
-          "answer": "Do a column-wise reduce-scatter across r ranks, then a row-wise reduce-scatter across r ranks. Phase 1 communicates $rm$ elements per rank for $r-1$ iterations: ($r-1$)($T_s$ + $rm$ $T_m$). Phase 2 communicates m elements per rank for $r-1$ iterations: ($r-1$)($T_s$ + m $T_m$). Total: ($r-1$)(2$T_s$ + (r+1)m $T_m$).",
-          "extend": "The exam also accepted a less efficient flat ring formula only if the path or partners were explicit.",
+          "q": "Problem 6 (Distributed Data Parallel, 7 points). Consider distributed data parallel training of a large language model using $r^2$ GPUs, where $r$ is an integer. The GPUs are connected in a 2D mesh topology. The model has $N=r^2m$ parameters and each GPU holds a local gradient vector of size $N$ after the backward pass. Gradients are synchronized using a reduce-scatter followed by an all-gather. Each communication has a startup cost $T_s$ and a per-element transmission time $T_m$.\n\n1. (7 points) Derive the total communication time for a reduce-scatter operation using the ring algorithm as discussed in class. Express your answer in terms of $r,m,T_s,T_m$.",
+          "answer": "We can do reduce-scatter on a mesh topology in **two phases**, each with $r-1$ iterations **(2 points)**.\n\n**Phase 1: column-wise reduce-scatter.** Each column has $r$ ranks. Each rank holds $r^2m$ elements in total, so each column is responsible for reducing $r^2m/r=rm$ elements **(1 point)**. Each rank participates in reduce-scatter across $r$ ranks over $rm$ data. The communication cost per rank is\n\n$$(r-1)(T_s+rmT_m)\\quad\\mathbf{(1\\ point)}.$$\n\n**Phase 2: row-wise reduce-scatter.** After phase 1, each rank holds $rm$ elements **(1 point)**. Each row performs reduce-scatter across $r$ ranks, reducing the data further to $m$ elements per rank. The cost is\n\n$$(r-1)(T_s+mT_m)\\quad\\mathbf{(1\\ point)}.$$\n\nThe total cost is\n\n$$\\mathbf{(r-1)(2T_s+(r+1)mT_m)}\\quad\\mathbf{(1\\ point)}.$$\n\nThe exam also accepted an inefficient ring over all $r^2$ ranks with cost $(r^2-1)(T_s+mT_m)$ if the mesh path/partners and chunking were clearly identified.",
+          "extend": "Memory: two-phase mesh reduce-scatter = column over $rm$, then row over $m$. Add both costs.",
           "tags": [
             "DDP",
             "Reduce-scatter",
@@ -30,12 +30,13 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Why does DDP need gradient synchronization?",
-          "answer": "Each replica sees a different mini-batch, so its local gradient is only a partial estimate. Synchronizing, usually by summing or averaging gradients across replicas, makes all model copies apply the same update.",
+          "q": "Supplemental practice (not a direct exam question): Why does Distributed Data Parallel training need gradient synchronization?",
+          "answer": "Each model replica sees a different mini-batch, so its local gradient is only a partial estimate of the global batch gradient. **Gradient synchronization sums or averages gradients across replicas**, making the replicas perform the same parameter update.",
           "tags": [
             "DDP",
             "Gradients"
-          ]
+          ],
+          "extend": "Memory: DDP replicates parameters but splits data; gradients must be synchronized so replicas stay identical."
         }
       ]
     },
@@ -50,9 +51,9 @@
           "sources": [
             "SS25 P5.1"
           ],
-          "q": "What are the two main techniques used by FlashAttention?",
-          "answer": "Tiling partitions Q, K, and V into blocks that fit in fast on-chip SRAM. Operator fusion combines score computation, softmax, and multiplication by V in one kernel, avoiding materializing large intermediate attention matrices in slow HBM.",
-          "extend": "The key idea is IO-awareness: same attention result, less memory traffic.",
+          "q": "Problem 5 (Flash Attention, 2 points).\n\n1. (2 points) Explain the two main techniques used by Flash Attention to speed up the computation of attention.",
+          "answer": "**Tiling:** The large input matrices $Q,K,V$, stored in slow high-bandwidth memory, are partitioned into smaller blocks that are small enough to be loaded into the GPU's fast on-chip SRAM **(1 point)**.\n\n**Operator fusion:** The steps of attention calculation, score computation, softmax, and multiplication by value matrix $V$, are merged into a single computational kernel. This fused kernel executes all operations on tiles loaded in fast on-chip SRAM **without writing large intermediate matrices back to slow HBM (1 point)**.",
+          "extend": "Memory: FlashAttention changes memory traffic, not the mathematical attention result.",
           "tags": [
             "FlashAttention",
             "Tiling",
@@ -65,13 +66,14 @@
           "sources": [
             "WS26 P7.1"
           ],
-          "q": "What does ZeRO-2 shard and what does it keep replicated?",
-          "answer": "ZeRO-2 shards gradients and optimizer states across GPUs, but each GPU still stores the full forward/backward model weights. This is why the memory formula includes a replicated 2-byte weight te$rm$ plus sharded gradient/optimizer te$rm$s.",
+          "q": "Problem 7 (Scalable Machine Learning, 6 points). In the ZeRO-2 memory-accounting setting above, what does ZeRO-2 shard and what does it keep replicated?",
+          "answer": "In **ZeRO-2, gradients and optimizer states are sharded across GPUs**, while each GPU still stores **the full forward/backward weights**. In the WS26 memory formula this gives per-parameter per-GPU memory\n\n$$2+\\frac{14}{G}\\text{ bytes},$$\n\nwhere the 2 bytes are replicated BF16 weights and the 14 bytes are sharded gradients plus FP32 optimizer states.",
           "tags": [
             "ZeRO-2",
             "FSDP",
             "Memory"
-          ]
+          ],
+          "extend": "Memory: ZeRO-1 shards optimizer states; ZeRO-2 shards optimizer states + gradients; parameters remain replicated."
         }
       ]
     }

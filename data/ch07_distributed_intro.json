@@ -16,13 +16,14 @@
             "SS24 P6.1",
             "WS26 P7.2"
           ],
-          "q": "Explain data parallelism and model parallelism, and what problem each addresses.",
-          "answer": "Data parallelism replicates the model on multiple devices and gives each device different data batches; it mainly speeds up training throughput. Model parallelism splits the model itself across devices; it enables training models that do not fit in one device memory.",
+          "q": "Problem 6 (Computational aspects in LLMs, 4 points).\n\n1. (4 points) Explain what data parallelism and model parallelism are, and what challenges each addresses when training an LLM.",
+          "answer": "**Data parallelism:** The dataset is split into smaller batches that are processed in parallel across multiple devices. Each device has a copy of the model and processes a different subset of the data. **This is useful for speeding up training.**\n\n**Model parallelism:** The model itself is split across multiple devices, with each device responsible for computing a portion of the model. Devices exchange intermediate results with each other. **This is useful for training very large models that do not fit into the memory of a single device.**",
           "tags": [
             "Distributed training",
             "Data parallelism",
             "Model parallelism"
-          ]
+          ],
+          "extend": "Memory: data parallel = split data, replicate model, speed. Model parallel = split model, solve memory/model-size limit."
         },
         {
           "type": "open",
@@ -30,12 +31,13 @@
           "sources": [
             "WS26 P7.2"
           ],
-          "q": "What is the difference between pipeline parallelism and tensor parallelism?",
-          "answer": "Pipeline parallelism splits the model by layers, so each GPU owns consecutive layers and passes activations forward and gradients backward. Tensor parallelism splits tensors within a layer, for example attention heads or matrix shards, so GPUs compute partial results for the same layer and combine them.",
+          "q": "Problem 7 (Scalable Machine Learning, 6 points).\n\n2. (2 points) Explain the difference between pipeline parallelism and tensor parallelism. In each case, describe how the model is split across GPUs.",
+          "answer": "**Pipeline parallelism:** the model is split between layers across GPUs, where each GPU holds a subset of consecutive layers, e.g. GPU 0 holds layers 1-3 and GPU 1 holds layers 4-6 **(1 point)**. During the forward pass, each GPU sends activations to the next GPU; during backward pass, activation gradients are passed back.\n\n**Tensor parallelism:** the model is split within individual layers across GPUs, where each GPU holds a portion of the weight tensors of each layer, e.g. different attention heads in a transformer are assigned to different GPUs **(1 point)**. GPUs compute partial outputs for the same layer and combine them before moving to the next layer.",
           "tags": [
             "Pipeline parallelism",
             "Tensor parallelism"
-          ]
+          ],
+          "extend": "Memory: pipeline = split by layers; tensor = split inside a layer/tensor."
         }
       ]
     },
@@ -50,9 +52,9 @@
           "sources": [
             "WS26 P7.1"
           ],
-          "q": "A 10B parameter model is trained with Adam mixed precision on 40 GB GPUs using ZeRO-2. What is the minimum number of GPUs?",
-          "answer": "In ZeRO-2, forward/backward weights are replicated, while gradients and optimizer states are sharded. Per parameter per GPU: 2 bytes for bf16 weights plus $(2+4+4+4)/G=14/G$ bytes for sharded gradients and Adam states. For $N=10^{10}$ and 40 GB, require $10^{10}(2+14/G) \\le 40\\cdot 10^9$, so $2+14/G \\le 4$, hence $G\\ge 7$. Minimum is 7 GPUs.",
-          "extend": "Remember that GB is treated as $10^9$ bytes in the exam statement.",
+          "q": "Problem 7 (Scalable Machine Learning, 6 points). Consider training an $N$-parameter model with the Adam optimizer in mixed precision on a node where each GPU has 40 GB of memory. Ignore training-batch memory. Per-parameter storage requirements are: forward/backward weights: 2 bytes (BFloat16); gradients: 2 bytes (BFloat16); optimizer state (FP32): model weights for updates 4 bytes, Adam first moment $m$ 4 bytes, Adam second moment $v$ 4 bytes.\n\n1. (4 points) You want to train a 10B parameter model, $N=10^{10}$, using ZeRO-2. What is the minimum number of GPUs needed?",
+          "answer": "In **ZeRO-2, gradients and optimizer states are sharded across GPUs, while each GPU still stores the full forward/backward weights (1 point)**. For $G$ GPUs, memory per parameter per GPU is **(1 point)**\n\n$$2+\\frac{2}{G}+\\frac{4+4+4}{G}=2+\\frac{14}{G}\\text{ bytes}.$$\n\nThe memory constraint is **(1 point)**\n\n$$N\\left(2+\\frac{14}{G}\\right)\\le 40\\times10^9.$$\n\nSubstitute $N=10^{10}$:\n\n$$10^{10}\\left(2+\\frac{14}{G}\\right)\\le40\\times10^9,$$\n\nso\n\n$$2+\\frac{14}{G}\\le4,\\quad \\frac{14}{G}\\le2,\\quad G\\ge7.$$\n\nThe minimum number of GPUs is **$G=7$ (1 point)**.",
+          "extend": "Memory: ZeRO-2 shards gradients + optimizer state, but not forward/backward weights.",
           "tags": [
             "ZeRO-2",
             "Memory",
@@ -65,12 +67,13 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Why does mixed precision reduce memory pressure?",
-          "answer": "It stores forward/backward weights and gradients in lower precision such as bf16/fp16 while often keeping optimizer update states in fp32. This reduces the replicated training footprint without abandoning stable optimizer updates.",
+          "q": "Supplemental practice (not a direct exam question): Why does mixed precision reduce memory pressure?",
+          "answer": "**Mixed precision stores some tensors in lower precision**, such as BF16/FP16 forward weights and gradients, reducing bytes per parameter. Optimizer update states may still be kept in FP32 for numerical stability, so the memory saving depends on which tensors are low precision.",
           "tags": [
             "Mixed precision",
             "Memory"
-          ]
+          ],
+          "extend": "Memory: in the WS26 accounting table, BF16 weights and gradients are 2 bytes, FP32 optimizer states are 4 bytes each."
         }
       ]
     }
