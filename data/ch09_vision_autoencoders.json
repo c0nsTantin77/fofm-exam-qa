@@ -16,7 +16,7 @@
             "SS24 P8.2",
             "WS26 P8.3"
           ],
-          "q": "Problem 8 (Foundation Models in Computer Vision, 8 points).\n\n3. (3 points) You want to train an image classifier but only have a large unlabeled dataset and a small labeled dataset. Describe how you would use an autoencoder to train the classifier.",
+          "q": "3. You want to train an image classifier but only have a large unlabeled dataset and a small labeled dataset. Describe how you would use an autoencoder to train the classifier. (3 points)",
           "answer": "Train an autoencoder on the **large unlabeled dataset**, where the encoder compresses the input into a latent representation and the decoder is trained to reconstruct it **(1 point)**. **Discard the decoder and attach a classification head to the pretrained encoder (1 point)**. Fine-tune the resulting classifier on the **small labeled dataset (1 point)**.",
           "extend": "Memory: unsupervised pretrain encoder with reconstruction, then supervised finetune encoder + classifier head.",
           "tags": [
@@ -32,7 +32,7 @@
             "SS24 P8.1",
             "SS25 P8.2"
           ],
-          "q": "Problem 8 (Foundation Models in Computer Vision, 5 points).\n\n1. (1 point) Why is the dimensionality of the latent space $z$ in autoencoders typically smaller than the dimensionality of the input $x$?",
+          "q": "1. Why is the dimensionality of the latent space $z$ in autoencoders typically smaller than the dimensionality of the input $x$? (1 point)",
           "answer": "The latent space $z$ should **capture the essential factors of variation within the data**, achieved through dimensionality reduction, to ensure **a compact and meaningful representation (1 point)**.",
           "tags": [
             "Autoencoder",
@@ -54,7 +54,7 @@
           "sources": [
             "WS26 P8.1"
           ],
-          "q": "Problem 8 (Foundation Models in Computer Vision, 8 points).\n\n1. (2 points) Let $x\\in\\mathbb{R}^D$ denote an image in pixel space, $z\\in\\mathbb{R}^d$ with $d\\ll D$ a latent representation, and $G:\\mathbb{R}^d\\to\\mathbb{R}^D$ a learned decoder. Given two semantically different images $A$ and $B$, consider two interpolations: (i) linear interpolation in pixel space $x_{interp}=0.5x_A+0.5x_B$; (ii) linear interpolation in latent space $z_{interp}=0.5z_A+0.5z_B$, decoded via $G(z_{interp})$. Which interpolation is more likely to produce a natural-looking image? Explain.",
+          "q": "1. Let $x\\in\\mathbb{R}^D$ denote an image in pixel space, $z\\in\\mathbb{R}^d$ with $d\\ll D$ a latent representation, and $G:\\mathbb{R}^d\\to\\mathbb{R}^D$ a learned decoder. Given two semantically different images $A$ and $B$, consider two interpolations: (i) linear interpolation in pixel space $x_{interp}=0.5x_A+0.5x_B$; (ii) linear interpolation in latent space $z_{interp}=0.5z_A+0.5z_B$, decoded via $G(z_{interp})$. Which interpolation is more likely to produce a natural-looking image? Explain. (2 points)",
           "answer": "**Latent space interpolation (ii) is more likely to produce a natural-looking image (1 point).** According to the manifold hypothesis, natural images lie on a low-dimensional manifold embedded in high-dimensional pixel space. Interpolating directly in pixel space moves through regions off this manifold, producing unnatural results. Latent space interpolation stays on the manifold, since the latent space was learned to parameterize it, and thus produces semantically meaningful intermediate images **(1 point)**.",
           "tags": [
             "Manifold",
@@ -68,7 +68,7 @@
           "sources": [
             "SS25 P8.2"
           ],
-          "q": "Problem 8 (Foundation Models in Computer Vision, 8 points).\n\n2. (2 points) Suppose you train two autoencoders with encoders $E$ for an image reconstruction task. Autoencoder A is trained on cartoon images of dogs with latent dimension $k_A$. Autoencoder B is trained on natural photographs of dogs with latent dimension $k_B$. Assume both autoencoders achieve similar reconstruction quality on their own train sets. Under the manifold hypothesis, is $k_A$ likely smaller than, equal to, or greater than $k_B$? Justify your answer.",
+          "q": "2. Suppose you train two autoencoders with encoders $E$ for an image reconstruction task. Autoencoder A is trained on cartoon images of dogs with latent dimension $k_A$. Autoencoder B is trained on natural photographs of dogs with latent dimension $k_B$. Assume both autoencoders achieve similar reconstruction quality on their own train sets. Under the manifold hypothesis, is $k_A$ likely smaller than, equal to, or greater than $k_B$? Justify your answer. (2 points)",
           "answer": "Under the manifold hypothesis, data lies on a lower-dimensional manifold inside the high-dimensional input space. **Cartoon images are usually simpler and more uniform**, with fewer textures, colors, and variations, so they can be represented with fewer features. Natural photographs have higher-frequency details and require more features. Therefore **$k_A$ is likely smaller than $k_B$**.",
           "tags": [
             "Manifold",

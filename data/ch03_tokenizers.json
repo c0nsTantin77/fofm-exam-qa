@@ -16,7 +16,7 @@
             "SS24 P2.1",
             "WS26 P2.1"
           ],
-          "q": "Problem 2 (Tokenization, 4 points). Consider the Byte Pair Encoding (BPE) tokenizer discussed in class, with unicode characters as the initial vocabulary. After pretokenization on a text corpus, we obtain the following word frequency list:\n\n$(\"pek\", 3), (\"pep\", 3), (\"eck\", 4), (\"eco\", 4)$\n\n1. (2 points) Apply the first two training iterations of BPE to the word frequency list above and state the updated vocabulary at each iteration.",
+          "q": "Consider the Byte Pair Encoding (BPE) tokenizer discussed in class, with unicode characters as the initial vocabulary. After pretokenization on a text corpus, we obtain the following word frequency list:\n\n$(\"pek\", 3), (\"pep\", 3), (\"eck\", 4), (\"eco\", 4)$\n\n1. Apply the first two training iterations of BPE to the word frequency list above and state the updated vocabulary at each iteration. (2 points)",
           "answer": "**The initial vocabulary is:**\n\n$[c,e,k,o,p]$\n\n**Iteration 1:** The most frequent pair is **$e+c$**, appearing in $eck(4)+eco(4)=8$ times. Merging **$e+c\\to ec$**, we get the updated vocabulary: **$[c,e,k,o,p,ec]$ (1 point)**.\n\n**Iteration 2:** The most frequent pair is now **$p+e$**, appearing in $pek(3)+pep(3)=6$ times. Merging **$p+e\\to pe$**, we get updated vocabulary: **$[c,e,k,o,p,ec,pe]$ (1 point)**.",
           "extend": "Memory: count pairs with word frequencies. WS26 merges $e+c$ then $p+e$. SS24 variant on \"aabbaacaaba\" merges $aa\\to X$, then $Xb\\to Z$, vocabulary size 5.",
           "tags": [
@@ -30,7 +30,7 @@
           "sources": [
             "WS26 P2.2"
           ],
-          "q": "Problem 2 (Tokenization, 4 points). Using the tokenizer learned above:\n\n2. (2 points) Tokenize the word `pecs`.",
+          "q": "Using the tokenizer learned above:\n\n2. Tokenize the word `pecs`. (2 points)",
           "answer": "Split `pecs` into base characters:\n\n`p e c s`\n\nThe character **`s` is not in the base vocabulary**, so we replace it by **`<unk>` (1 point)**:\n\n`p e c <unk>`\n\nApplying the learned merge rules in order **(1 point)**:\n\n**Iteration 1 ($e+c\\to ec$):** `p ec <unk>`\n\n**Iteration 2 ($p+e\\to pe$):** `p` and `e` are no longer adjacent, skip.\n\nFinal tokenization: **`[p, ec, <unk>]`**. If the merge rules were applied in the wrong order, iteration 2 before iteration 1, we would get the incorrect result `[pe, c, <unk>]`.",
           "extend": "Memory: BPE inference applies learned merges in training order. Do not greedily apply a later merge first.",
           "tags": [
@@ -44,7 +44,7 @@
           "sources": [
             "SS24 P2.2"
           ],
-          "q": "Problem 2 (Tokenizers, 8 points).\n\n2. (1 point) How is the number of training iterations of a BPE tokenizer determined in practice?",
+          "q": "2. How is the number of training iterations of a BPE tokenizer determined in practice? (1 point)",
           "answer": "In practice, **the vocabulary size is set before training** the BPE tokenizer. Training runs until **the desired vocabulary size is reached (1 point)**.",
           "tags": [
             "Vocabulary size",
@@ -65,7 +65,7 @@
           "sources": [
             "SS25 P1.1"
           ],
-          "q": "Problem 1 (Tokenizers, 3 points). Tokenizers convert raw text into sequences of integer IDs, for example by repeatedly merging the most frequent pairs of symbols, as in the byte pair encoding tokenizer discussed in class.\n\n1. (1 point) Why can using a different tokenizer at inference time than the one used during pretraining lead to poor performance in a language model?",
+          "q": "Tokenizers convert raw text into sequences of integer IDs, for example by repeatedly merging the most frequent pairs of symbols, as in the byte pair encoding tokenizer discussed in class.\n\n1. Why can using a different tokenizer at inference time than the one used during pretraining lead to poor performance in a language model? (1 point)",
           "answer": "**The input embedding matrix of a pretrained model is tied to the tokenizer it was trained with (1 point).** Each token ID corresponds to a specific row in the embedding matrix. Using a different tokenizer will produce different token IDs, which will not align with the embedding matrix and can lead to poor performance. To use a different tokenizer, one would need to retrain the model from scratch or adapt the embedding layer, for example by using adapters.",
           "tags": [
             "Tokenizer",
@@ -81,7 +81,7 @@
             "SS24 P2.3",
             "SS25 P1.2"
           ],
-          "q": "Problem 1 (Tokenizers, 3 points).\n\n2. (2 point) You are given an English input text and train two tokenizers. Tokenizer A is trained on the text after applying pre-tokenization. Tokenizer B is trained directly on the raw text, without any pre-tokenization. In both cases, you apply byte pair encoding until no pair of symbols occurs more than once. Which tokenizer will likely produce a larger vocabulary, and why?",
+          "q": "2. You are given an English input text and train two tokenizers. Tokenizer A is trained on the text after applying pre-tokenization. Tokenizer B is trained directly on the raw text, without any pre-tokenization. In both cases, you apply byte pair encoding until no pair of symbols occurs more than once. Which tokenizer will likely produce a larger vocabulary, and why? (2 points)",
           "answer": "**Tokenizer B will likely produce a larger vocabulary (1 point).** This is because in Tokenizer A, byte pair encoding is applied only within each pre-token, e.g. within each word, not across pre-token boundaries. Tokenizer B works on raw text, so BPE can merge characters across any boundary, including punctuation. For example, different variants of the same word with punctuation, like `dog.`, `dog!`, and `dog?`, are treated as separate patterns, and if they occur frequently, are added as different tokens in the vocabulary **(1 point)**.",
           "tags": [
             "Pretokenization",
@@ -97,7 +97,7 @@
             "SS24 P2.4",
             "WS26 P2.3"
           ],
-          "q": "Problem 2 (Tokenizers, 8 points).\n\n4. (2 points) Tokenizer A is trained on natural language text, and tokenizer B on programming code. Both tokenizers are used to tokenize the same programming code. Which tokenizer will produce a shorter sequence of tokens and why?",
+          "q": "4. Tokenizer A is trained on natural language text, and tokenizer B on programming code. Both tokenizers are used to tokenize the same programming code. Which tokenizer will produce a shorter sequence of tokens and why? (2 points)",
           "answer": "**The tokenizer trained specifically on programming code will produce a shorter sequence of tokens (1 point).** This is because the code-specific tokenizer can tokenize common code patterns, keywords, and structures more efficiently. It can represent these elements as single tokens, whereas a tokenizer trained on natural language text might break them down into multiple subwords or characters, resulting in longer sequences **(1 point)**. Just mentioning that training and applying to the same data is more efficient is not an argument.",
           "tags": [
             "Tokenizer",

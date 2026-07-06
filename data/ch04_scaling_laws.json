@@ -15,7 +15,7 @@
           "sources": [
             "WS26 P4.1"
           ],
-          "q": "Problem 4 (Scaling Laws, 6 points). Consider the parametric scaling law for the test loss of a language model with $N$ non-embedding parameters trained on $D$ tokens:\n\n$$L(N,D)=E+\\frac{A}{N^\\alpha}+\\frac{B}{D^\\beta},$$\n\nwhere $E,A,B,\\alpha,\\beta$ are constants and the training compute is approximated by $C=6ND$ FLOPs.\n\n1. (4 points) To account for inference cost, we minimize the objective $L(N,D)+\\lambda N$ subject to $C=6ND$, where $C$ is a fixed compute budget and $\\lambda\\ge0$ controls the weight on inference cost. For the special case $\\alpha=\\beta=1$, derive the optimal $N^*$ and explain how it changes as $\\lambda$ increases.",
+          "q": "Consider the parametric scaling law for the test loss of a language model with $N$ non-embedding parameters trained on $D$ tokens:\n\n$$L(N,D)=E+\\frac{A}{N^\\alpha}+\\frac{B}{D^\\beta},$$\n\nwhere $E,A,B,\\alpha,\\beta$ are constants and the training compute is approximated by $C=6ND$ FLOPs.\n\n1. To account for inference cost, we minimize the objective $L(N,D)+\\lambda N$ subject to $C=6ND$, where $C$ is a fixed compute budget and $\\lambda\\ge0$ controls the weight on inference cost. For the special case $\\alpha=\\beta=1$, derive the optimal $N^*$ and explain how it changes as $\\lambda$ increases. (4 points)",
           "answer": "Substituting $D=C/(6N)$ into the objective gives **(1 point)**:\n\n$$E+\\frac{A}{N}+\\frac{6BN}{C}+\\lambda N.$$\n\nDifferentiating with respect to $N$ and setting to zero **(1 point)**:\n\n$$-\\frac{A}{N^2}+\\frac{6B}{C}+\\lambda=0.$$\n\nSolving for $N^*$ **(1 point)**:\n\n$$\\mathbf{N^*=\\sqrt{\\frac{A}{6B/C+\\lambda}}}.$$\n\nAs $\\lambda$ increases, **$N^*$ decreases**, meaning the optimal model is smaller and trained on more tokens. This is the overtraining regime, where a smaller model is preferred to reduce inference cost **(1 point)**.",
           "extend": "Memory: substitute the compute constraint first; inference penalty adds $+\\lambda N$, so larger $\\lambda$ pushes optimal model size down.",
           "tags": [
@@ -30,7 +30,7 @@
           "sources": [
             "SS24 P7.1"
           ],
-          "q": "Problem 7 (Scaling Laws, 7 points). We trained a GPT model with 1B parameters on 5B, 10B, and 20B tokens on a dataset sourced from Common Crawl, and computed the perplexity of each dataset on C4.\n\n1. (5 points) How can you predict the performance of the model on 200B tokens, based on that data? Detail exactly how you would compute your prediction, so that you could compute your prediction with a computer.",
+          "q": "We trained a GPT model with 1B parameters on 5B, 10B, and 20B tokens on a dataset sourced from Common Crawl, and computed the perplexity of each dataset on C4.\n\n1. How can you predict the performance of the model on 200B tokens, based on that data? Detail exactly how you would compute your prediction, so that you could compute your prediction with a computer. (5 points)",
           "answer": "**(a) Model selection:** Assume a parametric form for the relationship between perplexity $P$ and number of training tokens $D$, for example\n\n$$P(D)=E+A\\cdot D^{-\\alpha},$$\n\nwhere $E,A,\\alpha$ are parameters to be estimated.\n\n**(b) Choose a loss function:** Select a loss measuring the difference between observed perplexities and predicted perplexities.\n\n**(c) Define the optimization problem:** Minimize the chosen loss over the measured data points at 5B, 10B, and 20B tokens.\n\n**(d) Optimize the parameters:** Use an optimization procedure such as **L-BFGS** to estimate $E,A,\\alpha$.\n\n**(e) Predict at 200B:** Use the fitted model to predict\n\n$$P(200B)=E+A\\cdot(200B)^{-\\alpha}.$$",
           "extend": "Memory: fit a parametric scaling curve on small runs, then extrapolate. The answer must be algorithmic enough to implement.",
           "tags": [
@@ -52,7 +52,7 @@
           "sources": [
             "SS25 P7.1"
           ],
-          "q": "Problem 7 (Scaling Laws, 5 points). Suppose you have determined the compute-optimal model size $N^*$ and dataset size $D^*$ for a compute budget $C$, using scaling laws derived from smaller-scale language model experiments.\n\n1. (4 points) Now you are given twice the amount of compute, $2C$. By what multiplicative factors should you scale $N^*$ and $D^*$ to remain compute-optimal? Justify your answer. Hint: You may use the parametric form of the loss or make reasonable assumptions.",
+          "q": "Suppose you have determined the compute-optimal model size $N^*$ and dataset size $D^*$ for a compute budget $C$, using scaling laws derived from smaller-scale language model experiments.\n\n1. Now you are given twice the amount of compute, $2C$. By what multiplicative factors should you scale $N^*$ and $D^*$ to remain compute-optimal? Justify your answer. Hint: You may use the parametric form of the loss or make reasonable assumptions. (4 points)",
           "answer": "Short solution from the exam: assume the empirical relationship **$D^*=20N^*$ (1 point)** and the compute estimate **$C=6N^*D^*$ (1 point)**. Then\n\n$$C=6N^*\\cdot20N^*=120(N^*)^2,$$\n\nso\n\n$$N^*=\\sqrt{\\frac{C}{120}},\\qquad D^*=20N^*.$$\n\nIf the compute budget is doubled, $C'=2C$, then\n\n$$N'^*=\\sqrt{\\frac{2C}{120}}=\\sqrt2\\,N^*,\\qquad D'^*=20N'^*=\\sqrt2\\,D^*.$$\n\nTherefore **both the optimal model size and optimal dataset size should be scaled by $\\sqrt2$ (2 points)**.",
           "extend": "Memory: with Chinchilla-style $D^*\\propto N^*$ and $C\\propto ND$, doubling compute multiplies both by $\\sqrt2$.",
           "tags": [
@@ -68,7 +68,7 @@
             "SS25 P7.2",
             "WS26 P4.1"
           ],
-          "q": "Problem 7 (Scaling Laws, 5 points).\n\n2. (1 point) Why is it in practice common not to train compute-optimal models?",
+          "q": "2. Why is it in practice common not to train compute-optimal models? (1 point)",
           "answer": "**Smaller models are often overtrained in practice to reduce inference compute (1 point).** Compute-optimal training minimizes training loss for a training compute budget, but deployment cost can make a smaller model trained on more tokens preferable.",
           "tags": [
             "Overtraining",
@@ -83,7 +83,7 @@
             "WS26 P4.2",
             "SS24 P7.2"
           ],
-          "q": "Problem 4 (Scaling Laws, 6 points). Figure 1 shows a log-log plot of test loss vs. non-embedding parameters for models trained on WebText2 and evaluated on WebText2, Internet Books, Books, Wikipedia, and Common Crawl.\n\n2. (2 points) Assume the loss for dataset $i$ follows $L_i(N)=E_i+A_i/N^{\\alpha_i}$. What does Figure 1 imply about $\\alpha_i$ across datasets, and what does this suggest about using a small model, e.g. $N=10^4$, to identify the best training dataset for a given target evaluation at larger scales?",
+          "q": "Figure 1 shows a log-log plot of test loss vs. non-embedding parameters for models trained on WebText2 and evaluated on WebText2, Internet Books, Books, Wikipedia, and Common Crawl.\n\n2. Assume the loss for dataset $i$ follows $L_i(N)=E_i+A_i/N^{\\alpha_i}$. What does Figure 1 imply about $\\alpha_i$ across datasets, and what does this suggest about using a small model, e.g. $N=10^4$, to identify the best training dataset for a given target evaluation at larger scales? (2 points)",
           "answer": "The curves are approximately parallel in the log-log plot, which implies that **$\\alpha_i$ is the same across all datasets (1 point)**. Therefore the relative ranking of datasets is preserved across model sizes, and **a single small-scale experiment, e.g. $N=10^4$, is sufficient to identify the best training dataset for a given target evaluation at larger scales (1 point)**.",
           "extend": "Memory: parallel log-log curves imply similar scaling exponents; small-scale ranking transfers to larger scale.",
           "tags": [
@@ -104,7 +104,7 @@
           "sources": [
             "Tutorial: Scaling Laws Q1"
           ],
-          "q": "Problem 1 (Scaling laws in the over-trained regime). The lecture risk model is\n\n$$L(N,D)=E+\\frac{A}{N^\\alpha}+\\frac{B}{D^\\beta}.$$\n\nDefine compute $C=6ND$ and token multiplier $M=D/N$. Under $\\alpha=\\beta$, reparameterize the risk in terms of $C$ and $M$, and explain the parallel-lines phenomenon in a log-log plot.",
+          "q": "Scaling laws in the over-trained regime. The lecture risk model is\n\n$$L(N,D)=E+\\frac{A}{N^\\alpha}+\\frac{B}{D^\\beta}.$$\n\nDefine compute $C=6ND$ and token multiplier $M=D/N$. Under $\\alpha=\\beta$, reparameterize the risk in terms of $C$ and $M$, and explain the parallel-lines phenomenon in a log-log plot.",
           "answer": "From $M=D/N$, $D=NM$. With $C=6ND$,\n\n$$N=\\sqrt{\\frac{C}{6M}},\\qquad D=\\sqrt{\\frac{CM}{6}}.$$\n\nSubstituting and using $\\alpha=\\beta$ gives\n\n$$L(C,M)=E+\\left(aM^{\\alpha/2}+bM^{-\\alpha/2}\\right)C^{-\\alpha/2}.$$\n\nThe exponent of $C$ is **the same for all $M$**, so the log-log slope is shared. The $M$ term changes only the intercept, producing **parallel lines**.",
           "extend": "Memory: $M$ changes intercept, not compute slope.",
           "tags": [
@@ -118,7 +118,7 @@
           "sources": [
             "Tutorial: Scaling Laws Q2"
           ],
-          "q": "Problem 1 continuation. How would you test whether larger over-trained model performance can be predicted from the reparameterized scaling law?",
+          "q": "Continuation. How would you test whether larger over-trained model performance can be predicted from the reparameterized scaling law?",
           "answer": "Run small-scale sweeps over $N$ and $D$, convert results to **$(C,M,L)$**, and identify the compute-optimal multiplier $M^*$. Fit the scaling-law parameters **$E,a,b,\\alpha_C$** using runs across multiple token multipliers.\n\nThen predict losses for larger models with **$M>M^*$**, train those larger over-trained models, and compare actual validation/test loss to the prediction.",
           "extend": "Memory: fit on small runs across multiple token multipliers, validate on larger over-trained runs.",
           "tags": [

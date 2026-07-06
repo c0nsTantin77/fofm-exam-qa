@@ -16,7 +16,7 @@
             "SS25 P3.1",
             "WS26 P3.1"
           ],
-          "q": "Problem 3 (Pre-training data and Evaluation of LLMs, 5 points).\n\n1. (3 points) Assume you have access to a large-scale raw dataset, e.g. Common Crawl, and a smaller high-quality dataset, e.g. Wikipedia. What are three data curation strategies discussed in class that are commonly used to curate the pretraining data?",
+          "q": "1. Assume you have access to a large-scale raw dataset, e.g. Common Crawl, and a smaller high-quality dataset, e.g. Wikipedia. What are three data curation strategies discussed in class that are commonly used to curate the pretraining data? (3 points)",
           "answer": "**Any three of the following:**\n\n**Heuristic-based filtering**\n\n**Deduplication**\n\n**Mixing and weighting data sources**\n\n**Machine learning-based quality filtering**\n\n**Rewriting low-quality data with LLMs**",
           "extend": "Memory: this is a list question. Give three concrete strategy names; do not answer only \"clean the data\".",
           "tags": [
@@ -31,7 +31,7 @@
           "sources": [
             "WS26 P3.1"
           ],
-          "q": "Problem 3 (Pre-training data and Evaluation of LLMs, 6 points).\n\n1. (3 points) Assume you have large-scale web data, e.g. Common Crawl, and your goal is to perform well on scientific Q&A. You have a representative dataset of 100k scientific Q&A pairs. Describe in 1-3 sentences how to filter Common Crawl to curate suitable pretraining data.",
+          "q": "1. Assume you have large-scale web data, e.g. Common Crawl, and your goal is to perform well on scientific Q&A. You have a representative dataset of 100k scientific Q&A pairs. Describe in 1-3 sentences how to filter Common Crawl to curate suitable pretraining data. (3 points)",
           "answer": "We use **ML-based quality filtering**, treating the 100k scientific Q&A pairs as **high-quality positive data** and sampling documents from Common Crawl as **low-quality or negative data (1 point)**. Since Common Crawl is much larger than the scientific dataset, we sample from Common Crawl so that **the number of positive and negative examples is roughly balanced (1 point)**. We then train a **binary classifier** on this labeled data to predict domain relevance and use it to filter Common Crawl, keeping only documents suitable for scientific Q&A pretraining **(1 point)**.",
           "extend": "Memory: positives = representative scientific Q&A; negatives = sampled Common Crawl; train classifier; filter Common Crawl.",
           "tags": [
@@ -55,7 +55,7 @@
             "SS25 P3.2",
             "WS26 P3.2"
           ],
-          "q": "Problem 3 (Pre-training data and Evaluation of LLMs, 5 points).\n\n2. (2 points) Show that minimizing the perplexity of an autoregressive language model on a sequence consisting of $N$ tokens $t_1,\\ldots,t_N$ is equivalent to maximizing the log-probability that the model assigns to the sequence.",
+          "q": "2. Show that minimizing the perplexity of an autoregressive language model on a sequence consisting of $N$ tokens $t_1,\\ldots,t_N$ is equivalent to maximizing the log-probability that the model assigns to the sequence. (2 points)",
           "answer": "The perplexity of a model on a sequence is\n\n$$\\exp\\!\\left(-\\frac{1}{N}\\sum_{i=1}^N \\log p_\\theta(t_i)\\right),$$\n\nwhere $p_\\theta(t_i)=p_\\theta(t_i\\mid t_1,\\ldots,t_{i-1})$ is the model's probability of token $t_i$ given preceding tokens **(1 point)**.\n\nBy the chain rule,\n\n$$p_\\theta(t_1,\\ldots,t_N)=\\prod_{i=1}^N p_\\theta(t_i\\mid t_1,\\ldots,t_{i-1}),$$\n\nso\n\n$$\\log p_\\theta(t_1,\\ldots,t_N)=\\sum_{i=1}^N \\log p_\\theta(t_i\\mid t_1,\\ldots,t_{i-1})\\quad\\mathbf{(1\\ point)}.$$\n\nBecause the exponential and the factor $-1/N$ are monotonic transformations of the negative log-probability, **minimizing perplexity is equivalent to maximizing sequence log-probability**.",
           "extend": "Memory: PPL is exp(average negative log-likelihood). Chain rule turns sequence probability into the sum over next-token log-probs.",
           "tags": [
@@ -70,7 +70,7 @@
           "sources": [
             "WS26 P3.2"
           ],
-          "q": "Problem 3 (Pre-training data and Evaluation of LLMs, 6 points).\n\n2. (3 point) Define perplexity of a next-token distribution. What is the maximum possible perplexity for a vocabulary of size 10, and when is it attained?",
+          "q": "2. Define perplexity of a next-token distribution. What is the maximum possible perplexity for a vocabulary of size 10, and when is it attained? (3 points)",
           "answer": "The perplexity of a language model on a sequence of $N$ tokens $t_1,\\ldots,t_N$ is defined as **(1 point)**\n\n$$\\operatorname{perplexity}=\\exp\\!\\left(-\\frac{1}{N}\\sum_{i=1}^N \\ln P(t_i)\\right),$$\n\nwhere $P(t_i)$ is the probability assigned to the $i$-th token by the model. Perplexity is maximized when **the distribution is uniform**, i.e. $P(t_i)=1/v$ **(1 point)**. For $v=10$,\n\n$$\\operatorname{perplexity}_{max}=\\exp\\!\\left(-\\frac{1}{N}\\sum_{i=1}^N\\ln\\frac{1}{10}\\right)=\\exp(\\ln 10)=\\mathbf{10}\\quad\\mathbf{(1\\ point)}.$$",
           "extend": "Memory: maximum uncertainty over 10 tokens = uniform distribution = perplexity 10.",
           "tags": [
@@ -84,7 +84,7 @@
           "sources": [
             "SS24 P3.1"
           ],
-          "q": "Problem 3 (Evaluation and Prompting, 4 points). The evaluation of pretrained LLMs is tricky, and results may vary according to the chosen evaluation method.\n\n1. (2 points) Explain two methods used to evaluate the performance of a pretrained LLM without finetuning.",
+          "q": "The evaluation of pretrained LLMs is tricky, and results may vary according to the chosen evaluation method.\n\n1. Explain two methods used to evaluate the performance of a pretrained LLM without finetuning. (2 points)",
           "answer": "**Any two from:**\n\n**Perplexity:** measures how well a language model predicts a sample. It is the exponent of the average negative log-likelihood of the test set. Lower perplexity indicates better performance **(1 point)**.\n\n**Human evaluation:** human annotators assess model output based on criteria such as coherence and relevance. This is subjective and expensive, but it is a good measure of LLM performance **(1 point)**.\n\n**Few-shot prompting on a benchmark:** the model is evaluated on a specific benchmark dataset using few-shot prompting, where it is given a few examples in the prompt before being tested on new instances **(1 point)**.",
           "extend": "Memory: no finetuning means no weight updates. Mention perplexity, human eval, or few-shot benchmark prompting.",
           "tags": [

@@ -16,7 +16,7 @@
             "SS24 P8.3",
             "WS26 P8.4"
           ],
-          "q": "Problem 8 (Foundation Models in Computer Vision, 8 points).\n\n4. (2 points) Let $x$ denote an input image and $\\theta$ the model parameters. Write down the data likelihood $p_\\theta(x)$ for a variational autoencoder. Explain what each term represents and why this objective cannot be optimized directly.",
+          "q": "4. Let $x$ denote an input image and $\\theta$ the model parameters. Write down the data likelihood $p_\\theta(x)$ for a variational autoencoder. Explain what each term represents and why this objective cannot be optimized directly. (2 points)",
           "answer": "The data likelihood is **(0.5 points)**\n\n$$p_\\theta(x)=\\int p_\\theta(z)p_\\theta(x\\mid z)\\,dz.$$\n\nHere **$p_\\theta(z)$ is the prior over the latent vector $z$**, modeled as a multivariate Gaussian $N(0,I)$ **(0.5 points)**, and **$p_\\theta(x\\mid z)$ is the conditional likelihood of the data given latent vector $z$**, represented by a decoder neural network **(0.5 points)**. The integral is **intractable**, because it requires integrating over the entire high-dimensional latent space **(0.5 points)**.",
           "tags": [
             "VAE",
@@ -31,7 +31,7 @@
           "sources": [
             "SS24 P8.3"
           ],
-          "q": "Problem 8 (Foundation Models in Computer Vision, 5 points).\n\n3. (2 points) Why are standard autoencoders not used for image generation? Describe the image-generating process in variational autoencoders.",
+          "q": "3. Why are standard autoencoders not used for image generation? Describe the image-generating process in variational autoencoders. (2 points)",
           "answer": "**Standard autoencoders use deterministic mappings** from input space $x$ to latent space $z$ and back. Once trained, the encoder-decoder pair can reconstruct inputs similar to the training data but cannot generate new diverse samples. **It is not possible to sample from the latent space since it is not known.**\n\nUsing variational autoencoders, **we sample from the latent space with the prior distribution $p_\\theta(z)$**. The generated image is then a sample taken from **$p_\\theta(x\\mid z)$**.",
           "tags": [
             "Autoencoder",
@@ -53,7 +53,7 @@
           "sources": [
             "SS25 P8.3"
           ],
-          "q": "Problem 8 (Foundation Models in Computer Vision, 8 points). Assume you are given a dataset $D=\\{x^{(i)}\\}_{i=1}^N$ and train a variational autoencoder using the ELBO\n\n$$L(\\theta,\\phi;x^{(i)})=\\mathbb{E}_{z\\sim q_\\phi(z\\mid x^{(i)})}[\\log p_\\theta(x^{(i)}\\mid z)]-D_{KL}(q_\\phi(z\\mid x^{(i)})\\,\\|\\,p(z)).$$\n\n(a) (2 points) Explain why the expectation in the ELBO is generally intractable, and how it is approximated during training.",
+          "q": "Assume you are given a dataset $D=\\{x^{(i)}\\}_{i=1}^N$ and train a variational autoencoder using the ELBO\n\n$$L(\\theta,\\phi;x^{(i)})=\\mathbb{E}_{z\\sim q_\\phi(z\\mid x^{(i)})}[\\log p_\\theta(x^{(i)}\\mid z)]-D_{KL}(q_\\phi(z\\mid x^{(i)})\\,\\|\\,p(z)).$$\n\n(a) Explain why the expectation in the ELBO is generally intractable, and how it is approximated during training. (2 points)",
           "answer": "The expectation\n\n$$\\mathbb{E}_{z\\sim q_\\phi(z\\mid x^{(i)})}[\\log p_\\theta(x^{(i)}\\mid z)]$$\n\nis intractable because it involves **marginalizing over all possible latent vectors $z$**, which would require evaluating the decoder over the entire latent space **(1 point)**. During training, the expectation is approximated using **Monte Carlo sampling** by drawing samples of $z$ from $q_\\phi(z\\mid x^{(i)})$ **(1 point)**.",
           "tags": [
             "ELBO",
@@ -68,7 +68,7 @@
           "sources": [
             "SS25 P8.3"
           ],
-          "q": "Problem 8 (Foundation Models in Computer Vision, 8 points).\n\n(b) (2 points) Explain how the reparameterization trick allows backpropagation through the ELBO with respect to the encoder parameters $\\phi$.",
+          "q": "(b) Explain how the reparameterization trick allows backpropagation through the ELBO with respect to the encoder parameters $\\phi$. (2 points)",
           "answer": "The encoder $q_\\phi(z\\mid x^{(i)})$ outputs the parameters of a Gaussian distribution: **mean $\\mu_\\phi(x^{(i)})$ and standard deviation $\\sigma_\\phi(x^{(i)})$ (1 point)**. Sampling $z\\sim N(\\mu_\\phi(x^{(i)}),\\sigma_\\phi(x^{(i)})^2I)$ directly is non-differentiable with respect to $\\phi$.\n\nThe reparameterization trick samples **$\\epsilon\\sim N(0,I)$** and computes\n\n$$z=\\mu_\\phi(x^{(i)})+\\sigma_\\phi(x^{(i)})\\cdot\\epsilon,$$\n\nwhich allows differentiating the ELBO with respect to encoder parameters during the forward pass **(1 point)**.",
           "extend": "Memory: move randomness into $\\epsilon$; keep $\\mu_\\phi$ and $\\sigma_\\phi$ in a differentiable computation graph.",
           "tags": [
@@ -83,7 +83,7 @@
           "sources": [
             "WS26 P8.2"
           ],
-          "q": "Problem 8 (Foundation Models in Computer Vision, 8 points).\n\n2. (1 points) A transposed convolution, also called upconvolution, is used to increase the spatial dimensions of a feature map. Given an input feature map of size $2\\times2$, a filter of size $3\\times3$, stride 2, and padding 1, what is the spatial size of the output feature map?",
+          "q": "2. A transposed convolution, also called upconvolution, is used to increase the spatial dimensions of a feature map. Given an input feature map of size $2\\times2$, a filter of size $3\\times3$, stride 2, and padding 1, what is the spatial size of the output feature map? (1 point)",
           "answer": "**The output size is $4\\times4$ (1 point).**",
           "tags": [
             "Transposed convolution",

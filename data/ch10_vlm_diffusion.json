@@ -15,7 +15,7 @@
           "sources": [
             "SS25 P8.1"
           ],
-          "q": "Problem 8 (Foundation Models in Computer Vision, 8 points).\n\n1. (2 points) Denoising diffusion models consist of a forward process and a reverse process. Describe what each process does in one sentence.",
+          "q": "1. Denoising diffusion models consist of a forward process and a reverse process. Describe what each process does in one sentence. (2 points)",
           "answer": "**The forward diffusion process gradually adds noise to the input (1 point).**\n\n**The reverse denoising process learns to generate data by denoising (1 point).**",
           "extend": "Memory: forward = add noise; reverse = learned denoising/generation.",
           "tags": [
