@@ -46,7 +46,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): Why is the marginal likelihood $p_\\theta(x)=\\int p_\\theta(x|z)p(z)\\,dz$ usually intractable in a VAE?",
+          "q": "Why is the marginal likelihood $p_\\theta(x)=\\int p_\\theta(x|z)p(z)\\,dz$ usually intractable in a VAE?",
           "answer": "The decoder is a neural network, so the integral over all latent variables usually has no closed-form solution. The latent space may be continuous and high-dimensional, making exact integration impractical. VAEs therefore optimize a tractable lower bound, the ELBO, instead of the exact marginal likelihood.",
           "extend": "Memory: VAE likelihood is hard because it integrates the neural decoder over latent space.",
           "tags": [
@@ -61,7 +61,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): How does a VAE differ from a deterministic autoencoder at generation time?",
+          "q": "How does a VAE differ from a deterministic autoencoder at generation time?",
           "answer": "A deterministic autoencoder usually needs an encoded input to produce a reconstruction. A VAE learns a latent prior, commonly $p(z)=\\mathcal{N}(0,I)$, so generation can sample $z$ from the prior and decode it into a new data sample. This makes the latent space explicitly generative.",
           "extend": "Memory: VAE generation samples latent variables from a prior, then decodes.",
           "tags": [
@@ -127,7 +127,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): What are the reconstruction and KL terms in the VAE ELBO encouraging?",
+          "q": "What are the reconstruction and KL terms in the VAE ELBO encouraging?",
           "answer": "The reconstruction term encourages decoded samples from the approximate posterior to explain the input well. The KL term encourages the approximate posterior $q_\\phi(z|x)$ to stay close to the prior $p(z)$. Together, they balance data reconstruction against a smooth, sampleable latent space.",
           "extend": "Memory: reconstruction means fit input; KL means regularize latent distribution toward prior.",
           "tags": [
@@ -142,7 +142,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): Why does the reparameterization trick write $z=\\mu_\\phi(x)+\\sigma_\\phi(x)\\odot\\epsilon$ with $\\epsilon\\sim\\mathcal{N}(0,I)$?",
+          "q": "Why does the reparameterization trick write $z=\\mu_\\phi(x)+\\sigma_\\phi(x)\\odot\\epsilon$ with $\\epsilon\\sim\\mathcal{N}(0,I)$?",
           "answer": "This separates the random sampling from the learnable parameters. The noise $\\epsilon$ is sampled independently, while $\\mu_\\phi(x)$ and $\\sigma_\\phi(x)$ remain differentiable functions of the encoder parameters. Gradients can therefore backpropagate through $z$ into the encoder.",
           "extend": "Memory: move randomness into $\\epsilon$ so gradients flow through $\\mu$ and $\\sigma$.",
           "tags": [

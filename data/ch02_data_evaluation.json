@@ -46,7 +46,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): Why can exact deduplication alone be insufficient for cleaning web-scale pretraining data?",
+          "q": "Why can exact deduplication alone be insufficient for cleaning web-scale pretraining data?",
           "answer": "Exact deduplication only removes byte-identical or string-identical examples. Web data often contains **near-duplicates**, such as copied pages with small formatting changes, boilerplate, mirrors, or lightly edited text. These can still cause memorization, benchmark contamination, and wasted training compute.",
           "extend": "Memory: exact duplicates are easy; near-duplicates are the real web-data problem.",
           "tags": [
@@ -61,7 +61,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): Give one advantage and one risk of using a classifier to filter pretraining documents for quality.",
+          "q": "Give one advantage and one risk of using a classifier to filter pretraining documents for quality.",
           "answer": "An advantage is that a classifier can remove low-quality, spammy, unsafe, or off-domain documents at large scale. A risk is that the classifier introduces **selection bias**: it may over-filter minority domains, dialects, or unusual but useful content, and the model may inherit the filter classifier's blind spots.",
           "extend": "Memory: filtering improves average quality but can narrow the data distribution.",
           "tags": [
@@ -128,7 +128,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): Two language models are evaluated on the same tokenized test set. Model A has average negative log-likelihood $1.5$ nats/token and Model B has $2.0$ nats/token. Which model has lower perplexity, and why?",
+          "q": "Two language models are evaluated on the same tokenized test set. Model A has average negative log-likelihood $1.5$ nats/token and Model B has $2.0$ nats/token. Which model has lower perplexity, and why?",
           "answer": "Model A has lower perplexity. Perplexity is $\\exp(\\text{average NLL})$, so Model A has $e^{1.5}$ and Model B has $e^{2.0}$. Since $1.5<2.0$, **Model A assigns higher probability to the test tokens on average**.",
           "extend": "Memory: lower NLL means lower perplexity on the same tokenization.",
           "tags": [
@@ -143,7 +143,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): Why is it dangerous to compare perplexity numbers from two models if they use different tokenizers?",
+          "q": "Why is it dangerous to compare perplexity numbers from two models if they use different tokenizers?",
           "answer": "Perplexity is measured per token, but different tokenizers create different token sequences. A tokenizer with longer or shorter tokens changes the number of prediction steps and the scale of per-token likelihood. Therefore perplexity is most meaningful when models are compared on **the same data with the same tokenization** or with carefully normalized metrics.",
           "extend": "Memory: perplexity is tokenizer-dependent.",
           "tags": [
@@ -225,7 +225,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): In an MMLU-style multiple-choice evaluation, why should the answer option order sometimes be randomized during evaluation?",
+          "q": "In an MMLU-style multiple-choice evaluation, why should the answer option order sometimes be randomized during evaluation?",
           "answer": "Randomizing option order helps detect or reduce **position bias**, where a model prefers a particular letter such as A or C independent of content. If performance changes strongly under permutation, the evaluation may be measuring shortcut behavior rather than robust task knowledge.",
           "extend": "Memory: option randomization tests whether the model solves content or exploits answer-position shortcuts.",
           "tags": [
@@ -240,7 +240,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): A benchmark question can be answered correctly by matching a superficial keyword in the prompt. What kind of ablation would reveal this weakness?",
+          "q": "A benchmark question can be answered correctly by matching a superficial keyword in the prompt. What kind of ablation would reveal this weakness?",
           "answer": "One useful ablation removes or masks the superficial keyword while preserving the underlying task, or constructs counterexamples where the keyword points to the wrong answer. If model accuracy collapses or follows the keyword, the benchmark item likely suffers from **shortcut learning** rather than testing the intended capability.",
           "extend": "Memory: ablations should break the shortcut while keeping the intended skill test.",
           "tags": [

@@ -29,7 +29,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): Why does diffusion generation require multiple inference steps?",
+          "q": "Why does diffusion generation require multiple inference steps?",
           "answer": "Diffusion generation usually removes noise gradually over a sequence of denoising steps. **More denoising steps mean more inference-time compute**, but they can improve sample quality because generation follows a learned reverse process rather than producing the final image in one pass.",
           "extend": "Memory: diffusion is iterative denoising; quality/compute tradeoff depends on number of sampling steps.",
           "tags": [
@@ -43,7 +43,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): In a denoising diffusion model, what is the training target commonly predicted by the neural network, and why is this useful?",
+          "q": "In a denoising diffusion model, what is the training target commonly predicted by the neural network, and why is this useful?",
           "answer": "A common target is the noise added to the clean data at a given timestep. Predicting the noise is useful because training can sample noisy versions of real data and teach the network how to remove the corruption step by step, which defines the learned reverse denoising process.",
           "extend": "Memory: many diffusion formulations train a network to predict noise or an equivalent denoising target.",
           "tags": [
@@ -65,7 +65,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): What is the core training idea behind CLIP-style vision-language models?",
+          "q": "What is the core training idea behind CLIP-style vision-language models?",
           "answer": "CLIP-style models train an image encoder and a text encoder so that **matching image-text pairs have similar embeddings** and **mismatched pairs are far apart**, typically with a contrastive objective.",
           "extend": "Memory: image and text are embedded into the same space; matching pairs close, nonmatching pairs separated.",
           "tags": [
@@ -80,7 +80,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): Why are CLIP-style models useful for zero-shot recognition?",
+          "q": "Why are CLIP-style models useful for zero-shot recognition?",
           "answer": "Because class names or prompts can be encoded in the same embedding space as images. A model can classify an image by comparing its image embedding to text embeddings such as \"a photo of a dog\" or \"a photo of a cat\", **without training a new classifier head for those classes**.",
           "tags": [
             "CLIP",

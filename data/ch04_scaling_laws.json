@@ -45,7 +45,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): In the scaling law $L(N,D)=E+A/N^\\alpha+B/D^\\beta$, what does the irreducible term $E$ represent, and why does increasing compute not remove it?",
+          "q": "In the scaling law $L(N,D)=E+A/N^\\alpha+B/D^\\beta$, what does the irreducible term $E$ represent, and why does increasing compute not remove it?",
           "answer": "$E$ represents the asymptotic loss floor under the assumed data distribution, model family, and objective. Increasing $N$ and $D$ reduces the finite-model and finite-data terms, but it does not remove **irreducible uncertainty or mismatch** captured by $E$.",
           "extend": "Memory: $E$ is the floor; $A/N^\\alpha$ and $B/D^\\beta$ are the reducible parts.",
           "tags": [
@@ -60,7 +60,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): Why is extrapolating a fitted scaling law far beyond the observed range of $N$ and $D$ risky?",
+          "q": "Why is extrapolating a fitted scaling law far beyond the observed range of $N$ and $D$ risky?",
           "answer": "The fitted exponents and constants are empirical and may hold only in the measured regime. Far outside that range, data quality, optimization, architecture, tokenizer, or saturation effects may change. Therefore extrapolated predictions can be wrong even if the curve fits the observed experiments well.",
           "extend": "Memory: scaling laws are empirical fits, not guarantees outside the measured regime.",
           "tags": [
@@ -127,7 +127,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): Under a fixed training compute budget $C\\approx6ND$, what is the tradeoff between making $N$ larger and making $D$ larger?",
+          "q": "Under a fixed training compute budget $C\\approx6ND$, what is the tradeoff between making $N$ larger and making $D$ larger?",
           "answer": "Because $C$ is fixed, increasing $N$ forces $D$ to decrease, and increasing $D$ forces $N$ to decrease. A compute-optimal choice balances model-size error and data-limitation error; too large a model with too few tokens is undertrained, while too small a model trained on many tokens may be capacity-limited.",
           "extend": "Memory: fixed compute means model size and token count compete.",
           "tags": [
@@ -142,7 +142,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): Why can overtraining a smaller model be attractive even if it is not compute-optimal for training loss?",
+          "q": "Why can overtraining a smaller model be attractive even if it is not compute-optimal for training loss?",
           "answer": "A smaller overtrained model can be cheaper to serve at inference time because inference cost and memory usually scale with parameter count. If a model will be queried many times, reducing inference cost can matter more than achieving the lowest possible training-compute-optimal loss.",
           "extend": "Memory: Chinchilla-optimal is about training compute; deployment may care about inference cost.",
           "tags": [
@@ -206,7 +206,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): If a tutorial experiment trains several model sizes for the same number of tokens, why is that not enough to identify a compute-optimal frontier?",
+          "q": "If a tutorial experiment trains several model sizes for the same number of tokens, why is that not enough to identify a compute-optimal frontier?",
           "answer": "A compute-optimal frontier requires varying both model size and token count under comparable compute budgets. Training all models for the same token count only shows one slice of the $(N,D)$ plane. It cannot reveal whether a smaller model should receive more tokens or a larger model fewer tokens at fixed compute.",
           "extend": "Memory: compute-optimal analysis needs a grid over model size and data, not one fixed token budget.",
           "tags": [
@@ -221,7 +221,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): In an overtraining experiment, what evidence would show that additional tokens are still useful for a fixed model size?",
+          "q": "In an overtraining experiment, what evidence would show that additional tokens are still useful for a fixed model size?",
           "answer": "If validation loss continues to decrease predictably as more tokens are used, additional tokens are still useful. If the curve flattens strongly, the model may be approaching a capacity or irreducible-loss regime. The key evidence is the **validation loss trend**, not just the training loss.",
           "extend": "Memory: judge extra data by held-out loss, not memorization on training data.",
           "tags": [

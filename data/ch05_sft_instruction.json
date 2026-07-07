@@ -47,7 +47,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): What is the difference between continued pretraining and supervised instruction fine-tuning?",
+          "q": "What is the difference between continued pretraining and supervised instruction fine-tuning?",
           "answer": "Continued pretraining usually keeps the next-token prediction objective on large unlabeled or weakly structured text. Supervised instruction fine-tuning trains on prompt-response examples so the model learns to follow instructions and produce desired answer formats. The main difference is **raw text continuation versus supervised instruction-response behavior**.",
           "extend": "Memory: pretraining predicts text; SFT imitates target responses to instructions.",
           "tags": [
@@ -62,7 +62,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): Why can training only on chain-of-thought answers be risky if the deployment setting expects short final answers?",
+          "q": "Why can training only on chain-of-thought answers be risky if the deployment setting expects short final answers?",
           "answer": "The model may learn to always produce long reasoning traces even when concise answers are required. It can also overfit to the style of the rationales rather than the underlying task. A good SFT dataset should match the desired deployment behavior, including whether reasoning should be visible or hidden.",
           "extend": "Memory: SFT teaches behavior and format, not only correctness.",
           "tags": [
@@ -99,7 +99,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): What is the practical reason to use LoRA instead of full fine-tuning?",
+          "q": "What is the practical reason to use LoRA instead of full fine-tuning?",
           "answer": "**LoRA updates far fewer parameters** than full fine-tuning. This reduces GPU memory use, optimizer-state memory, checkpoint size, and storage cost while keeping the pretrained weights frozen.",
           "tags": [
             "LoRA",
@@ -156,7 +156,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): In LoRA, why is the update matrix written as a low-rank product $AB$ instead of directly training a full $d\\times d$ update?",
+          "q": "In LoRA, why is the update matrix written as a low-rank product $AB$ instead of directly training a full $d\\times d$ update?",
           "answer": "Writing the update as $AB$ constrains it to rank at most $r$, where $r\\ll d$. This drastically reduces trainable parameters from $d^2$ to about **$2dr$** for a square matrix, while still allowing the model to adapt the frozen base weights in a task-specific direction.",
           "extend": "Memory: LoRA saves trainable parameters by low-rank adaptation.",
           "tags": [
@@ -171,7 +171,7 @@
           "sources": [
             "AI-generated"
           ],
-          "q": "Supplemental practice (not a direct exam question): At inference time, how can LoRA adapters be merged into the base weight, and why is this useful?",
+          "q": "At inference time, how can LoRA adapters be merged into the base weight, and why is this useful?",
           "answer": "After training, the effective weight is $W+AB$ (possibly with a scaling factor). The product can be added into the base weight to form a single merged matrix. This is useful because inference can then use the same matrix multiplication as the base model, avoiding separate adapter operations.",
           "extend": "Memory: LoRA can be trained as adapters and served as merged weights.",
           "tags": [
